@@ -1,0 +1,10 @@
+# Variables sensibles
+terraform.tfvars
+*.p12
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
