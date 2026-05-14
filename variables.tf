@@ -25,3 +25,8 @@ variable "s3_bucket_comprobantes" {
   description = "Nombre del bucket S3 para guardar XML y RIDEs"
   type        = string
 }
+
+variable "email_alertas" {
+  description = "Email para recibir alertas de comprobantes fallidos"
+  type        = string
+}

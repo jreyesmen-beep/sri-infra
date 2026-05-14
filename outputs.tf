@@ -22,3 +22,23 @@ output "lambda_role_name" {
   description = "Nombre del rol IAM para la Lambda"
   value       = aws_iam_role.lambda_sri.name
 }
+
+output "cola_sri_url" {
+  description = "URL de la cola SQS principal"
+  value       = aws_sqs_queue.cola_sri.id
+}
+
+output "cola_sri_arn" {
+  description = "ARN de la cola SQS principal"
+  value       = aws_sqs_queue.cola_sri.arn
+}
+
+output "cola_sri_muerta_url" {
+  description = "URL de la cola muerta (DLQ)"
+  value       = aws_sqs_queue.cola_sri_muerta.id
+}
+
+output "cola_sri_muerta_arn" {
+  description = "ARN de la cola muerta (DLQ)"
+  value       = aws_sqs_queue.cola_sri_muerta.arn
+}
