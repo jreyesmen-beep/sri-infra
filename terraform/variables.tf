@@ -30,3 +30,13 @@ variable "email_alertas" {
   description = "Email para recibir alertas de comprobantes fallidos"
   type        = string
 }
+
+variable "sri_url_recepcion" {
+  description = "URL SOAP del SRI para recepcion de comprobantes"
+  type        = string
+}
+
+variable "sri_url_autorizacion" {
+  description = "URL SOAP del SRI para autorizacion de comprobantes"
+  type        = string
+}
