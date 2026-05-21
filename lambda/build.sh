@@ -2,7 +2,8 @@
 set -e
 
 echo "📦 Instalando dependencias..."
-cd lambda/facturacion
+#cd lambda/facturacion
+cd ../lambda/facturacion
 rm -rf package
 mkdir package
 
