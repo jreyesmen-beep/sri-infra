@@ -42,3 +42,18 @@ output "cola_sri_muerta_arn" {
   description = "ARN de la cola muerta (DLQ)"
   value       = aws_sqs_queue.cola_sri_muerta.arn
 }
+
+output "api_url" {
+  description = "URL base del API Gateway"
+  value       = "https://${aws_api_gateway_rest_api.sri.id}.execute-api.${var.aws_region}.amazonaws.com/${var.ambiente}"
+}
+
+output "cognito_user_pool_id" {
+  description = "ID del User Pool de Cognito"
+  value       = aws_cognito_user_pool.sri.id
+}
+
+output "cognito_client_id" {
+  description = "Client ID para el frontend"
+  value       = aws_cognito_user_pool_client.frontend.id
+}
