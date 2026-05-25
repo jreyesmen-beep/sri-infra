@@ -129,7 +129,7 @@ resource "aws_secretsmanager_secret" "certificado_p12" {
   name        = "sri/${var.ambiente}/cert5-p12"
   description = "Certificado de firma electronica SRI Ecuador"
   kms_key_id  = aws_kms_key.sri_secrets.arn
-
+  
   tags = {
     Proyecto = "facturacion-electronica"
     Ambiente = var.ambiente
