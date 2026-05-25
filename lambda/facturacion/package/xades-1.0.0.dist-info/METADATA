@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: xades
+Version: 1.0.0
+Summary: XaDES XML signature
+Home-page: http://github.com/etobella/python-xades
+Author: Enric Tobella Alomar
+Author-email: etobella@creublanca.es
+License: LGPL-3
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+License-File: LICENSE
+Requires-Dist: xmlsig
+Requires-Dist: pytz
+Provides-Extra: test
+Requires-Dist: xmlsig[test] ; extra == 'test'
+
+XaDES XML Signature created with cryptography and lxml
