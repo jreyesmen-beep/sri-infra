@@ -1,0 +1,5 @@
+aws lambda invoke \
+  --function-name facturacion-sri-certificacion \
+  --payload file://prueba-factura.json \
+  --log-type Tail \
+  response.json

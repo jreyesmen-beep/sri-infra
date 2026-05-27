@@ -1,0 +1,10 @@
+aws lambda invoke \
+  --function-name facturacion-sri-certificacion \
+  --payload file://prueba-factura.json \
+  --log-type Tail \
+  --query 'LogResult' \
+  --output text \
+  response.json | base64 --decode
+
+# Ver la respuesta
+cat response.json

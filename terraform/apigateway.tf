@@ -366,7 +366,6 @@ resource "aws_api_gateway_stage" "sri" {
   stage_name    = var.ambiente
 
   # Logs en CloudWatch
-<<<<<<< HEAD
   #access_log_destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
@@ -386,9 +385,6 @@ resource "aws_api_gateway_stage" "sri" {
     })
 
   }
-=======
-  access_log_destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
->>>>>>> 63016457d0b1b3cea0a36bd343fb498988f5c451
 
   xray_tracing_enabled = true
 
@@ -421,7 +417,6 @@ resource "aws_api_gateway_method_settings" "sri" {
     throttling_burst_limit = 50   # máx requests simultáneos
     throttling_rate_limit  = 100  # requests por segundo
   }
-<<<<<<< HEAD
 }
 
 # -------------------------------------------------
@@ -466,6 +461,4 @@ resource "aws_api_gateway_account" "sri" {
   depends_on = [
     aws_iam_role_policy_attachment.apigateway_cloudwatch
   ]
-=======
->>>>>>> 63016457d0b1b3cea0a36bd343fb498988f5c451
 }

@@ -1,0 +1,48 @@
+aws sqs send-message \
+  --queue-url https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion \
+  --message-body '{
+    "clave_acceso":        "2312202401179123456700110010010000000011234567814",
+    "ambiente":            "1",
+    "ruc":                 "1791234567001",
+    "razon_social":        "MI EMPRESA S.A.",
+    "nombre_comercial":    "MI EMPRESA",
+    "establecimiento":     "001",
+    "punto_emision":       "001",
+    "secuencial":          "000000001",
+    "dir_matriz":          "Av. Amazonas N12-34, Quito",
+    "dir_establecimiento": "Av. Amazonas N12-34, Quito",
+    "fecha_emision":       "23/12/2024",
+    "tipo_id_comprador":   "05",
+    "razon_comprador":     "CONSUMIDOR FINAL",
+    "id_comprador":        "9999999999999",
+    "total_sin_impuestos": 100.00,
+    "total_descuento":     0.00,
+    "importe_total":       115.00,
+    "impuestos": [
+      {
+        "codigo":  "2",
+        "tarifa":  "2",
+        "base":    100.00,
+        "valor":   15.00
+      }
+    ],
+    "items": [
+      {
+        "codigo":          "PROD001",
+        "descripcion":     "Producto de prueba",
+        "cantidad":        1.0,
+        "precio_unitario": 100.00,
+        "descuento":       0.00,
+        "precio_total":    100.00,
+        "impuestos": [
+          {
+            "codigo":      "2",
+            "tarifa":      "2",
+            "porcentaje":  "15",
+            "base":        100.00,
+            "valor":       15.00
+          }
+        ]
+      }
+    ]
+  }'
