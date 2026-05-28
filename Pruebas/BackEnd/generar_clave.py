@@ -45,7 +45,7 @@ clave = generar_clave_acceso(
     ambiente     = "1",
     estab        = "001",
     pto_emision  = "002",
-    secuencial   = "000000010",
+    secuencial   = "000000017",
     tipo_emision = "1"
 )
 print(f"Clave de acceso: {clave}")

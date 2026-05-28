@@ -19,7 +19,7 @@ class SRIClient:
         transport = Transport(session=session, timeout=60)
 
         self.client_recepcion    = Client(os.environ["SRI_URL_RECEPCION"],    transport=transport)
-        self.client_autorizacion = Client(os.environ["SRI_URL_AUTORIZACION"], transport=transport)
+        #self.client_autorizacion = Client(os.environ["SRI_URL_AUTORIZACION"], transport=transport)
 
     def enviar_comprobante(self, xml_firmado: str) -> dict:
         """

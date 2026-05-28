@@ -366,7 +366,7 @@ resource "aws_api_gateway_stage" "sri" {
   stage_name    = var.ambiente
 
   # Logs en CloudWatch
-  #access_log_destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
+  # access_log_destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
 
@@ -387,6 +387,9 @@ resource "aws_api_gateway_stage" "sri" {
   }
 
   xray_tracing_enabled = true
+
+  # Asegura que el rol de cuenta esté listo antes del stage
+  depends_on = [aws_api_gateway_account.sri]
 
   tags = {
     Proyecto = "facturacion-electronica"
