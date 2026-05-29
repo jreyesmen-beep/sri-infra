@@ -118,7 +118,7 @@ resource "aws_kms_key" "sri_secrets" {
 }
 
 resource "aws_kms_alias" "sri_secrets" {
-  name          = "alias/sri-s7"
+  name          = "alias/sri-s8"
   target_key_id = aws_kms_key.sri_secrets.key_id
 }
 
@@ -126,7 +126,7 @@ resource "aws_kms_alias" "sri_secrets" {
 # Secret: certificado .p12 (binario)
 # -------------------------------------------------
 resource "aws_secretsmanager_secret" "certificado_p12" {
-  name        = "sri/${var.ambiente}/cert7-p12"
+  name        = "sri/${var.ambiente}/cert8-p12"
   description = "Certificado de firma electronica SRI Ecuador"
   kms_key_id  = aws_kms_key.sri_secrets.arn
   
@@ -139,13 +139,18 @@ resource "aws_secretsmanager_secret" "certificado_p12" {
 resource "aws_secretsmanager_secret_version" "certificado_p12" {
   secret_id     = aws_secretsmanager_secret.certificado_p12.id
   secret_binary = filebase64(var.certificado_p12_path)  # Lee el .p12 local
+
+  lifecycle {
+    ignore_changes = [secret_binary]  # ← Terraform no tocará el valor
+  }
+
 }
 
 # -------------------------------------------------
 # Secret: password del certificado
 # -------------------------------------------------
 resource "aws_secretsmanager_secret" "certificado_password" {
-  name        = "sri/${var.ambiente}/cert7-password"
+  name        = "sri/${var.ambiente}/cert8-password"
   description = "Password del certificado .p12 SRI Ecuador"
   kms_key_id  = aws_kms_key.sri_secrets.arn
 

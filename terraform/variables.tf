@@ -18,7 +18,7 @@ variable "certificado_password" {
 variable "ambiente" {
   description = "certificacion o produccion"
   type        = string
-  default     = "cert7"
+  default     = "cert8"
 }
 
 variable "s3_bucket_comprobantes" {
