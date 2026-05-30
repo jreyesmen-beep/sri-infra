@@ -11,7 +11,14 @@ def obtener_secret_binario(secret_name: str) -> bytes:
 
     client = boto3.client("secretsmanager")
     response = client.get_secret_value(SecretId=secret_name)
-    valor = base64.b64decode(response["SecretBinary"])
+    # valor = base64.b64decode(response["SecretBinary"])
+
+# ✅ boto3 ya devuelve SecretBinary como bytes decodificados
+    if "SecretBinary" in response:
+        valor = response["SecretBinary"]
+    else:
+        raise ValueError(f"El secret {secret_name} no es binario")
+
     _cache[secret_name] = valor
     return valor
 
