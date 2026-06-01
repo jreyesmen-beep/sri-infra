@@ -27,6 +27,7 @@ terraform/*.tfstate
 lambda/facturacion.zip
 lambda/*.zip
 lambda/facturacion/package/*.*
+lambda/facturacion/package/
 
 # Pruebas
 ../Pruebas/Diagnostico/*.pem
@@ -36,4 +37,6 @@ Pruebas/Diagnostico/*.pem
 Pruebas/Diagnostico/*.zip
 Pruebas/Diagnostico/*.p12
 
+# sri-frontend
 node_modules
+sri-frontend/node_modules
