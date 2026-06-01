@@ -118,7 +118,7 @@ resource "aws_kms_key" "sri_secrets" {
 }
 
 resource "aws_kms_alias" "sri_secrets" {
-  name          = "alias/sri-s9"
+  name          = "alias/sri-s10"
   target_key_id = aws_kms_key.sri_secrets.key_id
 }
 
@@ -126,7 +126,7 @@ resource "aws_kms_alias" "sri_secrets" {
 # Secret: certificado .p12 (binario)
 # -------------------------------------------------
 resource "aws_secretsmanager_secret" "certificado_p12" {
-  name        = "sri/${var.ambiente}/cert9-p12"
+  name        = "sri/${var.ambiente}/cert10-p12"
   description = "Certificado de firma electronica SRI Ecuador"
   kms_key_id  = aws_kms_key.sri_secrets.arn
   
@@ -150,7 +150,7 @@ resource "aws_secretsmanager_secret_version" "certificado_p12" {
 # Secret: password del certificado
 # -------------------------------------------------
 resource "aws_secretsmanager_secret" "certificado_password" {
-  name        = "sri/${var.ambiente}/cert9-password"
+  name        = "sri/${var.ambiente}/cert10-password"
   description = "Password del certificado .p12 SRI Ecuador"
   kms_key_id  = aws_kms_key.sri_secrets.arn
 

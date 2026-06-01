@@ -47,8 +47,8 @@ resource "aws_iam_policy" "leer_secrets_sri" {
           # aws_secretsmanager_secret.certificado_p12.arn,
           # aws_secretsmanager_secret.certificado_password.arn
 # Wildcard al final cubre cualquier sufijo aleatorio que genere AWS
-          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:sri/${var.ambiente}/cert9-p12*",
-          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:sri/${var.ambiente}/cert9-password*"
+          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:sri/${var.ambiente}/cert10-p12*",
+          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:sri/${var.ambiente}/cert10-password*"
         ]
       },
       {
