@@ -1,0 +1,41 @@
+# Variables sensibles
+terraform.tfvars
+*.p12
+terraform/terraform.tfvars
+terraform/*.p12
+
+# Terraform
+.terraform/
+.terraform/providers/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+*.tfstate
+terraform/.terraform/
+terraform/.terraform/providers/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfplan
+terraform/*.tfstate
+
+# Lambda
+../lambda/facturacion.zip
+../lambda/*.zip
+../lambda/facturacion/package/*.*
+lambda/facturacion.zip
+lambda/*.zip
+lambda/facturacion/package/*.*
+lambda/facturacion/package/
+
+# Pruebas
+../Pruebas/Diagnostico/*.pem
+../Pruebas/Diagnostico/*.zip
+../Pruebas/Diagnostico/*.p12
+Pruebas/Diagnostico/*.pem
+Pruebas/Diagnostico/*.zip
+Pruebas/Diagnostico/*.p12
+
+# sri-frontend
+sri-frontend/node_modules/
