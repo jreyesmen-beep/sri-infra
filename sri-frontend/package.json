@@ -1,0 +1,21 @@
+{
+  "name": "facturacion-sri-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev":     "vite",
+    "build":   "vite build",
+    "preview": "vite preview",
+    "deploy":  "bash deploy.sh"
+  },
+  "dependencies": {
+    "react":        "^18.3.0",
+    "react-dom":    "^18.3.0",
+    "react-router-dom": "^6.23.0",
+    "amazon-cognito-identity-js": "^6.3.7",
+    "aws-amplify":  "^6.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "vite": "^5.2.0"
+  }
+}
