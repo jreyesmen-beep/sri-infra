@@ -142,6 +142,13 @@ resource "aws_api_gateway_method_response" "post_factura_200" {
   response_models = {
     "application/json" = "Empty"
   }
+
+  # ← Agregar estos headers
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+  }
 }
 
 # Respuesta 400 del método
@@ -153,6 +160,13 @@ resource "aws_api_gateway_method_response" "post_factura_400" {
 
   response_models = {
     "application/json" = "Empty"
+  }
+
+  # ← Agregar estos headers
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
   }
 }
 
@@ -259,8 +273,8 @@ resource "aws_api_gateway_model" "factura" {
       "id_comprador", "items"
     ]
     properties = {
-      clave_acceso    = { type = "string", minLength = 49, maxLength = 49 }
-      ruc             = { type = "string", minLength = 13, maxLength = 13 }
+      clave_acceso    = { type = "string" } # , minLength = 49, maxLength = 49 }
+      ruc             = { type = "string" } # , minLength = 13, maxLength = 13 }
       razon_social    = { type = "string" }
       id_comprador    = { type = "string" }
       items           = {
@@ -324,7 +338,8 @@ resource "aws_api_gateway_integration_response" "options_facturas" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
+    # "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
   depends_on = [aws_api_gateway_integration.options_facturas]

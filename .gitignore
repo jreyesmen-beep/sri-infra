@@ -38,4 +38,4 @@ Pruebas/Diagnostico/*.zip
 Pruebas/Diagnostico/*.p12
 
 # sri-frontend
-sri-frontend/node_modules/*.*
+sri-frontend/node_modules/
