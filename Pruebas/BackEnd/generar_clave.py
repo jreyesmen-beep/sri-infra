@@ -11,7 +11,7 @@ def generar_clave_acceso(
 
     clave_sin_verificador = (
         fecha + tipo_comp + ruc + ambiente +
-        estab + pto_emision + secuencial + tipo_emision
+        estab + pto_emision + secuencial + '12345678' + tipo_emision
     )
 
     # Algoritmo módulo 11
@@ -45,7 +45,7 @@ clave = generar_clave_acceso(
     ambiente     = "1",
     estab        = "001",
     pto_emision  = "002",
-    secuencial   = "000000017",
+    secuencial   = "000000021",
     tipo_emision = "1"
 )
 print(f"Clave de acceso: {clave}")

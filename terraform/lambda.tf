@@ -123,3 +123,26 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   maximum_batching_window_in_seconds = 0
   enabled                            = true
 }
+
+resource "aws_lambda_function" "api_proxy" {
+  function_name    = "api-proxy-sri-${var.ambiente}"
+  role             = aws_iam_role.lambda_sri.arn
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  runtime          = "python3.12"
+  handler          = "proxy_handler.lambda_handler"
+  timeout          = 30
+  memory_size      = 256
+
+  environment {
+    variables = {
+      SQS_COLA_URL = aws_sqs_queue.cola_sri.id
+      AMBIENTE     = var.ambiente
+    }
+  }
+
+  tags = {
+    Proyecto = "facturacion-electronica"
+    Ambiente = var.ambiente
+  }
+}

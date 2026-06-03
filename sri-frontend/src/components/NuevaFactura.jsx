@@ -145,6 +145,16 @@ export default function NuevaFactura() {
                 style       = {styles.input}
               />
             </div>
+            <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+              <label style={styles.label}>Dirección Establecimiento</label>
+              <input
+                value       = {form.dir_establecimiento}
+                onChange    = {e => setForm(f => ({ ...f, dir_establecimiento: e.target.value }))}
+                placeholder = "Av. Amazonas N12-34, Quito"
+                required
+                style       = {styles.input}
+              />
+            </div>            
           </div>
         </section>
 
@@ -284,7 +294,8 @@ function generarClaveAcceso(form, fecha) {
   const dd   = String(fecha.getDate()).padStart(2, '0')
   const mm   = String(fecha.getMonth() + 1).padStart(2, '0')
   const yyyy = fecha.getFullYear()
-  const clave = `${dd}${mm}${yyyy}01${form.ruc}1${form.establecimiento}${form.punto_emision}${form.secuencial.padStart(9,'0')}1`
+  const codigoBase = '12345678'
+  const clave = `${dd}${mm}${yyyy}01${form.ruc}1${form.establecimiento}${form.punto_emision}${form.secuencial.padStart(9,'0')}${codigoBase}1`
 
   const factores = [2, 3, 4, 5, 6, 7]
   let total = 0

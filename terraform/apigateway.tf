@@ -115,9 +115,11 @@ resource "aws_api_gateway_integration" "post_factura_sqs" {
   rest_api_id             = aws_api_gateway_rest_api.sri.id
   resource_id             = aws_api_gateway_resource.facturas.id
   http_method             = aws_api_gateway_method.post_factura.http_method
-  type                    = "AWS"
+  type                    = "AWS_PROXY"       # ← cambia a proxy
   integration_http_method = "POST"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:sqs:path/${data.aws_caller_identity.current.account_id}/${aws_sqs_queue.cola_sri.name}"
+  uri                     = aws_lambda_function.api_proxy.invoke_arn
+
+/*   uri                     = "arn:aws:apigateway:${var.aws_region}:sqs:path/${data.aws_caller_identity.current.account_id}/${aws_sqs_queue.cola_sri.name}"
   credentials             = aws_iam_role.apigateway_sqs.arn
 
   request_parameters = {
@@ -129,7 +131,16 @@ resource "aws_api_gateway_integration" "post_factura_sqs" {
     "application/json" = "Action=SendMessage&MessageBody=$util.urlEncode($input.body)"
   }
 
-  passthrough_behavior = "NEVER"
+  passthrough_behavior = "NEVER" */
+}
+
+# Permiso para que API Gateway invoque la Lambda proxy
+resource "aws_lambda_permission" "apigateway_proxy" {
+  statement_id  = "AllowAPIGatewayInvokeProxy"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api_proxy.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.sri.execution_arn}/*/*"
 }
 
 # Respuesta 200 del método
