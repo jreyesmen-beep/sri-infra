@@ -39,3 +39,5 @@ Pruebas/Diagnostico/*.p12
 
 # sri-frontend
 sri-frontend/node_modules/
+sri-frontend/.env
+sri-frontend/.env.example
