@@ -47,3 +47,7 @@ button {
 }
 
 .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
