@@ -2,14 +2,14 @@ import os
 import time
 import logging
 import requests
+from http.client import RemoteDisconnected
 from zeep import Client
 from zeep.transports import Transport
 from zeep.exceptions import TransportError
 from requests import Session
 from requests.exceptions import (
     ConnectionError,
-    Timeout,
-    RemoteDisconnected
+    Timeout
 )
 
 logger = logging.getLogger(__name__)
