@@ -61,14 +61,18 @@ export default function NuevaFactura() {
       total_descuento:     items.reduce((a, i) => a + Number(i.descuento), 0),
       importe_total:       total,
       impuestos: [{
-        codigo: '2', tarifa: '2',
-        base: subtotal, valor: iva
+        codigo: '2', 
+        tarifa: '4',                         // ← era "2", ahora "4" para IVA 15%
+        base: subtotal, 
+        valor: iva
       }],
       items: items.map(it => ({
         ...it,
         precio_total: it.cantidad * it.precio_unitario - it.descuento,
         impuestos: [{
-          codigo: '2', tarifa: '2', porcentaje: '15',
+          codigo: '2', 
+          tarifa: '4', 
+          porcentaje: 15,       // ← era "2", ahora "4" para IVA 15%
           base:  it.cantidad * it.precio_unitario - it.descuento,
           valor: (it.cantidad * it.precio_unitario - it.descuento) * 0.15
         }]

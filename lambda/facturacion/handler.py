@@ -55,6 +55,7 @@ def lambda_handler(event, context):
 
 
 def procesar_comprobante(datos: dict):
+    # logger.info(f"PAYLOAD RECIBIDO: {json.dumps(datos, ensure_ascii=False)}")
     clave_acceso = datos["clave_acceso"]
     sri = SRIClient()
 
@@ -65,6 +66,7 @@ def procesar_comprobante(datos: dict):
     # 2. Firmar XML
     logger.info("Firmando XML...")
     xml_firmado = firmar_xml(xml)
+    # logger.info(f"XML FIRMADO :\n{xml_firmado}")
 
     # 3. Guardar XML firmado en S3
     guardar_en_s3(clave_acceso, xml_firmado, "xml-firmado")

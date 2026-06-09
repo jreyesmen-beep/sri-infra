@@ -32,6 +32,11 @@ def lambda_handler(event, context):
         else:
             datos = body
 
+        logger.info(f"Encolando comprobante: {datos.get('clave_acceso', 'sin clave')}")
+        # logger.info(f"Impuestos recibidos  : {json.dumps(datos.get('impuestos', []))}")
+        # logger.info(f"Items recibidos  : {json.dumps(datos.get('items', []))}")
+
+        # El proxy SOLO encola, no transforma datos
         # Enviar a SQS
         sqs.send_message(
             QueueUrl    = COLA_URL,
@@ -45,7 +50,8 @@ def lambda_handler(event, context):
             "headers":    CORS_HEADERS,
             "body": json.dumps({
                 "estado":  "EN_PROCESO",
-                "mensaje": "Comprobante recibido y en cola de procesamiento"
+                "mensaje": "Comprobante recibido y en cola de procesamiento",
+                "clave_acceso":  datos.get("clave_acceso", "")
             })
         }
 
@@ -66,6 +72,6 @@ def lambda_handler(event, context):
             "headers":    CORS_HEADERS,
             "body": json.dumps({
                 "estado":  "ERROR",
-                "mensaje": "Error interno del servidor"
+                "mensaje": str(e)
             })
         }
