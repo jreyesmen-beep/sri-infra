@@ -18,6 +18,90 @@ AMBIENTE = os.environ["AMBIENTE"]
 COLA_URL = os.environ["SQS_COLA_URL"]
 
 def lambda_handler(event, context):
+    # ← Detectar si viene de API Gateway (GET) o de SQS
+    if "httpMethod" in event:
+        return manejar_api_gateway(event, context)
+    else:
+        return manejar_sqs(event, context)
+
+def manejar_api_gateway(event, context):
+    """Maneja requests GET desde API Gateway."""
+    CORS = {
+        "Access-Control-Allow-Origin":  "*",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+    }
+
+    try:
+        # Obtener clave de acceso del path
+        clave_acceso = event.get("pathParameters", {}).get("claveAcceso", "")
+
+        if not clave_acceso:
+            return {
+                "statusCode": 400,
+                "headers":    CORS,
+                "body": json.dumps({"estado": "ERROR", "mensaje": "Clave de acceso requerida"})
+            }
+
+        logger.info(f"Consultando estado: {clave_acceso}")
+
+        # Buscar estado en S3
+        resultado = consultar_estado_s3(clave_acceso)
+
+        return {
+            "statusCode": 200,
+            "headers":    CORS,
+            "body":       json.dumps(resultado, ensure_ascii=False)
+        }
+
+    except Exception as e:
+        logger.error(f"Error consultando estado: {str(e)}")
+        return {
+            "statusCode": 500,
+            "headers":    CORS,
+            "body": json.dumps({"estado": "ERROR", "mensaje": str(e)})
+        }    
+
+def consultar_estado_s3(clave_acceso: str) -> dict:
+    """Busca el archivo de estado en S3."""
+    from datetime import datetime
+
+    # Buscar en los últimos 7 días
+    for dias_atras in range(7):
+        fecha = datetime.now()
+        from datetime import timedelta
+        fecha = fecha - timedelta(days=dias_atras)
+        fecha_str = fecha.strftime("%Y/%m/%d")
+
+        # Buscar estado autorizado
+        key_estado = f"{AMBIENTE}/estados/{fecha_str}/{clave_acceso}.json"
+        try:
+            response = s3.get_object(Bucket=BUCKET, Key=key_estado)
+            return json.loads(response["Body"].read().decode("utf-8"))
+        except s3.exceptions.NoSuchKey:
+            pass
+        except Exception:
+            pass
+
+        # Buscar estado de error
+        key_error = f"{AMBIENTE}/errores/{fecha_str}/{clave_acceso}.json"
+        try:
+            response = s3.get_object(Bucket=BUCKET, Key=key_error)
+            return json.loads(response["Body"].read().decode("utf-8"))
+        except s3.exceptions.NoSuchKey:
+            pass
+        except Exception:
+            pass
+
+    # Si no encontró nada, puede estar en proceso
+    return {
+        "clave_acceso": clave_acceso,
+        "estado":       "EN_PROCESO",
+        "mensaje":      "El comprobante está siendo procesado"
+    }
+
+def manejar_sqs(event, context):
+    """Maneja mensajes de la cola SQS — lógica original."""
     """
     Punto de entrada. Procesa mensajes de SQS.
     Cada mensaje contiene los datos de un comprobante a emitir.
