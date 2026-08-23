@@ -57,3 +57,8 @@ output "cognito_client_id" {
   description = "Client ID para el frontend"
   value       = aws_cognito_user_pool_client.frontend.id
 }
+
+output "s3_bucket_comprobantes" {
+  description = "Comprobantes en S3"
+  value       =  aws_s3_bucket.comprobantes
+}

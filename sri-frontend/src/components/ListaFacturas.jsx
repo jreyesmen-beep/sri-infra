@@ -91,3 +91,13 @@ const styles = {
   infoLabel: { fontSize: '0.75rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 600 },
   infoValor: { fontFamily: "'DM Mono', monospace", fontSize: '0.875rem', color: '#0F1923', wordBreak: 'break-all' },
 }
+
+const ESTADOS = {
+  AUTORIZADO:        { color: '#E3F5EE', texto: '#005C3D', icono: '✓', label: 'Autorizado'            },
+  EN_PROCESO:        { color: '#EFF6FF', texto: '#1D4ED8', icono: '⏳', label: 'En proceso'            },
+  NO_ENCONTRADO:     { color: '#F8FAFC', texto: '#64748B', icono: '○', label: 'No encontrado'          },
+  SRI_NO_DISPONIBLE: { color: '#FFF7ED', texto: '#C2410C', icono: '⚠️', label: 'SRI no disponible'    },
+  SRI_RECHAZO:       { color: '#FFF5F5', texto: '#E53E3E', icono: '✕', label: 'Rechazado por el SRI'  },
+  ERROR_INTERNO:     { color: '#FFF5F5', texto: '#E53E3E', icono: '✕', label: 'Error interno'          },
+  NO_AUTORIZADO:     { color: '#FFF5F5', texto: '#E53E3E', icono: '✕', label: 'No autorizado'          },
+}

@@ -64,34 +64,121 @@ def manejar_api_gateway(event, context):
 
 def consultar_estado_s3(clave_acceso: str) -> dict:
     """Busca el archivo de estado en S3."""
-    from datetime import datetime
+    """
+    Busca el estado del comprobante en S3.
+    Estrategia: buscar en prefijos sin fecha primero,
+    luego por fecha si no encuentra.
+    """   
+    logger.info(f"Buscando en S3 clave: {clave_acceso}")
 
-    # Buscar en los últimos 7 días
-    for dias_atras in range(7):
-        fecha = datetime.now()
-        from datetime import timedelta
-        fecha = fecha - timedelta(days=dias_atras)
-        fecha_str = fecha.strftime("%Y/%m/%d")
+    # -----------------------------------------------
+    # 1. Buscar estado autorizado (sin filtrar por fecha)
+    # -----------------------------------------------
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/estados/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                logger.info(f"Estado encontrado: {obj['Key']}")
+                data = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
+                return json.loads(data["Body"].read().decode("utf-8"))
+    except Exception as e:
+        logger.error(f"Error buscando estado: {str(e)}")
 
-        # Buscar estado autorizado
-        key_estado = f"{AMBIENTE}/estados/{fecha_str}/{clave_acceso}.json"
-        try:
-            response = s3.get_object(Bucket=BUCKET, Key=key_estado)
-            return json.loads(response["Body"].read().decode("utf-8"))
-        except s3.exceptions.NoSuchKey:
-            pass
-        except Exception:
-            pass
+    # -----------------------------------------------
+    # 2. Buscar estado de error
+    # -----------------------------------------------
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/errores/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                logger.info(f"Error encontrado: {obj['Key']}")
+                data = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
+                return json.loads(data["Body"].read().decode("utf-8"))
+    except Exception as e:
+        logger.error(f"Error buscando errores: {str(e)}")
 
-        # Buscar estado de error
-        key_error = f"{AMBIENTE}/errores/{fecha_str}/{clave_acceso}.json"
-        try:
-            response = s3.get_object(Bucket=BUCKET, Key=key_error)
-            return json.loads(response["Body"].read().decode("utf-8"))
-        except s3.exceptions.NoSuchKey:
-            pass
-        except Exception:
-            pass
+    # -----------------------------------------------
+    # 3. Verificar si existe el XML autorizado en S3
+    # -----------------------------------------------
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/xml-autorizado/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                logger.info(f"XML autorizado encontrado: {obj['Key']}")
+                return {
+                    "clave_acceso": clave_acceso,
+                    "estado":       "AUTORIZADO",
+                    "mensaje":      "Comprobante autorizado por el SRI"
+                }
+    except Exception as e:
+        logger.error(f"Error buscando XML autorizado: {str(e)}")
+
+    # -----------------------------------------------
+    # 4. Verificar si existe el XML firmado (en proceso)
+    # -----------------------------------------------
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/xml-firmado/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                logger.info(f"XML firmado encontrado: {obj['Key']}")
+                return {
+                    "clave_acceso": clave_acceso,
+                    "estado":       "EN_PROCESO",
+                    "mensaje":      "El comprobante fue enviado y está siendo procesado"
+                }
+    except Exception as e:
+        logger.error(f"Error buscando XML firmado: {str(e)}")
+
+    # -----------------------------------------------
+    # 5. No existe ningún registro
+    # -----------------------------------------------
+    logger.info(f"No se encontró ningún registro para: {clave_acceso}")
+    return {
+        "clave_acceso": clave_acceso,
+        "estado":       "NO_ENCONTRADO",
+        "mensaje":      "No existe ningún comprobante con esta clave de acceso"
+    }
+
+    # from datetime import datetime
+
+    # # Buscar en los últimos 7 días
+    # for dias_atras in range(7):
+    #     fecha = datetime.now()
+    #     from datetime import timedelta
+    #     fecha = fecha - timedelta(days=dias_atras)
+    #     fecha_str = fecha.strftime("%Y/%m/%d")
+
+    #     # Buscar estado autorizado
+    #     key_estado = f"{AMBIENTE}/estados/{fecha_str}/{clave_acceso}.json"
+    #     try:
+    #         response = s3.get_object(Bucket=BUCKET, Key=key_estado)
+    #         return json.loads(response["Body"].read().decode("utf-8"))
+    #     except s3.exceptions.NoSuchKey:
+    #         pass
+    #     except Exception:
+    #         pass
+
+    #     # Buscar estado de error
+    #     key_error = f"{AMBIENTE}/errores/{fecha_str}/{clave_acceso}.json"
+    #     try:
+    #         response = s3.get_object(Bucket=BUCKET, Key=key_error)
+    #         return json.loads(response["Body"].read().decode("utf-8"))
+    #     except s3.exceptions.NoSuchKey:
+    #         pass
+    #     except Exception:
+    #         pass
 
     # Si no encontró nada, puede estar en proceso
     return {
