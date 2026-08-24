@@ -563,3 +563,70 @@ resource "aws_api_gateway_gateway_response" "cors_5xx" {
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
   }
 }
+
+# /facturas/{claveAcceso}/ride
+resource "aws_api_gateway_resource" "factura_ride" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  parent_id   = aws_api_gateway_resource.factura_detalle.id
+  path_part   = "ride"
+}
+
+resource "aws_api_gateway_method" "get_ride" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.factura_ride.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
+}
+
+resource "aws_api_gateway_integration" "get_ride_lambda" {
+  rest_api_id             = aws_api_gateway_rest_api.sri.id
+  resource_id             = aws_api_gateway_resource.factura_ride.id
+  http_method             = aws_api_gateway_method.get_ride.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.fact_sri.invoke_arn
+}
+
+# OPTIONS para CORS
+resource "aws_api_gateway_method" "options_ride" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.factura_ride.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "options_ride" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.factura_ride.id
+  http_method = aws_api_gateway_method.options_ride.http_method
+  type        = "MOCK"
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "options_ride_200" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.factura_ride.id
+  http_method = aws_api_gateway_method.options_ride.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_ride" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.factura_ride.id
+  http_method = aws_api_gateway_method.options_ride.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+  depends_on = [aws_api_gateway_integration.options_ride]
+}

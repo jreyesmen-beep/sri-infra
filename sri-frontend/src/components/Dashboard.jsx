@@ -140,5 +140,17 @@ const styles = {
     flex:       1,
     padding:    '2rem',
     maxWidth:   '960px',
-  }
+  },
+  btnRIDE: {
+    background:   '#00875A',
+    color:        '#fff',
+    border:       'none',
+    borderRadius: '8px',
+    padding:      '0.75rem 1.5rem',
+    fontWeight:   600,
+    fontSize:     '0.9rem',
+    marginTop:    '1rem',
+    width:        '100%',
+    cursor:       'pointer',
+  }  
 }

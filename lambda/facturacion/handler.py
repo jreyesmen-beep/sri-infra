@@ -32,35 +32,105 @@ def manejar_api_gateway(event, context):
         "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
     }
 
-    try:
-        # Obtener clave de acceso del path
+    http_method = event.get("httpMethod", "")
+    path        = event.get("path", "")
+
+    # GET /facturas/{claveAcceso} → consultar estado
+    if http_method == "GET" and "/facturas/" in path:
         clave_acceso = event.get("pathParameters", {}).get("claveAcceso", "")
 
-        if not clave_acceso:
+        # GET /facturas/{claveAcceso}/ride → descargar PDF
+        if path.endswith("/ride"):
+            return descargar_ride(clave_acceso, CORS)
+
+        return consultar_estado(clave_acceso, CORS)
+
+    return {
+        "statusCode": 404,
+        "headers":    CORS,
+        "body":       json.dumps({"mensaje": "Ruta no encontrada"})
+    }
+
+def descargar_ride(clave_acceso: str, cors: dict) -> dict:
+    """Genera y devuelve el RIDE en PDF."""
+    from ride_generator import generar_ride
+
+    try:
+        # Buscar datos del comprobante en S3
+        estado = consultar_estado_s3(clave_acceso)
+
+        if estado.get("estado") != "AUTORIZADO":
             return {
                 "statusCode": 400,
-                "headers":    CORS,
-                "body": json.dumps({"estado": "ERROR", "mensaje": "Clave de acceso requerida"})
+                "headers":    cors,
+                "body": json.dumps({
+                    "mensaje": "Solo se puede generar RIDE de comprobantes autorizados"
+                })
             }
 
-        logger.info(f"Consultando estado: {clave_acceso}")
+        # Buscar datos originales en S3
+        datos = _obtener_datos_originales(clave_acceso)
 
-        # Buscar estado en S3
-        resultado = consultar_estado_s3(clave_acceso)
+        # Generar PDF
+        pdf_bytes = generar_ride(
+            datos               = datos,
+            numero_autorizacion = estado.get("numero_autorizacion", ""),
+            fecha_autorizacion  = estado.get("fecha_autorizacion", "")
+        )
 
+        # Guardar en S3
+        key = f"{AMBIENTE}/rides/{clave_acceso}.pdf"
+        s3.put_object(
+            Bucket      = BUCKET,
+            Key         = key,
+            Body        = pdf_bytes,
+            ContentType = "application/pdf"
+        )
+
+        # Devolver PDF en base64
         return {
             "statusCode": 200,
-            "headers":    CORS,
-            "body":       json.dumps(resultado, ensure_ascii=False)
+            "headers": {
+                **cors,
+                "Content-Type":        "application/pdf",
+                "Content-Disposition": f'attachment; filename="factura-{clave_acceso}.pdf"'
+            },
+            "body":            base64.b64encode(pdf_bytes).decode("utf-8"),
+            "isBase64Encoded": True
         }
 
     except Exception as e:
-        logger.error(f"Error consultando estado: {str(e)}")
+        logger.error(f"Error generando RIDE: {str(e)}")
         return {
             "statusCode": 500,
-            "headers":    CORS,
-            "body": json.dumps({"estado": "ERROR", "mensaje": str(e)})
-        }    
+            "headers":    cors,
+            "body": json.dumps({"mensaje": f"Error generando RIDE: {str(e)}"})
+        }        
+
+def _obtener_datos_originales(clave_acceso: str) -> dict:
+    """Recupera los datos originales del comprobante desde S3."""
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/errores/"
+        )
+        # Buscar en estados
+        for prefix in ["estados", "errores"]:
+            resp = s3.list_objects_v2(
+                Bucket = BUCKET,
+                Prefix = f"{AMBIENTE}/{prefix}/"
+            )
+            for obj in resp.get("Contents", []):
+                if clave_acceso in obj["Key"] and obj["Key"].endswith(".json"):
+                    data = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
+                    estado = json.loads(data["Body"].read().decode("utf-8"))
+                    if "datos_originales" in estado:
+                        return estado["datos_originales"]
+    except Exception as e:
+        logger.warning(f"No se encontraron datos originales: {e}")
+
+    return {}
+
 
 def consultar_estado_s3(clave_acceso: str) -> dict:
     """Busca el archivo de estado en S3."""

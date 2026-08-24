@@ -17,6 +17,7 @@ terraform/.terraform/providers/
 terraform/.terraform.lock.hcl
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
 terraform/*.tfplan
 terraform/*.tfstate
 
@@ -39,5 +40,6 @@ Pruebas/Diagnostico/*.p12
 
 # sri-frontend
 sri-frontend/node_modules/
+sri-frontend/dist/
 sri-frontend/.env
 sri-frontend/.env.example

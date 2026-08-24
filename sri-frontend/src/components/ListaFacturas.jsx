@@ -72,9 +72,47 @@ export default function ListaFacturas() {
             )}
           </div>
         )}
+
+        {factura?.estado === "AUTORIZADO" && (
+          <button
+            onClick = {() => descargarRIDE(clave)}
+            style   = {styles.btnRIDE}
+          >
+            ⬇ Descargar RIDE (PDF)
+          </button>
+        )}
+
       </div>
     </div>
   )
+}
+
+async function descargarRIDE(claveAcceso) {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/facturas/${claveAcceso}/ride`,
+      { headers: { "Authorization": `Bearer ${getToken()}` } }
+    )
+
+    if (!response.ok) throw new Error("Error al generar el RIDE")
+
+    // Convertir base64 a blob y descargar
+    const data  = await response.json()
+    const bytes = atob(data)
+    const arr   = new Uint8Array(bytes.length)
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+
+    const blob = new Blob([arr], { type: "application/pdf" })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement("a")
+    a.href     = url
+    a.download = `factura-${claveAcceso}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+
+  } catch (err) {
+    setError(err.message)
+  }
 }
 
 const styles = {
