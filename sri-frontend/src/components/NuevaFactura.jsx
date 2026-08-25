@@ -18,6 +18,7 @@ export default function NuevaFactura() {
     tipo_id_comprador:'05',
     razon_comprador:  'CONSUMIDOR FINAL',
     id_comprador:     '9999999999999',
+    email_comprador:  '',
     dir_establecimiento: '',
   })
   const [items,   setItems]   = useState([{ ...ITEM_VACIO }])
@@ -55,6 +56,7 @@ export default function NuevaFactura() {
     const payload = {
       ...form,
       ambiente:      '1',
+      email_comprador: form.email_comprador || "",  // ← nuevo
       fecha_emision:  fechaStr,
       clave_acceso:   generarClaveAcceso(form, fecha),
       total_sin_impuestos: subtotal,
@@ -199,6 +201,19 @@ export default function NuevaFactura() {
                 style       = {styles.input}
               />
             </div>
+
+            // En el bloque de datos del comprador agrega este campo
+            <div style={styles.campo}>
+              <label style={styles.label}>Email del Comprador</label>
+              <input
+                type        = "email"
+                value       = {form.email_comprador || ""}
+                onChange    = {e => setForm(f => ({ ...f, email_comprador: e.target.value }))}
+                placeholder = "cliente@email.com"
+                style       = {styles.input}
+              />
+            </div>
+
           </div>
         </section>
 

@@ -2,11 +2,15 @@ import json
 import logging
 import os
 import boto3
-from datetime import datetime
+import base64
 
+from datetime import datetime
 from xml_builder  import construir_factura
 from firma_xml    import firmar_xml
 from sri_client   import SRIClient, SRINoDisponible, SRIRechazo, SRITimeout
+from ride_generator import generar_ride
+from ses_sender     import enviar_ride_por_email
+
 
 logger   = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -333,6 +337,41 @@ def procesar_comprobante(datos: dict):
 
     # Guardar estado final
     _guardar_estado_ok(datos, respuesta_autorizacion)
+
+    # 4. Generar RIDE
+    logger.info("Generando RIDE...")
+    pdf_bytes = generar_ride(
+        datos               = datos,
+        numero_autorizacion = respuesta_autorizacion["numero_autorizacion"],
+        fecha_autorizacion  = respuesta_autorizacion["fecha_autorizacion"]
+    )
+
+    # Guardar PDF en S3
+    key_pdf = f"{AMBIENTE}/rides/{clave_acceso}.pdf"
+    s3.put_object(
+        Bucket      = BUCKET,
+        Key         = key_pdf,
+        Body        = pdf_bytes,
+        ContentType = "application/pdf"
+    )
+    logger.info(f"RIDE guardado en S3: {key_pdf}")
+
+    # 5. Enviar por email si hay destinatario
+    email_cliente = datos.get("email_comprador", "")
+    if email_cliente:
+        logger.info(f"Enviando RIDE por email a: {email_cliente}")
+        resultado_email = enviar_ride_por_email(
+            email_destinatario  = email_cliente,
+            nombre_destinatario = datos.get("razon_comprador", "Cliente"),
+            datos_factura       = datos,
+            pdf_bytes           = pdf_bytes,
+            numero_autorizacion = respuesta_autorizacion["numero_autorizacion"],
+            fecha_autorizacion  = respuesta_autorizacion["fecha_autorizacion"]
+        )
+        logger.info(f"Resultado email: {resultado_email}")
+    else:
+        logger.info("No se proporcionó email del comprador, se omite envío")
+
 
     logger.info(f"✅ Factura autorizada: {respuesta_autorizacion['numero_autorizacion']}")
     #guardar_en_s3(clave_acceso, "AUTORIZADO", "xml-autorizado")

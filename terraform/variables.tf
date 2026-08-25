@@ -40,3 +40,13 @@ variable "sri_url_autorizacion" {
   description = "URL SOAP del SRI para autorizacion de comprobantes"
   type        = string
 }
+
+variable "email_emisor" {
+  description = "Email verificado en SES para enviar facturas"
+  type        = string
+}
+
+variable "nombre_emisor" {
+  description = "Nombre que aparece en el email"
+  type        = string
+}

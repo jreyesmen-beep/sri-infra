@@ -99,6 +99,8 @@ resource "aws_lambda_function" "facturacion_sri" {
       SQS_COLA_URL              = aws_sqs_queue.cola_sri.id
       SRI_URL_RECEPCION         = var.sri_url_recepcion
       SRI_URL_AUTORIZACION      = var.sri_url_autorizacion
+      EMAIL_EMISOR              = var.email_emisor      # ← nuevo
+      NOMBRE_EMISOR             = var.nombre_emisor     # ← nuevo      
     }
   }
 

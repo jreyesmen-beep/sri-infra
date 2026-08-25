@@ -62,3 +62,8 @@ output "s3_bucket_comprobantes" {
   description = "Comprobantes en S3"
   value       =  aws_s3_bucket.comprobantes
 }
+
+output "ses_email_emisor" {
+  description = "Email configurado para envío en SES"
+  value       = aws_ses_email_identity.emisor.email
+}

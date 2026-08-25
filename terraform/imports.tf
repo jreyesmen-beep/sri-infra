@@ -90,7 +90,7 @@ import {
 }
 
 import {
-  to = aws_lambda_function.fact_sri
+  to = aws_lambda_function.facturacion_sri
   id = "facturacion-sri-${var.ambiente}"
 }
 

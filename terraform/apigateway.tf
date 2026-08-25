@@ -585,7 +585,7 @@ resource "aws_api_gateway_integration" "get_ride_lambda" {
   http_method             = aws_api_gateway_method.get_ride.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.fact_sri.invoke_arn
+  uri                     = aws_lambda_function.facturacion_sri.invoke_arn
 }
 
 # OPTIONS para CORS
