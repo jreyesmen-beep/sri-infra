@@ -56,9 +56,9 @@ export default function NuevaFactura() {
     const payload = {
       ...form,
       ambiente:      '1',
-      email_comprador: form.email_comprador || "",  // ← nuevo
       fecha_emision:  fechaStr,
       clave_acceso:   generarClaveAcceso(form, fecha),
+      email_comprador: form.email_comprador || "",  // ← nuevo
       total_sin_impuestos: subtotal,
       total_descuento:     items.reduce((a, i) => a + Number(i.descuento), 0),
       importe_total:       total,
@@ -202,14 +202,17 @@ export default function NuevaFactura() {
               />
             </div>
 
-            // En el bloque de datos del comprador agrega este campo
-            <div style={styles.campo}>
-              <label style={styles.label}>Email del Comprador</label>
+            {/* ← Campo email agregado aquí */}
+            <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+              <label style={styles.label}>
+                Email del Comprador
+                <span style={styles.labelOpcional}> (opcional — para envío del RIDE)</span>
+              </label>
               <input
                 type        = "email"
                 value       = {form.email_comprador || ""}
                 onChange    = {e => setForm(f => ({ ...f, email_comprador: e.target.value }))}
-                placeholder = "cliente@email.com"
+                placeholder = "cliente@empresa.com"
                 style       = {styles.input}
               />
             </div>
@@ -355,4 +358,11 @@ const styles = {
   claveLabel:{ fontSize: '0.75rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 600 },
   clave:     { fontFamily: "'DM Mono', monospace", fontSize: '0.85rem', color: '#00875A', wordBreak: 'break-all' },
   btnNueva:  { background: '#00875A', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: 600 },
+  labelOpcional: {
+    fontWeight:    400,
+    color:         '#94A3B8',
+    textTransform: 'none',
+    letterSpacing: 0,
+    fontSize:      '0.7rem',
+  },  
 }
