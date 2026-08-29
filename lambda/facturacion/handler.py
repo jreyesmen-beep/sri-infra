@@ -30,30 +30,80 @@ def lambda_handler(event, context):
 
 def manejar_api_gateway(event, context):
     """Maneja requests GET desde API Gateway."""
+    """
+    Punto de entrada para requests de API Gateway.
+    SIEMPRE debe retornar el formato completo con statusCode, headers y body.
+    """    
     CORS = {
         "Access-Control-Allow-Origin":  "*",
         "Access-Control-Allow-Headers": "Content-Type,Authorization",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Content-Type":                 "application/json"
     }
 
-    http_method = event.get("httpMethod", "")
-    path        = event.get("path", "")
+    try:
+        http_method = event.get("httpMethod", "GET")
+        path        = event.get("path", "")
+        params      = event.get("pathParameters") or {}
 
-    # GET /facturas/{claveAcceso} → consultar estado
-    if http_method == "GET" and "/facturas/" in path:
-        clave_acceso = event.get("pathParameters", {}).get("claveAcceso", "")
+        logger.info(f"API Gateway request: {http_method} {path}")
+        logger.info(f"Path parameters: {params}")
 
-        # GET /facturas/{claveAcceso}/ride → descargar PDF
-        if path.endswith("/ride"):
+        # OPTIONS - preflight CORS
+        if http_method == "OPTIONS":
+            return {
+                "statusCode": 200,
+                "headers":    CORS,
+                "body":       ""
+            }
+
+        # GET /facturas/{claveAcceso}/ride
+        if http_method == "GET" and path.endswith("/ride"):
+            clave_acceso = params.get("claveAcceso", "")
+            if not clave_acceso:
+                return {
+                    "statusCode": 400,
+                    "headers":    CORS,
+                    "body":       json.dumps({"mensaje": "Clave de acceso requerida"})
+                }
             return descargar_ride(clave_acceso, CORS)
 
-        return consultar_estado(clave_acceso, CORS)
+        # GET /facturas/{claveAcceso}
+        if http_method == "GET" and "claveAcceso" in params:
+            clave_acceso = params.get("claveAcceso", "")
+            if not clave_acceso:
+                return {
+                    "statusCode": 400,
+                    "headers":    CORS,
+                    "body":       json.dumps({"mensaje": "Clave de acceso requerida"})
+                }
 
-    return {
-        "statusCode": 404,
-        "headers":    CORS,
-        "body":       json.dumps({"mensaje": "Ruta no encontrada"})
-    }
+            logger.info(f"Consultando estado: {clave_acceso}")
+            resultado = consultar_estado_s3(clave_acceso)
+
+            return {
+                "statusCode": 200,
+                "headers":    CORS,
+                "body":       json.dumps(resultado, ensure_ascii=False)
+            }
+
+        # Ruta no encontrada
+        return {
+            "statusCode": 404,
+            "headers":    CORS,
+            "body":       json.dumps({"mensaje": f"Ruta no encontrada: {http_method} {path}"})
+        }
+
+    except Exception as e:
+        logger.error(f"Error en API Gateway handler: {str(e)}", exc_info=True)
+        return {
+            "statusCode": 500,
+            "headers":    CORS,
+            "body":       json.dumps({
+                "mensaje": "Error interno del servidor",
+                "detalle": str(e)
+            })
+        }
 
 def descargar_ride(clave_acceso: str, cors: dict) -> dict:
     """Genera y devuelve el RIDE en PDF."""

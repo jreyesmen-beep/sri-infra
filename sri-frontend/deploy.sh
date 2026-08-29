@@ -32,14 +32,35 @@ echo "   Bucket  : $BUCKET"
 echo "   CloudFront: $CF_ID"
 
 echo "📦  Subiendo a S3..."
-aws s3 sync "$DIST_DIR/" "s3://$BUCKET/" --delete
+aws s3 sync "$DIST_DIR/" "s3://$BUCKET/" \
+  --delete \
+  --cache-control "max-age=31536000,public" \
+  --exclude "index.html"
 
-echo "🔄  Invalidando caché de CloudFront..."
-aws cloudfront create-invalidation \
+# index.html sin cache para que siempre tome la versión más reciente
+aws s3 cp "$DIST_DIR/index.html" "s3://$BUCKET/index.html" \
+  --cache-control "no-cache,no-store,must-revalidate" \
+  --content-type "text/html"
+
+echo "🔄  Invalidando caché de CloudFront (en segundo plano)..."
+INVALIDATION_ID=$(aws cloudfront create-invalidation \
   --distribution-id "$CF_ID" \
-  --paths "/*"
+  --paths "/*" \
+  --query 'Invalidation.Id' \
+  --output text)
 
-echo "✅  Deploy completo"
+echo "   Invalidación iniciada: $INVALIDATION_ID"
+echo "   (No es necesario esperar — el sitio ya está actualizado en S3)"
+
 cd "$TERRAFORM_DIR"
 URL=$(terraform output -raw frontend_url)
+
+cd "$TERRAFORM_DIR"
+URL=$(terraform output -raw frontend_url)
+
+echo ""
+echo "✅  Deploy completo"
 echo "🌐  URL: $URL"
+echo "⏳  La caché de CloudFront se limpiará en ~2-3 minutos"
+echo "   Para verificar el estado de la invalidación:"
+echo "   aws cloudfront get-invalidation --distribution-id $CF_ID --id $INVALIDATION_ID"

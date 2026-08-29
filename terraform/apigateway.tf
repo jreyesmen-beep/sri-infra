@@ -564,6 +564,18 @@ resource "aws_api_gateway_gateway_response" "cors_5xx" {
   }
 }
 
+# CORS específico para preflight no autorizado
+resource "aws_api_gateway_gateway_response" "cors_missing_auth" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  response_type = "MISSING_AUTHENTICATION_TOKEN"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
+  }
+}
+
 # /facturas/{claveAcceso}/ride
 resource "aws_api_gateway_resource" "factura_ride" {
   rest_api_id = aws_api_gateway_rest_api.sri.id
