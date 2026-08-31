@@ -1,0 +1,4185 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.8",
+  "serial": 1329,
+  "lineage": "94cfc4c0-8fd2-63d8-db3b-782ebf876737",
+  "outputs": {
+    "api_url": {
+      "value": "https://xbdvwkho8d.execute-api.us-east-1.amazonaws.com/certificacion",
+      "type": "string"
+    },
+    "certificado_p12_arn": {
+      "value": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12-s909Co",
+      "type": "string"
+    },
+    "certificado_password_arn": {
+      "value": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password-19NQio",
+      "type": "string"
+    },
+    "cloudfront_id": {
+      "value": "E2E775NLI0YZ7",
+      "type": "string"
+    },
+    "cognito_client_id": {
+      "value": "1m0kpv9af0agi1uq9rtde84f9i",
+      "type": "string"
+    },
+    "cognito_user_pool_id": {
+      "value": "us-east-1_RmtetGi5c",
+      "type": "string"
+    },
+    "cola_sri_arn": {
+      "value": "arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion",
+      "type": "string"
+    },
+    "cola_sri_muerta_arn": {
+      "value": "arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-muerta-certificacion",
+      "type": "string"
+    },
+    "cola_sri_muerta_url": {
+      "value": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-muerta-certificacion",
+      "type": "string"
+    },
+    "cola_sri_url": {
+      "value": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion",
+      "type": "string"
+    },
+    "frontend_url": {
+      "value": "https://d1ei3p7iqxo5z.cloudfront.net",
+      "type": "string"
+    },
+    "kms_key_arn": {
+      "value": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+      "type": "string"
+    },
+    "lambda_role_arn": {
+      "value": "arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion",
+      "type": "string"
+    },
+    "lambda_role_name": {
+      "value": "rol-lambda-facturacion-sri-certificacion",
+      "type": "string"
+    },
+    "s3_bucket_comprobantes": {
+      "value": {
+        "acceleration_status": "",
+        "acl": null,
+        "arn": "arn:aws:s3:::facturacion-sri-tu-empresa",
+        "bucket": "facturacion-sri-tu-empresa",
+        "bucket_domain_name": "facturacion-sri-tu-empresa.s3.amazonaws.com",
+        "bucket_prefix": "",
+        "bucket_regional_domain_name": "facturacion-sri-tu-empresa.s3.us-east-1.amazonaws.com",
+        "cors_rule": [],
+        "force_destroy": false,
+        "grant": [
+          {
+            "id": "c47546252af53e8e3e78f49150f3322ee217c3d026844376f7801d436f42c03a",
+            "permissions": [
+              "FULL_CONTROL"
+            ],
+            "type": "CanonicalUser",
+            "uri": ""
+          }
+        ],
+        "hosted_zone_id": "Z3AQBSTGFYJSTF",
+        "id": "facturacion-sri-tu-empresa",
+        "lifecycle_rule": [],
+        "logging": [],
+        "object_lock_configuration": [],
+        "object_lock_enabled": false,
+        "policy": "",
+        "region": "us-east-1",
+        "replication_configuration": [],
+        "request_payer": "BucketOwner",
+        "server_side_encryption_configuration": [
+          {
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          }
+        ],
+        "tags": {
+          "Ambiente": "certificacion",
+          "Proyecto": "facturacion-electronica"
+        },
+        "tags_all": {
+          "Ambiente": "certificacion",
+          "Proyecto": "facturacion-electronica"
+        },
+        "timeouts": null,
+        "versioning": [
+          {
+            "enabled": true,
+            "mfa_delete": false
+          }
+        ],
+        "website": [],
+        "website_domain": null,
+        "website_endpoint": null
+      },
+      "type": [
+        "object",
+        {
+          "acceleration_status": "string",
+          "acl": "string",
+          "arn": "string",
+          "bucket": "string",
+          "bucket_domain_name": "string",
+          "bucket_prefix": "string",
+          "bucket_regional_domain_name": "string",
+          "cors_rule": [
+            "list",
+            [
+              "object",
+              {
+                "allowed_headers": [
+                  "list",
+                  "string"
+                ],
+                "allowed_methods": [
+                  "list",
+                  "string"
+                ],
+                "allowed_origins": [
+                  "list",
+                  "string"
+                ],
+                "expose_headers": [
+                  "list",
+                  "string"
+                ],
+                "max_age_seconds": "number"
+              }
+            ]
+          ],
+          "force_destroy": "bool",
+          "grant": [
+            "set",
+            [
+              "object",
+              {
+                "id": "string",
+                "permissions": [
+                  "set",
+                  "string"
+                ],
+                "type": "string",
+                "uri": "string"
+              }
+            ]
+          ],
+          "hosted_zone_id": "string",
+          "id": "string",
+          "lifecycle_rule": [
+            "list",
+            [
+              "object",
+              {
+                "abort_incomplete_multipart_upload_days": "number",
+                "enabled": "bool",
+                "expiration": [
+                  "list",
+                  [
+                    "object",
+                    {
+                      "date": "string",
+                      "days": "number",
+                      "expired_object_delete_marker": "bool"
+                    }
+                  ]
+                ],
+                "id": "string",
+                "noncurrent_version_expiration": [
+                  "list",
+                  [
+                    "object",
+                    {
+                      "days": "number"
+                    }
+                  ]
+                ],
+                "noncurrent_version_transition": [
+                  "set",
+                  [
+                    "object",
+                    {
+                      "days": "number",
+                      "storage_class": "string"
+                    }
+                  ]
+                ],
+                "prefix": "string",
+                "tags": [
+                  "map",
+                  "string"
+                ],
+                "transition": [
+                  "set",
+                  [
+                    "object",
+                    {
+                      "date": "string",
+                      "days": "number",
+                      "storage_class": "string"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "logging": [
+            "list",
+            [
+              "object",
+              {
+                "target_bucket": "string",
+                "target_prefix": "string"
+              }
+            ]
+          ],
+          "object_lock_configuration": [
+            "list",
+            [
+              "object",
+              {
+                "object_lock_enabled": "string",
+                "rule": [
+                  "list",
+                  [
+                    "object",
+                    {
+                      "default_retention": [
+                        "list",
+                        [
+                          "object",
+                          {
+                            "days": "number",
+                            "mode": "string",
+                            "years": "number"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "object_lock_enabled": "bool",
+          "policy": "string",
+          "region": "string",
+          "replication_configuration": [
+            "list",
+            [
+              "object",
+              {
+                "role": "string",
+                "rules": [
+                  "set",
+                  [
+                    "object",
+                    {
+                      "delete_marker_replication_status": "string",
+                      "destination": [
+                        "list",
+                        [
+                          "object",
+                          {
+                            "access_control_translation": [
+                              "list",
+                              [
+                                "object",
+                                {
+                                  "owner": "string"
+                                }
+                              ]
+                            ],
+                            "account_id": "string",
+                            "bucket": "string",
+                            "metrics": [
+                              "list",
+                              [
+                                "object",
+                                {
+                                  "minutes": "number",
+                                  "status": "string"
+                                }
+                              ]
+                            ],
+                            "replica_kms_key_id": "string",
+                            "replication_time": [
+                              "list",
+                              [
+                                "object",
+                                {
+                                  "minutes": "number",
+                                  "status": "string"
+                                }
+                              ]
+                            ],
+                            "storage_class": "string"
+                          }
+                        ]
+                      ],
+                      "filter": [
+                        "list",
+                        [
+                          "object",
+                          {
+                            "prefix": "string",
+                            "tags": [
+                              "map",
+                              "string"
+                            ]
+                          }
+                        ]
+                      ],
+                      "id": "string",
+                      "prefix": "string",
+                      "priority": "number",
+                      "source_selection_criteria": [
+                        "list",
+                        [
+                          "object",
+                          {
+                            "sse_kms_encrypted_objects": [
+                              "list",
+                              [
+                                "object",
+                                {
+                                  "enabled": "bool"
+                                }
+                              ]
+                            ]
+                          }
+                        ]
+                      ],
+                      "status": "string"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "request_payer": "string",
+          "server_side_encryption_configuration": [
+            "list",
+            [
+              "object",
+              {
+                "rule": [
+                  "list",
+                  [
+                    "object",
+                    {
+                      "apply_server_side_encryption_by_default": [
+                        "list",
+                        [
+                          "object",
+                          {
+                            "kms_master_key_id": "string",
+                            "sse_algorithm": "string"
+                          }
+                        ]
+                      ],
+                      "bucket_key_enabled": "bool"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            "map",
+            "string"
+          ],
+          "tags_all": [
+            "map",
+            "string"
+          ],
+          "timeouts": [
+            "object",
+            {
+              "create": "string",
+              "delete": "string",
+              "read": "string",
+              "update": "string"
+            }
+          ],
+          "versioning": [
+            "list",
+            [
+              "object",
+              {
+                "enabled": "bool",
+                "mfa_delete": "bool"
+              }
+            ]
+          ],
+          "website": [
+            "list",
+            [
+              "object",
+              {
+                "error_document": "string",
+                "index_document": "string",
+                "redirect_all_requests_to": "string",
+                "routing_rules": "string"
+              }
+            ]
+          ],
+          "website_domain": "string",
+          "website_endpoint": "string"
+        }
+      ]
+    },
+    "s3_bucket_frontend": {
+      "value": "frontend-facturacion-sri-certificacion-238700389543",
+      "type": "string"
+    },
+    "ses_email_emisor": {
+      "value": "infotech20250319@gmail.com",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "lambda_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": null,
+            "id": "975d09149c2e726453855a2b49a2adc2e5b235c3",
+            "output_base64sha256": "zvmNli46eu6ZMOas2WrJSKwDSIhpJy9ByOQK3tIOpe8=",
+            "output_base64sha512": "MntJzVU8DbqO7nngcDfXJBmpRACUtpVR0OSX/kUe353C1PZgsTetYkNSOSPzF/D0gD8Xpk2Yec8+rsw2VvM/dA==",
+            "output_file_mode": null,
+            "output_md5": "fdb82e42c6cab86d4a2dde152b75220b",
+            "output_path": "./../lambda/facturacion.zip",
+            "output_sha": "975d09149c2e726453855a2b49a2adc2e5b235c3",
+            "output_sha256": "cef98d962e3a7aee9930e6acd96ac948ac03488869272f41c8e40aded20ea5ef",
+            "output_sha512": "327b49cd553c0dba8eee79e07037d72419a9440094b69551d0e497fe451edf9dc2d4f660b137ad6243523923f317f0f4803f17a64d9879cf3eaecc3656f33f74",
+            "output_size": 38008464,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "./../lambda/facturacion/package",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "238700389543",
+            "arn": "arn:aws:iam::238700389543:root",
+            "id": "238700389543",
+            "user_id": "238700389543"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_account",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_version": "4",
+            "cloudwatch_role_arn": "arn:aws:iam::238700389543:role/rol-apigateway-cloudwatch-certificacion",
+            "features": [
+              "UsagePlans"
+            ],
+            "id": "api-gateway-account",
+            "reset_on_delete": null,
+            "throttle_settings": [
+              {
+                "burst_limit": 5000,
+                "rate_limit": 10000
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_iam_role.apigateway_cloudwatch",
+            "aws_iam_role_policy_attachment.apigateway_cloudwatch"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_authorizer",
+      "name": "cognito",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:apigateway:us-east-1::/restapis/xbdvwkho8d/authorizers/0orzk7",
+            "authorizer_credentials": "",
+            "authorizer_result_ttl_in_seconds": 300,
+            "authorizer_uri": "",
+            "id": "0orzk7",
+            "identity_source": "method.request.header.Authorization",
+            "identity_validation_expression": "",
+            "name": "autorizador-cognito-certificacion",
+            "provider_arns": [
+              "arn:aws:cognito-idp:us-east-1:238700389543:userpool/us-east-1_RmtetGi5c"
+            ],
+            "rest_api_id": "xbdvwkho8d",
+            "type": "COGNITO_USER_POOLS"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_deployment",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "canary_settings": [],
+            "created_date": "2026-06-03T17:34:50Z",
+            "description": "",
+            "execution_arn": "arn:aws:execute-api:us-east-1:238700389543:xbdvwkho8d/",
+            "id": "lr4hw8",
+            "invoke_url": "https://xbdvwkho8d.execute-api.us-east-1.amazonaws.com/",
+            "rest_api_id": "xbdvwkho8d",
+            "stage_description": null,
+            "stage_name": null,
+            "triggers": {
+              "redeployment": "a76e15d1952ed03565ef5b1bfacc9255f47ff755"
+            },
+            "variables": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_integration.get_factura_lambda",
+            "aws_api_gateway_integration.post_factura_sqs",
+            "aws_api_gateway_integration_response.post_factura_200",
+            "aws_api_gateway_integration_response.post_factura_400",
+            "aws_api_gateway_method.get_factura",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_gateway_response",
+      "name": "cors_4xx",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "aggr-xbdvwkho8d-DEFAULT_4XX",
+            "response_parameters": {
+              "gatewayresponse.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+              "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,OPTIONS'",
+              "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "response_templates": {
+              "application/json": "{\"message\":$context.error.messageString}"
+            },
+            "response_type": "DEFAULT_4XX",
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_gateway_response",
+      "name": "cors_5xx",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "aggr-xbdvwkho8d-DEFAULT_5XX",
+            "response_parameters": {
+              "gatewayresponse.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+              "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,OPTIONS'",
+              "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "response_templates": {
+              "application/json": "{\"message\":$context.error.messageString}"
+            },
+            "response_type": "DEFAULT_5XX",
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_gateway_response",
+      "name": "cors_missing_auth",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "aggr-xbdvwkho8d-MISSING_AUTHENTICATION_TOKEN",
+            "response_parameters": {
+              "gatewayresponse.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+              "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,OPTIONS'",
+              "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "response_templates": {
+              "application/json": "{\"message\":$context.error.messageString}"
+            },
+            "response_type": "MISSING_AUTHENTICATION_TOKEN",
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": "403"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "get_factura_lambda",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cache_key_parameters": [],
+            "cache_namespace": "jho6nc",
+            "connection_id": "",
+            "connection_type": "INTERNET",
+            "content_handling": "",
+            "credentials": "",
+            "http_method": "GET",
+            "id": "agi-xbdvwkho8d-jho6nc-GET",
+            "integration_http_method": "POST",
+            "passthrough_behavior": "WHEN_NO_MATCH",
+            "request_parameters": {},
+            "request_templates": {},
+            "resource_id": "jho6nc",
+            "rest_api_id": "xbdvwkho8d",
+            "timeout_milliseconds": 29000,
+            "tls_config": [],
+            "type": "AWS_PROXY",
+            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion/invocations"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_method.get_factura",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "get_ride_lambda",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cache_key_parameters": [],
+            "cache_namespace": "04g1qw",
+            "connection_id": "",
+            "connection_type": "INTERNET",
+            "content_handling": "",
+            "credentials": "",
+            "http_method": "GET",
+            "id": "agi-xbdvwkho8d-04g1qw-GET",
+            "integration_http_method": "POST",
+            "passthrough_behavior": "WHEN_NO_MATCH",
+            "request_parameters": {},
+            "request_templates": {},
+            "resource_id": "04g1qw",
+            "rest_api_id": "xbdvwkho8d",
+            "timeout_milliseconds": 29000,
+            "tls_config": [],
+            "type": "AWS_PROXY",
+            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion/invocations"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_method.get_ride",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.factura_ride",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "options_factura_detalle",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cache_key_parameters": [],
+            "cache_namespace": "jho6nc",
+            "connection_id": "",
+            "connection_type": "INTERNET",
+            "content_handling": "",
+            "credentials": "",
+            "http_method": "OPTIONS",
+            "id": "agi-xbdvwkho8d-jho6nc-OPTIONS",
+            "integration_http_method": "",
+            "passthrough_behavior": "WHEN_NO_MATCH",
+            "request_parameters": {},
+            "request_templates": {
+              "application/json": "{\"statusCode\": 200}"
+            },
+            "resource_id": "jho6nc",
+            "rest_api_id": "xbdvwkho8d",
+            "timeout_milliseconds": 29000,
+            "tls_config": [],
+            "type": "MOCK",
+            "uri": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_method.options_factura_detalle",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "options_facturas",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cache_key_parameters": [],
+            "cache_namespace": "tclj50",
+            "connection_id": "",
+            "connection_type": "INTERNET",
+            "content_handling": "",
+            "credentials": "",
+            "http_method": "OPTIONS",
+            "id": "agi-xbdvwkho8d-tclj50-OPTIONS",
+            "integration_http_method": "",
+            "passthrough_behavior": "WHEN_NO_MATCH",
+            "request_parameters": {},
+            "request_templates": {
+              "application/json": "{\"statusCode\": 200}"
+            },
+            "resource_id": "tclj50",
+            "rest_api_id": "xbdvwkho8d",
+            "timeout_milliseconds": 29000,
+            "tls_config": [],
+            "type": "MOCK",
+            "uri": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_method.options_facturas",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "options_ride",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cache_key_parameters": [],
+            "cache_namespace": "04g1qw",
+            "connection_id": "",
+            "connection_type": "INTERNET",
+            "content_handling": "",
+            "credentials": "",
+            "http_method": "OPTIONS",
+            "id": "agi-xbdvwkho8d-04g1qw-OPTIONS",
+            "integration_http_method": "",
+            "passthrough_behavior": "WHEN_NO_MATCH",
+            "request_parameters": {},
+            "request_templates": {
+              "application/json": "{\"statusCode\": 200}"
+            },
+            "resource_id": "04g1qw",
+            "rest_api_id": "xbdvwkho8d",
+            "timeout_milliseconds": 29000,
+            "tls_config": [],
+            "type": "MOCK",
+            "uri": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_method.options_ride",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.factura_ride",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "post_factura_sqs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cache_key_parameters": [],
+            "cache_namespace": "tclj50",
+            "connection_id": "",
+            "connection_type": "INTERNET",
+            "content_handling": "",
+            "credentials": "",
+            "http_method": "POST",
+            "id": "agi-xbdvwkho8d-tclj50-POST",
+            "integration_http_method": "POST",
+            "passthrough_behavior": "WHEN_NO_MATCH",
+            "request_parameters": {},
+            "request_templates": {},
+            "resource_id": "tclj50",
+            "rest_api_id": "xbdvwkho8d",
+            "timeout_milliseconds": 29000,
+            "tls_config": [],
+            "type": "AWS_PROXY",
+            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:api-proxy-sri-certificacion/invocations"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration_response",
+      "name": "options_factura_detalle",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content_handling": "",
+            "http_method": "OPTIONS",
+            "id": "agir-xbdvwkho8d-jho6nc-OPTIONS-200",
+            "resource_id": "jho6nc",
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+              "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+              "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "response_templates": {},
+            "rest_api_id": "xbdvwkho8d",
+            "selection_pattern": "",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_integration.options_factura_detalle",
+            "aws_api_gateway_method.options_factura_detalle",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration_response",
+      "name": "options_facturas",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content_handling": "",
+            "http_method": "OPTIONS",
+            "id": "agir-xbdvwkho8d-tclj50-OPTIONS-200",
+            "resource_id": "tclj50",
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+              "method.response.header.Access-Control-Allow-Methods": "'GET,POST,OPTIONS'",
+              "method.response.header.Access-Control-Allow-Origin": "'https://d1ei3p7iqxo5z.cloudfront.net'"
+            },
+            "response_templates": {},
+            "rest_api_id": "xbdvwkho8d",
+            "selection_pattern": "",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_integration.options_facturas",
+            "aws_api_gateway_method.options_facturas",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration_response",
+      "name": "options_ride",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content_handling": "",
+            "http_method": "OPTIONS",
+            "id": "agir-xbdvwkho8d-04g1qw-OPTIONS-200",
+            "resource_id": "04g1qw",
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+              "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+              "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "response_templates": {},
+            "rest_api_id": "xbdvwkho8d",
+            "selection_pattern": "",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_integration.options_ride",
+            "aws_api_gateway_method.options_ride",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.factura_ride",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration_response",
+      "name": "post_factura_200",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content_handling": "",
+            "http_method": "POST",
+            "id": "agir-xbdvwkho8d-tclj50-POST-200",
+            "resource_id": "tclj50",
+            "response_parameters": {},
+            "response_templates": {
+              "application/json": "{\"estado\":\"EN_PROCESO\",\"mensaje\":\"Comprobante recibido y en cola de procesamiento\"}"
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "selection_pattern": "^2[0-9][0-9]",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_integration.post_factura_sqs",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_integration_response",
+      "name": "post_factura_400",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content_handling": "",
+            "http_method": "POST",
+            "id": "agir-xbdvwkho8d-tclj50-POST-400",
+            "resource_id": "tclj50",
+            "response_parameters": {},
+            "response_templates": {
+              "application/json": "{\"estado\":\"ERROR\",\"mensaje\":\"Error al encolar el comprobante\"}"
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "selection_pattern": "^4[0-9][0-9]",
+            "status_code": "400"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_integration.post_factura_sqs",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "get_factura",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_required": false,
+            "authorization": "COGNITO_USER_POOLS",
+            "authorization_scopes": [],
+            "authorizer_id": "0orzk7",
+            "http_method": "GET",
+            "id": "agm-xbdvwkho8d-jho6nc-GET",
+            "operation_name": "",
+            "request_models": {},
+            "request_parameters": {
+              "method.request.path.claveAcceso": true
+            },
+            "request_validator_id": "",
+            "resource_id": "jho6nc",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "get_ride",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_required": false,
+            "authorization": "COGNITO_USER_POOLS",
+            "authorization_scopes": [],
+            "authorizer_id": "0orzk7",
+            "http_method": "GET",
+            "id": "agm-xbdvwkho8d-04g1qw-GET",
+            "operation_name": "",
+            "request_models": {},
+            "request_parameters": {},
+            "request_validator_id": "",
+            "resource_id": "04g1qw",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.factura_ride",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "options_factura_detalle",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_required": false,
+            "authorization": "NONE",
+            "authorization_scopes": [],
+            "authorizer_id": "",
+            "http_method": "OPTIONS",
+            "id": "agm-xbdvwkho8d-jho6nc-OPTIONS",
+            "operation_name": "",
+            "request_models": {},
+            "request_parameters": {},
+            "request_validator_id": "",
+            "resource_id": "jho6nc",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "options_facturas",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_required": false,
+            "authorization": "NONE",
+            "authorization_scopes": [],
+            "authorizer_id": "",
+            "http_method": "OPTIONS",
+            "id": "agm-xbdvwkho8d-tclj50-OPTIONS",
+            "operation_name": "",
+            "request_models": {},
+            "request_parameters": {},
+            "request_validator_id": "",
+            "resource_id": "tclj50",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "options_ride",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_required": false,
+            "authorization": "NONE",
+            "authorization_scopes": [],
+            "authorizer_id": "",
+            "http_method": "OPTIONS",
+            "id": "agm-xbdvwkho8d-04g1qw-OPTIONS",
+            "operation_name": "",
+            "request_models": {},
+            "request_parameters": {},
+            "request_validator_id": "",
+            "resource_id": "04g1qw",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.factura_ride",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "post_factura",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_required": false,
+            "authorization": "COGNITO_USER_POOLS",
+            "authorization_scopes": [],
+            "authorizer_id": "0orzk7",
+            "http_method": "POST",
+            "id": "agm-xbdvwkho8d-tclj50-POST",
+            "operation_name": "",
+            "request_models": {
+              "application/json": "ModeloFactura"
+            },
+            "request_parameters": {},
+            "request_validator_id": "ddvxgq",
+            "resource_id": "tclj50",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method_response",
+      "name": "options_factura_detalle_200",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "http_method": "OPTIONS",
+            "id": "agmr-xbdvwkho8d-jho6nc-OPTIONS-200",
+            "resource_id": "jho6nc",
+            "response_models": {},
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_method.options_factura_detalle",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method_response",
+      "name": "options_facturas_200",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "http_method": "OPTIONS",
+            "id": "agmr-xbdvwkho8d-tclj50-OPTIONS-200",
+            "resource_id": "tclj50",
+            "response_models": {},
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_method.options_facturas",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method_response",
+      "name": "options_ride_200",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "http_method": "OPTIONS",
+            "id": "agmr-xbdvwkho8d-04g1qw-OPTIONS-200",
+            "resource_id": "04g1qw",
+            "response_models": {},
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_method.options_ride",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.factura_ride",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method_response",
+      "name": "post_factura_200",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "http_method": "POST",
+            "id": "agmr-xbdvwkho8d-tclj50-POST-200",
+            "resource_id": "tclj50",
+            "response_models": {
+              "application/json": "Empty"
+            },
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": "200"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method_response",
+      "name": "post_factura_400",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "http_method": "POST",
+            "id": "agmr-xbdvwkho8d-tclj50-POST-400",
+            "resource_id": "tclj50",
+            "response_models": {
+              "application/json": "Empty"
+            },
+            "response_parameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            },
+            "rest_api_id": "xbdvwkho8d",
+            "status_code": "400"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cognito_user_pool.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_method_settings",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "xbdvwkho8d-certificacion-*/*",
+            "method_path": "*/*",
+            "rest_api_id": "xbdvwkho8d",
+            "settings": [
+              {
+                "cache_data_encrypted": false,
+                "cache_ttl_in_seconds": 300,
+                "caching_enabled": false,
+                "data_trace_enabled": false,
+                "logging_level": "INFO",
+                "metrics_enabled": true,
+                "require_authorization_for_cache_control": true,
+                "throttling_burst_limit": 50,
+                "throttling_rate_limit": 100,
+                "unauthorized_cache_control_header_strategy": "SUCCEED_WITH_RESPONSE_HEADER"
+              }
+            ],
+            "stage_name": "certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_account.sri",
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_deployment.sri",
+            "aws_api_gateway_integration.get_factura_lambda",
+            "aws_api_gateway_integration.post_factura_sqs",
+            "aws_api_gateway_integration_response.post_factura_200",
+            "aws_api_gateway_integration_response.post_factura_400",
+            "aws_api_gateway_method.get_factura",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_api_gateway_stage.sri",
+            "aws_cloudwatch_log_group.apigw_logs",
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.apigateway_cloudwatch",
+            "aws_iam_role.lambda_sri",
+            "aws_iam_role_policy_attachment.apigateway_cloudwatch",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_model",
+      "name": "factura",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content_type": "application/json",
+            "description": "",
+            "id": "n3k6lx",
+            "name": "ModeloFactura",
+            "rest_api_id": "xbdvwkho8d",
+            "schema": "{\"$schema\":\"http://json-schema.org/draft-04/schema#\",\"properties\":{\"clave_acceso\":{\"type\":\"string\"},\"id_comprador\":{\"type\":\"string\"},\"items\":{\"items\":{\"properties\":{\"cantidad\":{\"type\":\"number\"},\"codigo\":{\"type\":\"string\"},\"descripcion\":{\"type\":\"string\"},\"precio_unitario\":{\"type\":\"number\"}},\"required\":[\"codigo\",\"descripcion\",\"cantidad\",\"precio_unitario\"],\"type\":\"object\"},\"minItems\":1,\"type\":\"array\"},\"razon_social\":{\"type\":\"string\"},\"ruc\":{\"type\":\"string\"}},\"required\":[\"clave_acceso\",\"ruc\",\"razon_social\",\"id_comprador\",\"items\"],\"type\":\"object\"}"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_request_validator",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "ddvxgq",
+            "name": "validador-body-sri",
+            "rest_api_id": "xbdvwkho8d",
+            "validate_request_body": true,
+            "validate_request_parameters": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_resource",
+      "name": "factura_detalle",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "jho6nc",
+            "parent_id": "tclj50",
+            "path": "/facturas/{claveAcceso}",
+            "path_part": "{claveAcceso}",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_resource",
+      "name": "factura_ride",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "04g1qw",
+            "parent_id": "jho6nc",
+            "path": "/facturas/{claveAcceso}/ride",
+            "path_part": "ride",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_resource",
+      "name": "facturas",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "tclj50",
+            "parent_id": "x6kl31jvt8",
+            "path": "/facturas",
+            "path_part": "facturas",
+            "rest_api_id": "xbdvwkho8d"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_rest_api",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_key_source": "HEADER",
+            "arn": "arn:aws:apigateway:us-east-1::/restapis/xbdvwkho8d",
+            "binary_media_types": [
+              "application/pdf",
+              "application/octet-stream"
+            ],
+            "body": null,
+            "created_date": "2026-05-31T18:38:15Z",
+            "description": "API para emision de comprobantes electronicos SRI Ecuador",
+            "disable_execute_api_endpoint": false,
+            "endpoint_configuration": [
+              {
+                "ip_address_type": "ipv4",
+                "types": [
+                  "REGIONAL"
+                ],
+                "vpc_endpoint_ids": []
+              }
+            ],
+            "execution_arn": "arn:aws:execute-api:us-east-1:238700389543:xbdvwkho8d",
+            "fail_on_warnings": null,
+            "id": "xbdvwkho8d",
+            "minimum_compression_size": "",
+            "name": "api-facturacion-sri-certificacion",
+            "parameters": null,
+            "policy": "",
+            "put_rest_api_mode": null,
+            "root_resource_id": "x6kl31jvt8",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_stage",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_log_settings": [
+              {
+                "destination_arn": "arn:aws:logs:us-east-1:238700389543:log-group:/aws/apigateway/facturacion-sri-certificacion",
+                "format": "{\"caller\":\"$context.identity.caller\",\"httpMethod\":\"$context.httpMethod\",\"integrationErrorMessage\":\"$context.integrationErrorMessage\",\"ip\":\"$context.identity.sourceIp\",\"protocol\":\"$context.protocol\",\"requestId\":\"$context.requestId\",\"requestTime\":\"$context.requestTime\",\"resourcePath\":\"$context.resourcePath\",\"responseLength\":\"$context.responseLength\",\"status\":\"$context.status\",\"user\":\"$context.identity.user\"}"
+              }
+            ],
+            "arn": "arn:aws:apigateway:us-east-1::/restapis/xbdvwkho8d/stages/certificacion",
+            "cache_cluster_enabled": false,
+            "cache_cluster_size": "",
+            "canary_settings": [],
+            "client_certificate_id": "",
+            "deployment_id": "lr4hw8",
+            "description": "",
+            "documentation_version": "",
+            "execution_arn": "arn:aws:execute-api:us-east-1:238700389543:xbdvwkho8d/certificacion",
+            "id": "ags-xbdvwkho8d-certificacion",
+            "invoke_url": "https://xbdvwkho8d.execute-api.us-east-1.amazonaws.com/certificacion",
+            "rest_api_id": "xbdvwkho8d",
+            "stage_name": "certificacion",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "variables": {},
+            "web_acl_arn": "",
+            "xray_tracing_enabled": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_account.sri",
+            "aws_api_gateway_authorizer.cognito",
+            "aws_api_gateway_deployment.sri",
+            "aws_api_gateway_integration.get_factura_lambda",
+            "aws_api_gateway_integration.post_factura_sqs",
+            "aws_api_gateway_integration_response.post_factura_200",
+            "aws_api_gateway_integration_response.post_factura_400",
+            "aws_api_gateway_method.get_factura",
+            "aws_api_gateway_method.post_factura",
+            "aws_api_gateway_model.factura",
+            "aws_api_gateway_request_validator.sri",
+            "aws_api_gateway_resource.factura_detalle",
+            "aws_api_gateway_resource.facturas",
+            "aws_api_gateway_rest_api.sri",
+            "aws_cloudwatch_log_group.apigw_logs",
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_cognito_user_pool.sri",
+            "aws_iam_role.apigateway_cloudwatch",
+            "aws_iam_role.lambda_sri",
+            "aws_iam_role_policy_attachment.apigateway_cloudwatch",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudfront_distribution",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "aliases": [],
+            "arn": "arn:aws:cloudfront::238700389543:distribution/E2E775NLI0YZ7",
+            "caller_reference": "terraform-20260601124720541200000001",
+            "comment": "Frontend facturacion SRI certificacion",
+            "continuous_deployment_policy_id": "",
+            "custom_error_response": [
+              {
+                "error_caching_min_ttl": 0,
+                "error_code": 403,
+                "response_code": 200,
+                "response_page_path": "/index.html"
+              },
+              {
+                "error_caching_min_ttl": 0,
+                "error_code": 404,
+                "response_code": 200,
+                "response_page_path": "/index.html"
+              }
+            ],
+            "default_cache_behavior": [
+              {
+                "allowed_methods": [
+                  "GET",
+                  "HEAD",
+                  "OPTIONS"
+                ],
+                "cache_policy_id": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+                "cached_methods": [
+                  "GET",
+                  "HEAD"
+                ],
+                "compress": true,
+                "default_ttl": 0,
+                "field_level_encryption_id": "",
+                "forwarded_values": [],
+                "function_association": [],
+                "grpc_config": [
+                  {
+                    "enabled": false
+                  }
+                ],
+                "lambda_function_association": [],
+                "max_ttl": 0,
+                "min_ttl": 0,
+                "origin_request_policy_id": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
+                "realtime_log_config_arn": "",
+                "response_headers_policy_id": "",
+                "smooth_streaming": false,
+                "target_origin_id": "S3-frontend-sri",
+                "trusted_key_groups": [],
+                "trusted_signers": [],
+                "viewer_protocol_policy": "redirect-to-https"
+              }
+            ],
+            "default_root_object": "index.html",
+            "domain_name": "d1ei3p7iqxo5z.cloudfront.net",
+            "enabled": true,
+            "etag": "E23ZP02F085DFQ",
+            "hosted_zone_id": "Z2FDTNDATAQYW2",
+            "http_version": "http2",
+            "id": "E2E775NLI0YZ7",
+            "in_progress_validation_batches": 0,
+            "is_ipv6_enabled": true,
+            "last_modified_time": "2026-06-01 12:47:22.085 +0000 UTC",
+            "logging_config": [],
+            "ordered_cache_behavior": [],
+            "origin": [
+              {
+                "connection_attempts": 3,
+                "connection_timeout": 10,
+                "custom_header": [],
+                "custom_origin_config": [],
+                "domain_name": "frontend-facturacion-sri-certificacion-238700389543.s3.us-east-1.amazonaws.com",
+                "origin_access_control_id": "E1YCZMNOM224U4",
+                "origin_id": "S3-frontend-sri",
+                "origin_path": "",
+                "origin_shield": [],
+                "s3_origin_config": [],
+                "vpc_origin_config": []
+              }
+            ],
+            "origin_group": [],
+            "price_class": "PriceClass_100",
+            "restrictions": [
+              {
+                "geo_restriction": [
+                  {
+                    "locations": [],
+                    "restriction_type": "none"
+                  }
+                ]
+              }
+            ],
+            "retain_on_delete": false,
+            "staging": false,
+            "status": "Deployed",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "trusted_key_groups": [
+              {
+                "enabled": false,
+                "items": []
+              }
+            ],
+            "trusted_signers": [
+              {
+                "enabled": false,
+                "items": []
+              }
+            ],
+            "viewer_certificate": [
+              {
+                "acm_certificate_arn": "",
+                "cloudfront_default_certificate": true,
+                "iam_certificate_id": "",
+                "minimum_protocol_version": "TLSv1",
+                "ssl_support_method": ""
+              }
+            ],
+            "wait_for_deployment": true,
+            "web_acl_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_cloudfront_origin_access_control.frontend",
+            "aws_s3_bucket.frontend",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudfront_origin_access_control",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:cloudfront::238700389543:origin-access-control/E1YCZMNOM224U4",
+            "description": "Managed by Terraform",
+            "etag": "ETVPDKIKX0DER",
+            "id": "E1YCZMNOM224U4",
+            "name": "oac-frontend-sri-certificacion",
+            "origin_access_control_origin_type": "s3",
+            "signing_behavior": "always",
+            "signing_protocol": "sigv4"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "apigw_logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:us-east-1:238700389543:log-group:/aws/apigateway/facturacion-sri-certificacion",
+            "id": "/aws/apigateway/facturacion-sri-certificacion",
+            "kms_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "log_group_class": "STANDARD",
+            "name": "/aws/apigateway/facturacion-sri-certificacion",
+            "name_prefix": "",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "lambda_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:us-east-1:238700389543:log-group:/aws/lambda/facturacion-sri-certificacion",
+            "id": "/aws/lambda/facturacion-sri-certificacion",
+            "kms_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "log_group_class": "STANDARD",
+            "name": "/aws/lambda/facturacion-sri-certificacion",
+            "name_prefix": "",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_metric_alarm",
+      "name": "alarma_cola_muerta",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "actions_enabled": true,
+            "alarm_actions": [
+              "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion"
+            ],
+            "alarm_description": "Hay comprobantes que fallaron 3 veces al enviarse al SRI",
+            "alarm_name": "alarma-sri-cola-muerta-certificacion",
+            "arn": "arn:aws:cloudwatch:us-east-1:238700389543:alarm:alarma-sri-cola-muerta-certificacion",
+            "comparison_operator": "GreaterThanThreshold",
+            "datapoints_to_alarm": 0,
+            "dimensions": {
+              "QueueName": "cola-facturacion-sri-muerta-certificacion"
+            },
+            "evaluate_low_sample_count_percentiles": "",
+            "evaluation_periods": 1,
+            "extended_statistic": "",
+            "id": "alarma-sri-cola-muerta-certificacion",
+            "insufficient_data_actions": [],
+            "metric_name": "ApproximateNumberOfMessagesVisible",
+            "metric_query": [],
+            "namespace": "AWS/SQS",
+            "ok_actions": [
+              "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion"
+            ],
+            "period": 300,
+            "statistic": "Sum",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "threshold": 0,
+            "threshold_metric_id": "",
+            "treat_missing_data": "notBreaching",
+            "unit": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "aws_sns_topic.alertas_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_metric_alarm",
+      "name": "ses_bounces",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "actions_enabled": true,
+            "alarm_actions": [
+              "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion"
+            ],
+            "alarm_description": "Tasa de rebotes de email supera el 5%",
+            "alarm_name": "alarma-ses-bounces-certificacion",
+            "arn": "arn:aws:cloudwatch:us-east-1:238700389543:alarm:alarma-ses-bounces-certificacion",
+            "comparison_operator": "GreaterThanThreshold",
+            "datapoints_to_alarm": 0,
+            "dimensions": null,
+            "evaluate_low_sample_count_percentiles": "",
+            "evaluation_periods": 1,
+            "extended_statistic": "",
+            "id": "alarma-ses-bounces-certificacion",
+            "insufficient_data_actions": null,
+            "metric_name": "Reputation.BounceRate",
+            "metric_query": [],
+            "namespace": "AWS/SES",
+            "ok_actions": null,
+            "period": 300,
+            "statistic": "Average",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "billingfact"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "billingfact"
+            },
+            "threshold": 0.05,
+            "threshold_metric_id": "",
+            "treat_missing_data": "notBreaching",
+            "unit": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_sns_topic.alertas_sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cognito_user_pool",
+      "name": "sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_recovery_setting": [
+              {
+                "recovery_mechanism": [
+                  {
+                    "name": "verified_email",
+                    "priority": 1
+                  }
+                ]
+              }
+            ],
+            "admin_create_user_config": [
+              {
+                "allow_admin_create_user_only": false,
+                "invite_message_template": []
+              }
+            ],
+            "alias_attributes": null,
+            "arn": "arn:aws:cognito-idp:us-east-1:238700389543:userpool/us-east-1_RmtetGi5c",
+            "auto_verified_attributes": [
+              "email"
+            ],
+            "creation_date": "2026-05-31T18:38:15Z",
+            "custom_domain": "",
+            "deletion_protection": "INACTIVE",
+            "device_configuration": [],
+            "domain": "",
+            "email_configuration": [
+              {
+                "configuration_set": "",
+                "email_sending_account": "COGNITO_DEFAULT",
+                "from_email_address": "",
+                "reply_to_email_address": "",
+                "source_arn": ""
+              }
+            ],
+            "email_mfa_configuration": [],
+            "email_verification_message": "",
+            "email_verification_subject": "",
+            "endpoint": "cognito-idp.us-east-1.amazonaws.com/us-east-1_RmtetGi5c",
+            "estimated_number_of_users": 1,
+            "id": "us-east-1_RmtetGi5c",
+            "lambda_config": [],
+            "last_modified_date": "2026-05-31T18:38:15Z",
+            "mfa_configuration": "OFF",
+            "name": "usuarios-facturacion-sri-certificacion",
+            "password_policy": [
+              {
+                "minimum_length": 8,
+                "password_history_size": 0,
+                "require_lowercase": true,
+                "require_numbers": true,
+                "require_symbols": false,
+                "require_uppercase": true,
+                "temporary_password_validity_days": 7
+              }
+            ],
+            "schema": [
+              {
+                "attribute_data_type": "String",
+                "developer_only_attribute": false,
+                "mutable": true,
+                "name": "email",
+                "number_attribute_constraints": [],
+                "required": true,
+                "string_attribute_constraints": []
+              }
+            ],
+            "sign_in_policy": [
+              {
+                "allowed_first_auth_factors": [
+                  "PASSWORD"
+                ]
+              }
+            ],
+            "sms_authentication_message": "",
+            "sms_configuration": [],
+            "sms_verification_message": "",
+            "software_token_mfa_configuration": [],
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "user_attribute_update_settings": [],
+            "user_pool_add_ons": [],
+            "user_pool_tier": "ESSENTIALS",
+            "username_attributes": [],
+            "username_configuration": [],
+            "verification_message_template": [
+              {
+                "default_email_option": "CONFIRM_WITH_CODE",
+                "email_message": "",
+                "email_message_by_link": "",
+                "email_subject": "",
+                "email_subject_by_link": "",
+                "sms_message": ""
+              }
+            ],
+            "web_authn_configuration": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cognito_user_pool_client",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_token_validity": 1,
+            "allowed_oauth_flows": [],
+            "allowed_oauth_flows_user_pool_client": false,
+            "allowed_oauth_scopes": [],
+            "analytics_configuration": [],
+            "auth_session_validity": 3,
+            "callback_urls": [],
+            "client_secret": "",
+            "default_redirect_uri": "",
+            "enable_propagate_additional_user_context_data": false,
+            "enable_token_revocation": true,
+            "explicit_auth_flows": [
+              "ALLOW_REFRESH_TOKEN_AUTH",
+              "ALLOW_USER_PASSWORD_AUTH",
+              "ALLOW_USER_SRP_AUTH"
+            ],
+            "generate_secret": false,
+            "id": "1m0kpv9af0agi1uq9rtde84f9i",
+            "id_token_validity": 1,
+            "logout_urls": [],
+            "name": "cliente-frontend-sri-certificacion",
+            "prevent_user_existence_errors": "ENABLED",
+            "read_attributes": [],
+            "refresh_token_rotation": [],
+            "refresh_token_validity": 30,
+            "supported_identity_providers": [],
+            "token_validity_units": [
+              {
+                "access_token": "hours",
+                "id_token": "hours",
+                "refresh_token": "days"
+              }
+            ],
+            "user_pool_id": "us-east-1_RmtetGi5c",
+            "write_attributes": []
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "client_secret"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_cognito_user_pool.sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "lambda_logs_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:policy/politica-logs-lambda-sri-certificacion",
+            "attachment_count": 1,
+            "description": "Permite a la Lambda escribir logs en CloudWatch",
+            "id": "arn:aws:iam::238700389543:policy/politica-logs-lambda-sri-certificacion",
+            "name": "politica-logs-lambda-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"logs:CreateLogGroup\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:logs:us-east-1:238700389543:*\",\"Sid\":\"CrearLogGroup\"},{\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:logs:us-east-1:238700389543:log-group:/aws/lambda/*:*\",\"Sid\":\"EscribirLogs\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPATPE5G4ST3VKMRFUR4",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "lambda_s3_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:policy/politica-s3-lambda-sri-certificacion",
+            "attachment_count": 1,
+            "description": "Permite a la Lambda guardar comprobantes en S3",
+            "id": "arn:aws:iam::238700389543:policy/politica-s3-lambda-sri-certificacion",
+            "name": "politica-s3-lambda-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"s3:PutObject\",\"s3:GetObject\",\"s3:DeleteObject\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::facturacion-sri-tu-empresa/certificacion/*\",\"Sid\":\"GestionarComprobantes\"},{\"Action\":[\"s3:ListBucket\"],\"Condition\":{\"StringLike\":{\"s3:prefix\":[\"certificacion/*\"]}},\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::facturacion-sri-tu-empresa\",\"Sid\":\"ListarBucket\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPATPE5G4ST5IL7VD5CV",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "lambda_ses",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:policy/pol-fact-ses-lambda-sri-certificacion",
+            "attachment_count": 0,
+            "description": "Permite a la Lambda enviar emails con SES",
+            "id": "arn:aws:iam::238700389543:policy/pol-fact-ses-lambda-sri-certificacion",
+            "name": "pol-fact-ses-lambda-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"ses:SendEmail\",\"ses:SendRawEmail\"],\"Condition\":{\"StringEquals\":{\"ses:FromAddress\":\"infotech20250319@gmail.com\"}},\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EnviarEmailSES\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPATPE5G4STYAMBEDTGK",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "billingfact"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "billingfact"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "lambda_sqs_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:policy/politica-sqs-lambda-sri-certificacion",
+            "attachment_count": 1,
+            "description": "Permite a la Lambda interactuar con la cola SQS del SRI",
+            "id": "arn:aws:iam::238700389543:policy/politica-sqs-lambda-sri-certificacion",
+            "name": "politica-sqs-lambda-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"sqs:SendMessage\",\"sqs:ReceiveMessage\",\"sqs:DeleteMessage\",\"sqs:GetQueueAttributes\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion\",\"Sid\":\"GestionarColaSRI\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPATPE5G4ST4SQBH6VPO",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "leer_secrets_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:policy/politica-leer-secrets-sri-certificacion",
+            "attachment_count": 1,
+            "description": "Permite a la Lambda leer los secrets del certificado SRI",
+            "id": "arn:aws:iam::238700389543:policy/politica-leer-secrets-sri-certificacion",
+            "name": "politica-leer-secrets-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"secretsmanager:GetSecretValue\",\"secretsmanager:DescribeSecret\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12*\",\"arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password*\"],\"Sid\":\"LeerSecretsSRI\"},{\"Action\":[\"kms:Decrypt\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714\"],\"Sid\":\"UsarKMSParaDescifrar\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPATPE5G4STXV5CZUAHY",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "apigateway_cloudwatch",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:role/rol-apigateway-cloudwatch-certificacion",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Sid\":\"APIGatewayAssumeRole\"}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-05-31T18:29:05Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "rol-apigateway-cloudwatch-certificacion",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+            ],
+            "max_session_duration": 3600,
+            "name": "rol-apigateway-cloudwatch-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "unique_id": "AROATPE5G4STYEBI3LYZN"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "apigateway_sqs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:role/rol-apigateway-sqs-sri-certificacion",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Sid\":\"APIGatewayAssumeRole\"}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-05-31T18:29:05Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "rol-apigateway-sqs-sri-certificacion",
+            "inline_policy": [
+              {
+                "name": "politica-apigateway-sqs-certificacion",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"sqs:SendMessage\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion\",\"Sid\":\"EnviarMensajesSQS\"},{\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714\",\"Sid\":\"UsarKMS\"},{\"Action\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EscribirLogsAPIGW\"}]}"
+              }
+            ],
+            "managed_policy_arns": [],
+            "max_session_duration": 3600,
+            "name": "rol-apigateway-sqs-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "unique_id": "AROATPE5G4STYNIIBXWDD"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "lambda_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Sid\":\"LambdaAssumeRole\"}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-05-31T18:29:05Z",
+            "description": "Rol para Lambda de facturacion electronica SRI Ecuador",
+            "force_detach_policies": false,
+            "id": "rol-lambda-facturacion-sri-certificacion",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::238700389543:policy/pol-fact-ses-lambda-sri-certificacion",
+              "arn:aws:iam::238700389543:policy/politica-leer-secrets-sri-certificacion",
+              "arn:aws:iam::238700389543:policy/politica-logs-lambda-sri-certificacion",
+              "arn:aws:iam::238700389543:policy/politica-s3-lambda-sri-certificacion",
+              "arn:aws:iam::238700389543:policy/politica-sqs-lambda-sri-certificacion"
+            ],
+            "max_session_duration": 3600,
+            "name": "rol-lambda-facturacion-sri-certificacion",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "unique_id": "AROATPE5G4ST3XULKJCTY"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy",
+      "name": "apigateway_sqs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-apigateway-sqs-sri-certificacion:politica-apigateway-sqs-certificacion",
+            "name": "politica-apigateway-sqs-certificacion",
+            "name_prefix": "",
+            "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"sqs:SendMessage\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion\",\"Sid\":\"EnviarMensajesSQS\"},{\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714\",\"Sid\":\"UsarKMS\"},{\"Action\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EscribirLogsAPIGW\"}]}",
+            "role": "rol-apigateway-sqs-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.apigateway_sqs",
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "apigateway_cloudwatch",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-apigateway-cloudwatch-certificacion-20260531182137622300000003",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+            "role": "rol-apigateway-cloudwatch-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.apigateway_cloudwatch"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-lambda-facturacion-sri-certificacion-20260531182137530700000002",
+            "policy_arn": "arn:aws:iam::238700389543:policy/politica-logs-lambda-sri-certificacion",
+            "role": "rol-lambda-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_policy.lambda_logs_sri",
+            "aws_iam_role.lambda_sri",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "s3",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-lambda-facturacion-sri-certificacion-20260531182137526900000001",
+            "policy_arn": "arn:aws:iam::238700389543:policy/politica-s3-lambda-sri-certificacion",
+            "role": "rol-lambda-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_policy.lambda_s3_sri",
+            "aws_iam_role.lambda_sri",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "secrets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-lambda-facturacion-sri-certificacion-20260531183830013900000005",
+            "policy_arn": "arn:aws:iam::238700389543:policy/politica-leer-secrets-sri-certificacion",
+            "role": "rol-lambda-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_policy.leer_secrets_sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "ses",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-lambda-facturacion-sri-certificacion-20260826173858048000000001",
+            "policy_arn": "arn:aws:iam::238700389543:policy/pol-fact-ses-lambda-sri-certificacion",
+            "role": "rol-lambda-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_policy.lambda_ses",
+            "aws_iam_role.lambda_sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "sqs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "rol-lambda-facturacion-sri-certificacion-20260531183922750600000006",
+            "policy_arn": "arn:aws:iam::238700389543:policy/politica-sqs-lambda-sri-certificacion",
+            "role": "rol-lambda-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_policy.lambda_sqs_sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_kms_alias",
+      "name": "sri_secrets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:us-east-1:238700389543:alias/sri-s10",
+            "id": "alias/sri-s10",
+            "name": "alias/sri-s10",
+            "name_prefix": "",
+            "target_key_arn": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "target_key_id": "35ce4e3e-3630-442c-8ddc-30cfd11a8714"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "name": "sri_secrets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": 30,
+            "description": "Clave KMS para secrets del SRI Ecuador",
+            "enable_key_rotation": true,
+            "id": "35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "is_enabled": true,
+            "key_id": "35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::238700389543:root\"},\"Resource\":\"*\",\"Sid\":\"AdministracionCompleta\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey\",\"kms:DescribeKey\"],\"Condition\":{\"ArnLike\":{\"kms:EncryptionContext:aws:logs:arn\":\"arn:aws:logs:us-east-1:238700389543:*\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-east-1.amazonaws.com\"},\"Resource\":\"*\",\"Sid\":\"CloudWatchLogsEncriptar\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"secretsmanager.amazonaws.com\"},\"Resource\":\"*\",\"Sid\":\"SecretsManagerEncriptar\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Resource\":\"*\",\"Sid\":\"S3Encriptar\"},{\"Action\":[\"kms:Decrypt\",\"kms:DescribeKey\",\"kms:GenerateDataKey\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion\"},\"Resource\":\"*\",\"Sid\":\"LambdaDescifrar\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 365,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_event_source_mapping",
+      "name": "sqs_trigger",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "amazon_managed_kafka_event_source_config": [],
+            "arn": "arn:aws:lambda:us-east-1:238700389543:event-source-mapping:26149f27-ca9c-4279-b353-9f593a15781a",
+            "batch_size": 1,
+            "bisect_batch_on_function_error": false,
+            "destination_config": [],
+            "document_db_event_source_config": [],
+            "enabled": true,
+            "event_source_arn": "arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion",
+            "filter_criteria": [],
+            "function_arn": "arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion",
+            "function_name": "arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion",
+            "function_response_types": [],
+            "id": "26149f27-ca9c-4279-b353-9f593a15781a",
+            "kms_key_arn": "",
+            "last_modified": "2026-05-31T18:39:35Z",
+            "last_processing_result": "",
+            "maximum_batching_window_in_seconds": 0,
+            "maximum_record_age_in_seconds": 0,
+            "maximum_retry_attempts": 0,
+            "metrics_config": [],
+            "parallelization_factor": 0,
+            "provisioned_poller_config": [],
+            "queues": [],
+            "scaling_config": [],
+            "self_managed_event_source": [],
+            "self_managed_kafka_event_source_config": [],
+            "source_access_configuration": [],
+            "starting_position": "",
+            "starting_position_timestamp": "",
+            "state": "Enabled",
+            "state_transition_reason": "USER_INITIATED",
+            "tags": {},
+            "tags_all": {},
+            "topics": [],
+            "tumbling_window_in_seconds": 0,
+            "uuid": "26149f27-ca9c-4279-b353-9f593a15781a"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "api_proxy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:238700389543:function:api-proxy-sri-certificacion",
+            "code_sha256": "9QU5tUqPoqYgBhN4HQEKRjG+qh9yNReGAQ2k0f/e3Dg=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "AMBIENTE": "certificacion",
+                  "SQS_COLA_URL": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": "./../lambda/facturacion.zip",
+            "function_name": "api-proxy-sri-certificacion",
+            "handler": "proxy_handler.lambda_handler",
+            "id": "api-proxy-sri-certificacion",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:api-proxy-sri-certificacion/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-08-26T17:43:59.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/api-proxy-sri-certificacion",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 256,
+            "package_type": "Zip",
+            "publish": false,
+            "qualified_arn": "arn:aws:lambda:us-east-1:238700389543:function:api-proxy-sri-certificacion:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:api-proxy-sri-certificacion:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion",
+            "runtime": "python3.12",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "9QU5tUqPoqYgBhN4HQEKRjG+qh9yNReGAQ2k0f/e3Dg=",
+            "source_code_size": 38008621,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeout": 30,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "facturacion_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion",
+            "code_sha256": "zvmNli46eu6ZMOas2WrJSKwDSIhpJy9ByOQK3tIOpe8=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "Procesa comprobantes electronicos y los envia al SRI Ecuador",
+            "environment": [
+              {
+                "variables": {
+                  "AMBIENTE": "certificacion",
+                  "EMAIL_EMISOR": "infotech20250319@gmail.com",
+                  "NOMBRE_EMISOR": "TEFUS - Facturación Electrónica",
+                  "S3_BUCKET_COMPROBANTES": "facturacion-sri-tu-empresa",
+                  "SECRET_CERTIFICADO_P12": "sri/certificacion/cert10-p12",
+                  "SECRET_CERTIFICADO_PASS": "sri/certificacion/cert10-password",
+                  "SQS_COLA_URL": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion",
+                  "SRI_URL_AUTORIZACION": "https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl",
+                  "SRI_URL_RECEPCION": "https://celcer.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantesOffline?wsdl"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": "./../lambda/facturacion.zip",
+            "function_name": "facturacion-sri-certificacion",
+            "handler": "handler.lambda_handler",
+            "id": "facturacion-sri-certificacion",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-08-30T17:02:25.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/facturacion-sri-certificacion",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 512,
+            "package_type": "Zip",
+            "publish": false,
+            "qualified_arn": "arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:238700389543:function:facturacion-sri-certificacion:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion",
+            "runtime": "python3.12",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "zvmNli46eu6ZMOas2WrJSKwDSIhpJy9ByOQK3tIOpe8=",
+            "source_code_size": 38008464,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeout": 300,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_permission",
+      "name": "apigateway_lambda",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "lambda:InvokeFunction",
+            "event_source_token": null,
+            "function_name": "facturacion-sri-certificacion",
+            "function_url_auth_type": null,
+            "id": "AllowAPIGatewayInvoke",
+            "principal": "apigateway.amazonaws.com",
+            "principal_org_id": null,
+            "qualifier": "",
+            "source_account": null,
+            "source_arn": "arn:aws:execute-api:us-east-1:238700389543:xbdvwkho8d/*/*",
+            "statement_id": "AllowAPIGatewayInvoke",
+            "statement_id_prefix": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri",
+            "aws_cloudwatch_log_group.lambda_sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.facturacion_sri",
+            "aws_secretsmanager_secret.certificado_p12",
+            "aws_secretsmanager_secret.certificado_password",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_permission",
+      "name": "apigateway_proxy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "lambda:InvokeFunction",
+            "event_source_token": null,
+            "function_name": "api-proxy-sri-certificacion",
+            "function_url_auth_type": null,
+            "id": "AllowAPIGatewayInvokeProxy",
+            "principal": "apigateway.amazonaws.com",
+            "principal_org_id": null,
+            "qualifier": "",
+            "source_account": null,
+            "source_arn": "arn:aws:execute-api:us-east-1:238700389543:xbdvwkho8d/*/*",
+            "statement_id": "AllowAPIGatewayInvokeProxy",
+            "statement_id_prefix": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_api_gateway_rest_api.sri",
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_lambda_function.api_proxy",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.archive_file.lambda_zip",
+            "data.aws_caller_identity.current",
+            "null_resource.build_lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "comprobantes",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::facturacion-sri-tu-empresa",
+            "bucket": "facturacion-sri-tu-empresa",
+            "bucket_domain_name": "facturacion-sri-tu-empresa.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "facturacion-sri-tu-empresa.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "c47546252af53e8e3e78f49150f3322ee217c3d026844376f7801d436f42c03a",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "facturacion-sri-tu-empresa",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "us-east-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+                        "sse_algorithm": "aws:kms"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::frontend-facturacion-sri-certificacion-238700389543",
+            "bucket": "frontend-facturacion-sri-certificacion-238700389543",
+            "bucket_domain_name": "frontend-facturacion-sri-certificacion-238700389543.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "frontend-facturacion-sri-certificacion-238700389543.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "c47546252af53e8e3e78f49150f3322ee217c3d026844376f7801d436f42c03a",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "frontend-facturacion-sri-certificacion-238700389543",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":\"arn:aws:cloudfront::238700389543:distribution/E2E775NLI0YZ7\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudfront.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::frontend-facturacion-sri-certificacion-238700389543/*\",\"Sid\":\"AllowCloudFrontRead\"}],\"Version\":\"2012-10-17\"}",
+            "region": "us-east-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "frontend-facturacion-sri-certificacion-238700389543",
+            "id": "frontend-facturacion-sri-certificacion-238700389543",
+            "policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":\"arn:aws:cloudfront::238700389543:distribution/E2E775NLI0YZ7\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudfront.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::frontend-facturacion-sri-certificacion-238700389543/*\",\"Sid\":\"AllowCloudFrontRead\"}],\"Version\":\"2012-10-17\"}"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_cloudfront_distribution.frontend",
+            "aws_cloudfront_origin_access_control.frontend",
+            "aws_s3_bucket.frontend",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "comprobantes",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "facturacion-sri-tu-empresa",
+            "id": "facturacion-sri-tu-empresa",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_s3_bucket.comprobantes"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "frontend-facturacion-sri-certificacion-238700389543",
+            "id": "frontend-facturacion-sri-certificacion-238700389543",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_s3_bucket.frontend",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "comprobantes",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "facturacion-sri-tu-empresa",
+            "expected_bucket_owner": "",
+            "id": "facturacion-sri-tu-empresa",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+                    "sse_algorithm": "aws:kms"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "aws_s3_bucket.comprobantes",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "comprobantes",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "facturacion-sri-tu-empresa",
+            "expected_bucket_owner": "",
+            "id": "facturacion-sri-tu-empresa",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_s3_bucket.comprobantes"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "frontend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "frontend-facturacion-sri-certificacion-238700389543",
+            "expected_bucket_owner": "",
+            "id": "frontend-facturacion-sri-certificacion-238700389543",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_s3_bucket.frontend",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_secretsmanager_secret",
+      "name": "certificado_p12",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12-s909Co",
+            "description": "Certificado de firma electronica SRI Ecuador",
+            "force_overwrite_replica_secret": false,
+            "id": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12-s909Co",
+            "kms_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "name": "sri/certificacion/cert10-p12",
+            "name_prefix": "",
+            "policy": "",
+            "recovery_window_in_days": 30,
+            "replica": [],
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_secretsmanager_secret",
+      "name": "certificado_password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password-19NQio",
+            "description": "Password del certificado .p12 SRI Ecuador",
+            "force_overwrite_replica_secret": false,
+            "id": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password-19NQio",
+            "kms_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "name": "sri/certificacion/cert10-password",
+            "name_prefix": "",
+            "policy": "",
+            "recovery_window_in_days": 30,
+            "replica": [],
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_secretsmanager_secret_version",
+      "name": "certificado_p12",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12-s909Co",
+            "has_secret_string_wo": null,
+            "id": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12-s909Co|terraform-20260531183829820000000004",
+            "secret_binary": "MIISYQIBAzCCEh8GCSqGSIb3DQEHAaCCEhAEghIMMIISCDCCDL8GCSqGSIb3DQEHBqCCDLAwggysAgEAMIIMpQYJKoZIhvcNAQcBMBwGCiqGSIb3DQEMAQMwDgQIycW1L0q33J4CAggAgIIMeGbELZveNPyk+FvrdqHDnKZX6WgMImJTw4+T2OSe9AQ3yrVpofeSDI0SyD0Q8zkb6aCZlZ18+VQi2BKPCgdnMN6SpwG270UjZfoxZ8TLITJ9NS98YnpT1fvD3F9Uq3o0hNME74uFtCx5efDc+Q8vjI8zPiWKIbektVCvRjM6hLeyqiF6Mat73x0TgDJ5hkZgxQITAtZ8kCoO0ZhCOjoa6UYxd5kjraTdTS5Op2X0Fkv3mY2veDPXlYo9jWe9t6KW+N73eXYJsT063xeoz2JzluXZKoRFfhenH6RiXkrYYuY5TT0B3pKjY/P4L3RJSHa5hmDbBvp2IwXYJlXhK93sZGn1YpBUX9OOGgPnquRvCgeZzg/gfPUYoQdtmzf0L0R/9Ps1iSFthJITToEaDrToqUo99kzMwr9Xfsyh1wEFREIJl6ALuaDfv8K3nl4i2Vw6NWnW7c7UiPus9ilHWPqdP5mvjS21Qz9/Vh8F/DUE4Ubnh79kKnCuTXaiqcNRctpDvLOiC16i0gctwKI+GL717rs1h2U0gLF8ovjoDk12OZyJzyATaU62E0ZCx17Ji2jdhEjpF1XJ3pfvjp9jDqAYZb3aJkZ7IyZxR6+qV0JPrKdDI7ZxOP8VdTyOk2fF95UdMMKkMHA/+tDe1OWdqOY+TGUIHnekNJNBg+Hj2Ot8xaX9Vv14zHs9Lf9+Y6rhSkRdxLbYRHA4BDW5QgugE5Dsp8/YUM6nK9h1sOijg3AF57dFvq6ZFzTfXhhCQo9IgD5Qy3sGaNcj/BL2Z9ZIxVdXLu4PaZrEvroEb8KMVBmytIQKoDCBX/TKPG5QCV8mz0taTyOEd11WMn956a6hYXnyzhKPgwbrssLLLiPHuwDyPxr5BKQ4t6FaC9bZrPhsB/hRDkeeEk+4sGETl9kZROxQVbpQV0ysdHSq8P8TnrsTjVJh/cI9Y32rpARvn9MekQuXSk8O083n18iSVVVh0lhtbcGTcg/odRO4kgZiPCRDQ2qMW70nmqQ9MSe2qPtZ4I85EhQvk1B9g7pZY1yZ1EWyK1RXPuOw0659uWR7LmoEQGAO3OasPk9PimL6XUgPGdTrBizxwqWM7pSG4atO/BvJ5VXKKP71We3JypLWoruxu95OaUk3Yf2WbhcZD4/UlPamZ+31LFE+v1CORr0hb2w/1oNLwuI7twyT+zF6/iIF3yVMELd9WHIjODV4EulYITRs5zqzDh4gOjVlruW32DHC8GBhcjnQwiEcJsSD1sHKt1JSHOkxI29Ve5OVmFrU8M5fRBA5owEuz6uqZvzg+p3QaA0k5oIzkyiI30NpXNYkfOOHiv5ci/KZ/lJai/Jugi7xenAqxGgFVsXaWYX3ZJw8oYJfYRe674hkesMbryYhrgyxFdzUuyumbK5OitawQqh+9nlaYVKdyxzd5b1J6A5eMnyaERZhriWzRd1CkidPLhlIdO+A8cJA8ScaMsTBOWa7fU+q1pSrWSsxUrQtlKTa5Pgvr88wUOKIEvAYmnV0Te9fXKA/TVmuXbdGvzlIpQH1xAavfdGXB7JQC4NhVk2gBfqYhJpBNRZZCMdVN/7K6TdnCkQ/tqNUaosPoxYVkqXmtiVGUHMgvyxCS8yO6JCi2SdqBqpSvMZ2NVbE/RRxpkONoCuwn3axvt4TZKqufmkMMWfY60Y7i/pbhZGy8Jl7R7Jh91XtBckpUXptiRP0L5ZbaSQcO5jExDvC5P9JxdVbOonD0h2diSJQ4GK2Z9Aqp3E9O+FT36M2r4UYOleYE7+1G7dk75dIljByosbWAU65lh94gIHUsSHer7ujht3ZeuaXmaFYMZ0K4rEJYc1T126vGbzOxODL1Idd7+YGFf0P5+u49aINJwAaLcotwey656PLUSXXXPUdhl12BvBNuFbItrzdVfEJpSIY5QOV2vHK4nIHYCpDPerDMxfzrVddKiV8yyFu1CXgOX4BBqtCSPM+MCAreQAPC90wAdPYTKz8yU871GY7XeggV/YJ473Xuj5p1hqa2j5J8CwUfew6jyyhO2vXiYC8Exh0Is5BqnfsT7Xdp1i0birxdpLzuz0l1maO8faiya8KyPo2tyLZCbE1TieFNk89f7o/HaJYPcK4JQd61PEisVCHu+nTXZorhyHG2i7cZbge8hREUzyhh4oeAlmxEyxHU7ba1kbH0RXr7mxHtkmXOrEU/bH1wBzTlOLOmPkM4mllfsvGSiLJd2Uk7FL5BbazHRn9NczKdSiIJMep30TLfTBt3EO/QFxCcAzOJ/g27BgXjKieyp6JFYPb/CTwpjJFa78r6wtO82w5csrxCmhW0cU1PKCsmw0vtNPCQ6+3oAW3JF9VkUpkuSLpom5Up1OFzOLMHLb5tiCiqplj2ArVQmVhx2ybPPQYa9zhmAXuFkFCHF4kwb38ESv4zbVfk5xEN8r8kT8IdenknyBJ0Xab/fbHqdeRCDv2h8GObFqiQ7XL+ge8Dhb3DHfl877030d7FMd2I04Zc1RUJEcODQOC2mXee8aW21rjSvu6Bwq0hU5j2nZ1eMbCi2GuEyGME4Dibs/JkqPNISjAPJxH4Dk+yQjuZ/QSSH/W4/SFeyR00tIRBY7CLj4iUjrAMF3W5o0exonhI+FJIItVWH6RU3cM0cUxgclPs6ct2kca2ZPjbClwIdjPQ3W7F91zJlYC1PLYBv7yv/DKljpH8MqMewBW8tn5CuM/BGC2F6c+V3XrEygpQG2xst1+b0GyrjUCoSj6ZxzCXWh7txKFN5gkKmonHkorR8M0UzwzAv3jx5JtEKTiRicmB4e/UVOxYztcAgKZe61RmexW4pKeLCK19nFBdaR0dM4VuvRn9mnKGbeujSk2iDdI/NBdSyCtAlMp4f8KG1dTqfZ02tOwV2ZZxfn3Ya6mmSKt2/MKYN6hhqTb216RP3vQJCAuK0gJ9kIj8qSbNxhzffR3+DNhulBisGQc3iZ+H17UahUSZ878UrEjCVGCMoRJWEjv56923yZ3n2IRCsnIvH4cPm1nBOX0OR6nIOh5UApayVoMz7g49U0RyLoxigb6gYJUDwBwWxBddSCXWFxuM5PbsxLKbQjpN0Aw05y0awEISxdEEwCx8kigiNU5Eb0g1pUnnh0KumQfo0DXhxcfzDeUrQt+EMWkLHpgmQpl/gittjxvHWDObiSShgYQni0TFXVFEEbLWLOVlRzBTt81HnPbZPS8FBynkCFIo62jAu57aX3fFZqo2+aeVSYrjhu9rc/4NjSdTQKiSrXQGDBr1af1t7RncQDVFWpbCnu5dvTqO74ReFIZQlzAmjDcKDPzscLB5HQAGKKSjbwIBuor6GarRWNTPxB4RRqDAWHq3QLb6apOSMxZJkdUwJkLi/t8EQ3x2Z9P3/fJG9CK2JeGO6Y5h9G1uaN5VLaBtfffjYHPX8E338GdTygwWk1/zMlEHOHh69WvaO/JiMoCd4fefu7FZ/2LdxQkeYxK/CTU0hq2CAGtYYqPKk9G7Gbsb1iM4Y31t0zX9NBoizMLokhif9FRvm23SuXmGO3NOLzbJN7grdzQJj6pGP0qKpr2159CmYT7m6KZgKTRHSRo4fkTb7bAHoR+3+N6veSXfzhMhuwT3Tmpthhx9O27qgslWVTi5QIOm6KAKJuc5qtLHetGUPyvbqR0DdWqoDXVqZZwnGALmSBcBlViSrUfmGa9Vzoca5pIvp+gmwPuvllqqgvGQOBXY3NCalf4cV3uiv2TsafXgfG9sCaBfobjWe2zAT819IYBUELWMGkw/C0+RfQUY7B1yh6PPpVSNZNMYBPVyGur2CGfqevojBmnBg9oTJStF0giux1gn7F+NhZoSFtuQSVpEokAIsxsSSpYRyHmd01Q+4gF3279Ta/pU4uM9trCvDUlad8xDrNEtYcrnrMjpYEn2L7zcaOt+Hs/Mw9Uc2LF5zFbUX5YvdjI6PCwAML93dgtnnV2tpLoJ+OmzgnZvoaL/T2A/cSU0rzKKrVfPYgS8HapTTUSmvttWp+dI9FNTqzCayLvvMqlyNbloC3rX8Xbc6Sxxutee1y8HGNArGnfFuA1wkxklW+uU2H5F4HjfqGgW6vluF/5ajksmIaJ3Gsz0jBP1grh6s2/85Q441Nn5R8B8JGFcTIIIMSdvlB2PQC2YE4UoJxUItffN+XASrcNVk73JY/uSpJ2zYae4n++ucUrVLlTW1mmQQl9lonDiez9pBe8mTMQQR2dUlwv9ul/Fh+dB+1iTUiM/l1evg0HwhhH2vRwEf1WE6qkDTCCBUEGCSqGSIb3DQEHAaCCBTIEggUuMIIFKjCCBSYGCyqGSIb3DQEMCgECoIIE7jCCBOowHAYKKoZIhvcNAQwBAzAOBAja65ypKci4CAICCAAEggTIhCvuT/gPw4hrK7APax/HRyrwMTjUzi1Q5j/+SiqWlHHL2NkxecashpUJE5eGxVnCPQnNze0kgz9aVOgb2yYQxPd70omnDLTQxDZqcZjgohE0upEJXKRm8Md8QA9wjVSsZRH5Zm3qCVcdH3ZqJZSfmoGBHXZzqIHTkSmAECBolh5Q8EHEv/Kk0UdbNL5LZ11QygAnn2YlTx6aI97c5yDPLOh5OqJkoK2KvSR5DeGiuoHtRWAartsfpNwDr8G/m6lsSm3HLLpV8PG593xRcH/2F+RscqLfQhm+/D8G7uSM36fwBupGG8WJEEMjQgFJOZPA3YD6N5AVzLAftKjlTEhz+UygzWcxHeOicgHFIfaAtZdXSzN95JeC/9qjxA3aAlhPjLB6XP/NL554XCYU80e3soIDelnPsFjb8s6jIsR6Kbw2Y9e6dPOEDg107jZuDwwUOeEmJjGJJpuuqxT83+ho52Q6N+G76MkaKGT4Ln4VIOldvVmcaSlLNtmqX22JGF4jb0K4VT43tPDRYgyu3ri4up4/Y4WQU2+SQxI+DWr3jw4mUJkAbF12njZUBImS0sjTf91T0+jEtlAZFjtDlZTVLt1D3iIXAM0la1hPhFCWHgfMJeyegGlapRhGpw0adqQz5vWfEo0NSfSMdC0W9Kr/5jcDcqI3l7jkC7bNeKQDUs+PIELtKpTcJys02yyxpfwoi040OX2zWmMjI3o1KPBll3CBBRJNp24mnypgFzqDwC9Px7VcsXD40IztB1ISBP7ddAy9ohpqIY1Nt585CSCYpPz5WY/I+0KV1l8S/5YTqNITHZBqYn8bYSy1l/PLZOpe2iAiYYSKtrIYWiLreQhxMjwJ0S0oQ4OLM0ZJxWuR35aoqiyn6ay9ZgpcY3tjlMTkJU/g8PrI8PlwVzLoyQd/ZPrCjs7ROzAKltgTaDwIhDqosXewFeQG/AJ4J2V1KBSKmiBYXsf4A5+zC2yKRRxqM3vEjLdVrEeQ6kDS4odKtTFDxsQyYOr8ydqLxo21EadjJDMgE+vHhhGKp+PyrPYyjEaKzVjvyg2yKxEJLguMu5TLKeq+dEqrrCTURSb2/nM+NsVFo3xVd7p2wd8w3XCs/l7T/3TKKcqmLJRmijzg+E1Uj+Jr1YcKY6f9YbO+1K0fuBHxYkdJWgUnziA+vWIY1RXGFk/brd5hI9UYDTp9Huf9bUYQvmOeHBEYrmFS0eVGeobuKIesCCEpkubLQpkkqL8aNl2xoee8XnVo/ZO0RHUnM9KYeOUcVRJdgTCDZ/XW7JJ3IAbmNKZBu8qu+OVEEWG/vOeubWPJgE2jDErODZj9BJbLksToeJvsj185+DVFuvt8w4IE343st1kw+58uyQukVBCyj3QKLXFNYCIgtiRhBu9O82YsVsNpz+0YjXPbQN8mbKWi/Bft0rP8zJfwJwIOqRMpJoYYyotdO8Xl0mpmewfgbMuXEVDvC5Kb3SsGW6avPpLkt2zzYRa+EcX30hjS8Y0ordUXLsrfsvhmasF+X+9YfjvThZQhpt/4Z5vGugwEJkz+BkzST+JsQhCekMZb8NiSqHEwSgGWnZh5SJVnGut2yJutgcVOU9zec1k85whm7wP6SnIa8rbV0+d20eHwg98701X0MSUwIwYJKoZIhvcNAQkVMRYEFPoaiUV6hvnRT1jW7qXVHo2fqlpgMDkwITAJBgUrDgMCGgUABBQPFGjwEgubVkIkiAwR/qNkNCoOuwQQNIPJBuJopEP3GPpR8ttnQwICCAA=",
+            "secret_id": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-p12-s909Co",
+            "secret_string": "",
+            "secret_string_wo": null,
+            "secret_string_wo_version": null,
+            "version_id": "terraform-20260531183829820000000004",
+            "version_stages": [
+              "AWSCURRENT"
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_binary"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_string"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_string_wo"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "aws_secretsmanager_secret.certificado_p12",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_secretsmanager_secret_version",
+      "name": "certificado_password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password-19NQio",
+            "has_secret_string_wo": null,
+            "id": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password-19NQio|terraform-20260531183829810800000003",
+            "secret_binary": "",
+            "secret_id": "arn:aws:secretsmanager:us-east-1:238700389543:secret:sri/certificacion/cert10-password-19NQio",
+            "secret_string": "{\"password\":\"Kuara25Funci\"}",
+            "secret_string_wo": null,
+            "secret_string_wo_version": null,
+            "version_id": "terraform-20260531183829810800000003",
+            "version_stages": [
+              "AWSCURRENT"
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_binary"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_string"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_string_wo"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "aws_secretsmanager_secret.certificado_password",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ses_configuration_set",
+      "name": "facturacion",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ses:us-east-1:238700389543:configuration-set/config-facturacion-sri-certificacion",
+            "delivery_options": [
+              {
+                "tls_policy": "Require"
+              }
+            ],
+            "id": "config-facturacion-sri-certificacion",
+            "last_fresh_start": "0001-01-01T00:00:00Z",
+            "name": "config-facturacion-sri-certificacion",
+            "reputation_metrics_enabled": false,
+            "sending_enabled": true,
+            "tracking_options": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ses_email_identity",
+      "name": "emisor",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ses:us-east-1:238700389543:identity/infotech20250319@gmail.com",
+            "email": "infotech20250319@gmail.com",
+            "id": "infotech20250319@gmail.com"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sns_topic",
+      "name": "alertas_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "application_failure_feedback_role_arn": "",
+            "application_success_feedback_role_arn": "",
+            "application_success_feedback_sample_rate": 0,
+            "archive_policy": "",
+            "arn": "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion",
+            "beginning_archive_time": "",
+            "content_based_deduplication": false,
+            "delivery_policy": "",
+            "display_name": "",
+            "fifo_throughput_scope": "",
+            "fifo_topic": false,
+            "firehose_failure_feedback_role_arn": "",
+            "firehose_success_feedback_role_arn": "",
+            "firehose_success_feedback_sample_rate": 0,
+            "http_failure_feedback_role_arn": "",
+            "http_success_feedback_role_arn": "",
+            "http_success_feedback_sample_rate": 0,
+            "id": "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion",
+            "kms_master_key_id": "",
+            "lambda_failure_feedback_role_arn": "",
+            "lambda_success_feedback_role_arn": "",
+            "lambda_success_feedback_sample_rate": 0,
+            "name": "alertas-facturacion-sri-certificacion",
+            "name_prefix": "",
+            "owner": "238700389543",
+            "policy": "{\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"238700389543\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion\",\"Sid\":\"__default_statement_ID\"}],\"Version\":\"2008-10-17\"}",
+            "signature_version": 0,
+            "sqs_failure_feedback_role_arn": "",
+            "sqs_success_feedback_role_arn": "",
+            "sqs_success_feedback_sample_rate": 0,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tracing_config": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sns_topic_subscription",
+      "name": "email_alertas",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion:afad0171-1381-46f7-b2a1-5f99c8049c73",
+            "confirmation_timeout_in_minutes": 1,
+            "confirmation_was_authenticated": false,
+            "delivery_policy": "",
+            "endpoint": "jreyesmen@gmail.com",
+            "endpoint_auto_confirms": false,
+            "filter_policy": "",
+            "filter_policy_scope": "",
+            "id": "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion:afad0171-1381-46f7-b2a1-5f99c8049c73",
+            "owner_id": "238700389543",
+            "pending_confirmation": false,
+            "protocol": "email",
+            "raw_message_delivery": false,
+            "redrive_policy": "",
+            "replay_policy": "",
+            "subscription_role_arn": "",
+            "topic_arn": "arn:aws:sns:us-east-1:238700389543:alertas-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_sns_topic.alertas_sri"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sqs_queue",
+      "name": "cola_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion",
+            "content_based_deduplication": false,
+            "deduplication_scope": "",
+            "delay_seconds": 0,
+            "fifo_queue": false,
+            "fifo_throughput_limit": "",
+            "id": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion",
+            "kms_data_key_reuse_period_seconds": 300,
+            "kms_master_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "max_message_size": 262144,
+            "message_retention_seconds": 86400,
+            "name": "cola-facturacion-sri-certificacion",
+            "name_prefix": "",
+            "policy": "{\"Statement\":[{\"Action\":[\"sqs:SendMessage\",\"sqs:ReceiveMessage\",\"sqs:DeleteMessage\",\"sqs:GetQueueAttributes\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion\"},\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion\",\"Sid\":\"SoloRolLambda\"}],\"Version\":\"2012-10-17\"}",
+            "receive_wait_time_seconds": 20,
+            "redrive_allow_policy": "",
+            "redrive_policy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-muerta-certificacion\",\"maxReceiveCount\":3}",
+            "sqs_managed_sse_enabled": false,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeouts": null,
+            "url": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion",
+            "visibility_timeout_seconds": 300
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sqs_queue",
+      "name": "cola_sri_muerta",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-muerta-certificacion",
+            "content_based_deduplication": false,
+            "deduplication_scope": "",
+            "delay_seconds": 0,
+            "fifo_queue": false,
+            "fifo_throughput_limit": "",
+            "id": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-muerta-certificacion",
+            "kms_data_key_reuse_period_seconds": 300,
+            "kms_master_key_id": "arn:aws:kms:us-east-1:238700389543:key/35ce4e3e-3630-442c-8ddc-30cfd11a8714",
+            "max_message_size": 262144,
+            "message_retention_seconds": 1209600,
+            "name": "cola-facturacion-sri-muerta-certificacion",
+            "name_prefix": "",
+            "policy": "{\"Statement\":[{\"Action\":[\"sqs:SendMessage\",\"sqs:ReceiveMessage\",\"sqs:DeleteMessage\",\"sqs:GetQueueAttributes\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion\"},\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-muerta-certificacion\",\"Sid\":\"SoloRolLambda\"}],\"Version\":\"2012-10-17\"}",
+            "receive_wait_time_seconds": 0,
+            "redrive_allow_policy": "",
+            "redrive_policy": "",
+            "sqs_managed_sse_enabled": false,
+            "tags": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "tags_all": {
+              "Ambiente": "certificacion",
+              "Proyecto": "facturacion-electronica"
+            },
+            "timeouts": null,
+            "url": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-muerta-certificacion",
+            "visibility_timeout_seconds": 30
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_kms_key.sri_secrets",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sqs_queue_policy",
+      "name": "cola_sri",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "id": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion",
+            "policy": "{\"Statement\":[{\"Action\":[\"sqs:SendMessage\",\"sqs:ReceiveMessage\",\"sqs:DeleteMessage\",\"sqs:GetQueueAttributes\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion\"},\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-certificacion\",\"Sid\":\"SoloRolLambda\"}],\"Version\":\"2012-10-17\"}",
+            "queue_url": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sqs_queue_policy",
+      "name": "cola_sri_muerta",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "id": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-muerta-certificacion",
+            "policy": "{\"Statement\":[{\"Action\":[\"sqs:SendMessage\",\"sqs:ReceiveMessage\",\"sqs:DeleteMessage\",\"sqs:GetQueueAttributes\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::238700389543:role/rol-lambda-facturacion-sri-certificacion\"},\"Resource\":\"arn:aws:sqs:us-east-1:238700389543:cola-facturacion-sri-muerta-certificacion\",\"Sid\":\"SoloRolLambda\"}],\"Version\":\"2012-10-17\"}",
+            "queue_url": "https://sqs.us-east-1.amazonaws.com/238700389543/cola-facturacion-sri-muerta-certificacion"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_iam_role.lambda_sri",
+            "aws_kms_key.sri_secrets",
+            "aws_sqs_queue.cola_sri_muerta",
+            "data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "build_lambda",
+      "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "6884920315106085652",
+            "triggers": {
+              "firma_xml": "be926a14ee1aed15f7e57c1ec20ec035",
+              "handler": "a1dcd3a9069ad6ee05808c5f5c056064",
+              "requirements": "d6c9689bafbd267210dab5615c64bc2f",
+              "secrets": "feb5a83f244b9105142e0150d41508ee",
+              "sri_client": "2ee577a024dacf98512ea91c31250a2b",
+              "xml_builder": "102b9d46a28c6c8a7ecfb17d24de58c1"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "create_before_destroy": true
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

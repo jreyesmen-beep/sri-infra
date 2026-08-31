@@ -110,7 +110,7 @@ import {
   id = "api-proxy-sri-${var.ambiente}/AllowAPIGatewayInvokeProxy"
 }
 
-import {
-  to = aws_lambda_permission.apigateway_lambda 
-  id = "facturacion-sri-${var.ambiente}/AllowAPIGatewayInvoke"
-}
+# import {
+#   to = aws_lambda_permission.apigateway_lambda 
+#   id = "facturacion-sri-${var.ambiente}/AllowAPIGatewayInvoke"
+# }

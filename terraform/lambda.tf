@@ -140,6 +140,7 @@ resource "aws_lambda_function" "api_proxy" {
     variables = {
       SQS_COLA_URL = aws_sqs_queue.cola_sri.id
       AMBIENTE     = var.ambiente
+      LAMBDA_FACT_NAME = aws_lambda_function.facturacion_sri.function_name  # ← nuevo
     }
   }
 
@@ -147,4 +148,22 @@ resource "aws_lambda_function" "api_proxy" {
     Proyecto = "facturacion-electronica"
     Ambiente = var.ambiente
   }
+}
+
+# Permiso para que el proxy invoque el fact_sri
+resource "aws_iam_role_policy" "proxy_invoke_facturacion" {
+  name = "politica-proxy-invoke-facturacion-${var.ambiente}"
+  role = aws_iam_role.lambda_sri.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "InvocarLambdaFacturacion"
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = aws_lambda_function.facturacion_sri.arn
+      }
+    ]
+  })
 }
