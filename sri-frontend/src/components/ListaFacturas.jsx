@@ -35,158 +35,65 @@ export default function ListaFacturas() {
     }
   }
 
-  async function descargarRIDE() {
-    setDescargando(true)
-    setErrorDescarga('')
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/facturas/${clave}/ride`,
-        { headers: { "Authorization": `Bearer ${getToken()}` } }
-      )
+async function descargarRIDE() {
+  setDescargando(true)
+  setErrorDescarga('')
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/facturas/${clave}/ride`,
+      { headers: { "Authorization": `Bearer ${getToken()}` } }
+    )
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}))
-        throw new Error(body.mensaje || `Error ${response.status}`)
+    // Siempre leer como texto primero
+    const texto = await response.text()
+
+    if (!response.ok) {
+      try {
+        const data = JSON.parse(texto)
+        throw new Error(data.mensaje || `Error ${response.status}`)
+      } catch {
+        throw new Error(`Error ${response.status}`)
       }
-
-      // El Lambda devuelve base64 en el body
-      const data      = await response.json()
-      const pdfBase64 = data.pdf_base64 || data.body || data
-      const bytes     = atob(pdfBase64)
-      const arr       = new Uint8Array(bytes.length)
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-
-      const blob = new Blob([arr], { type: "application/pdf" })
-      const url  = URL.createObjectURL(blob)
-      const a    = document.createElement("a")
-      a.href     = url
-      a.download = `factura-${clave}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-
-    } catch (err) {
-      setErrorDescarga(err.message)
-    } finally {
-      setDescargando(false)
     }
+
+    // ✅ Parsear el JSON que contiene el PDF en base64
+    let data
+    try {
+      data = JSON.parse(texto)
+    } catch {
+      throw new Error("Respuesta inválida del servidor")
+    }
+
+    if (!data.pdf_base64) {
+      throw new Error("No se recibió el PDF del servidor")
+    }
+
+    // Decodificar base64 → bytes → Blob
+    const binaryStr = atob(data.pdf_base64)
+    const bytes     = new Uint8Array(binaryStr.length)
+    for (let i = 0; i < binaryStr.length; i++) {
+      bytes[i] = binaryStr.charCodeAt(i)
+    }
+    const blob = new Blob([bytes], { type: "application/pdf" })
+
+    // Descargar el blob
+    const url = URL.createObjectURL(blob)
+    const a   = document.createElement("a")
+    a.href     = url
+    a.download = data.filename || `factura-${clave}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    //logger.info?.(`PDF descargado: ${blob.size} bytes`)
+
+
+  } catch (err) {
+    setErrorDescarga(`Error al descargar: ${err.message}`)
+  } finally {
+    setDescargando(false)
   }
-
-  const info = factura ? (ESTADOS[factura.estado] || ESTADOS.ERROR_INTERNO) : null
-
-  return (
-    <div className="fade-in">
-      <h2 style={styles.titulo}>Consultar Comprobante</h2>
-      <p  style={styles.subtitulo}>
-        Ingresa la clave de acceso para consultar el estado
-      </p>
-
-      <div style={styles.card}>
-
-        {/* Formulario búsqueda */}
-        <form onSubmit={handleConsultar} style={styles.form}>
-          <input
-            value       = {clave}
-            onChange    = {e => setClave(e.target.value)}
-            placeholder = "Clave de acceso (49 dígitos)"
-            maxLength   = {49}
-            required
-            style       = {styles.input}
-          />
-          <button
-            type     = "submit"
-            style    = {styles.btnConsultar}
-            disabled = {estado === 'loading'}
-          >
-            {estado === 'loading' ? 'Consultando...' : 'Consultar'}
-          </button>
-        </form>
-
-        {/* Error de consulta */}
-        {error && (
-          <p style={styles.error}>{error}</p>
-        )}
-
-        {/* Resultado */}
-        {factura && estado === 'ok' && info && (
-          <div
-            style     = {{ ...styles.resultado, background: info.color }}
-            className = "fade-in"
-          >
-            {/* Badge de estado */}
-            <div style={styles.badgeRow}>
-              <span style={{ fontSize: '1.5rem' }}>{info.icono}</span>
-              <span style={{ ...styles.estadoLabel, color: info.texto }}>
-                {info.label}
-              </span>
-            </div>
-
-            {/* Datos de autorización */}
-            {factura.numero_autorizacion && (
-              <div style={styles.dato}>
-                <span style={styles.datoLabel}>Número de autorización</span>
-                <span style={styles.datoValor}>{factura.numero_autorizacion}</span>
-              </div>
-            )}
-
-            {factura.fecha_autorizacion && (
-              <div style={styles.dato}>
-                <span style={styles.datoLabel}>Fecha de autorización</span>
-                <span style={styles.datoValor}>{factura.fecha_autorizacion}</span>
-              </div>
-            )}
-
-            {/* Mensaje adicional */}
-            {factura.mensaje && (
-              <div style={styles.dato}>
-                <span style={styles.datoLabel}>Detalle</span>
-                <span style={{ ...styles.datoValor, color: info.texto }}>
-                  {factura.mensaje}
-                </span>
-              </div>
-            )}
-
-            {/* Botón descargar RIDE — solo si está autorizado */}
-            {factura.estado === 'AUTORIZADO' && (
-              <div style={{ marginTop: '1rem' }}>
-                <button
-                  onClick  = {descargarRIDE}
-                  style    = {{
-                    ...styles.btnRIDE,
-                    opacity: descargando ? 0.7 : 1
-                  }}
-                  disabled = {descargando}
-                >
-                  {descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
-                </button>
-
-                {errorDescarga && (
-                  <p style={{ ...styles.error, marginTop: '0.5rem' }}>
-                    {errorDescarga}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Aviso SRI no disponible */}
-            {factura.estado === 'SRI_NO_DISPONIBLE' && (
-              <div style={styles.aviso}>
-                <p>El SRI no estaba disponible. Tu comprobante se reintentará automáticamente.</p>
-                <button
-                  onClick = {handleConsultar}
-                  style   = {styles.btnReintentar}
-                >
-                  Verificar de nuevo
-                </button>
-              </div>
-            )}
-
-          </div>
-        )}
-      </div>
-    </div>
-  )
 }
 
 const styles = {

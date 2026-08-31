@@ -5,6 +5,12 @@ resource "aws_api_gateway_rest_api" "sri" {
   name        = "api-facturacion-sri-${var.ambiente}"
   description = "API para emision de comprobantes electronicos SRI Ecuador"
 
+  # ← Agregar soporte para contenido binario
+  binary_media_types = [
+    "application/pdf",
+    "application/octet-stream"
+  ]
+
   endpoint_configuration {
     types = ["REGIONAL"]
   }

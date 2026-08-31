@@ -1,5 +1,10 @@
-import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js'
+import {
+  CognitoUserPool,
+  CognitoUser,
+  AuthenticationDetails
+} from 'amazon-cognito-identity-js'
 
+// ✅ Nuevo formato — objeto en lugar de parámetros separados
 const userPool = new CognitoUserPool({
   UserPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
   ClientId:   import.meta.env.VITE_COGNITO_CLIENT_ID,
@@ -7,7 +12,12 @@ const userPool = new CognitoUserPool({
 
 export async function login(email, password) {
   return new Promise((resolve, reject) => {
-    const user    = new CognitoUser({ Username: email, Pool: userPool })
+    const user = new CognitoUser({
+      Username: email,
+      Pool:     userPool
+    })
+
+    // ✅ Nuevo formato para AuthenticationDetails
     const authDetails = new AuthenticationDetails({
       Username: email,
       Password: password,
@@ -21,8 +31,6 @@ export async function login(email, password) {
         resolve(token)
       },
       onFailure: (err) => reject(err),
-
-      // Primera vez que el usuario entra debe cambiar contraseña
       newPasswordRequired: (userAttributes) => {
         resolve({ newPasswordRequired: true, user, userAttributes })
       }
@@ -50,14 +58,6 @@ export function logout() {
   localStorage.removeItem('sri_email')
 }
 
-export function getToken() {
-  return localStorage.getItem('sri_token')
-}
-
-export function getEmail() {
-  return localStorage.getItem('sri_email')
-}
-
-export function isAuthenticated() {
-  return !!getToken()
-}
+export function getToken()         { return localStorage.getItem('sri_token') }
+export function getEmail()         { return localStorage.getItem('sri_email') }
+export function isAuthenticated()  { return !!getToken() }
