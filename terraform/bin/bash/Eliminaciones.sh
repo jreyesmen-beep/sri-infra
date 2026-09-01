@@ -6,3 +6,4 @@ aws lambda remove-permission \
   --function-name facturacion-sri-certificacion \
   --statement-id AllowAPIGatewayInvoke \
   --region us-east-1 2>/dev/null || echo "Ya no existía"
+  

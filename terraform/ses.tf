@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounces" {
   alarm_actions = [aws_sns_topic.alertas_sri.arn]
 
   tags = {
-    Proyecto = "billingfact"
+    Proyecto = "facturacion-electronica"
     Ambiente = var.ambiente
   }
 }
@@ -67,7 +67,7 @@ resource "aws_iam_policy" "lambda_ses" {
   })
 
   tags = {
-    Proyecto = "billingfact"
+    Proyecto = "facturacion-electronica"
     Ambiente = var.ambiente
   }
 }

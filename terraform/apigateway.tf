@@ -125,19 +125,6 @@ resource "aws_api_gateway_integration" "post_factura_sqs" {
   integration_http_method = "POST"
   uri                     = aws_lambda_function.api_proxy.invoke_arn
 
-/*   uri                     = "arn:aws:apigateway:${var.aws_region}:sqs:path/${data.aws_caller_identity.current.account_id}/${aws_sqs_queue.cola_sri.name}"
-  credentials             = aws_iam_role.apigateway_sqs.arn
-
-  request_parameters = {
-    "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
-  }
-
-  # Mapea el body del request al formato que espera SQS
-  request_templates = {
-    "application/json" = "Action=SendMessage&MessageBody=$util.urlEncode($input.body)"
-  }
-
-  passthrough_behavior = "NEVER" */
 }
 
 # Permiso para que API Gateway invoque la Lambda proxy

@@ -20,7 +20,6 @@ CORS_HEADERS = {
     "Content-Type":                 "application/json"
 }
 
-
 def lambda_handler(event, context):
     http_method = event.get("httpMethod", "")
     path        = event.get("path", "")

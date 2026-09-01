@@ -150,6 +150,7 @@ resource "aws_lambda_function" "api_proxy" {
   }
 }
 
+
 # Permiso para que el proxy invoque el fact_sri
 resource "aws_iam_role_policy" "proxy_invoke_facturacion" {
   name = "politica-proxy-invoke-facturacion-${var.ambiente}"

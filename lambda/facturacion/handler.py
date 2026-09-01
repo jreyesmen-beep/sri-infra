@@ -434,6 +434,8 @@ def procesar_comprobante(datos: dict):
 
     # 5. Enviar por email si hay destinatario
     email_cliente = datos.get("email_comprador", "")
+    logger.info(f"Email del comprador: '{email_cliente}'")
+    
     if email_cliente:
         logger.info(f"Enviando RIDE por email a: {email_cliente}")
         resultado_email = enviar_ride_por_email(

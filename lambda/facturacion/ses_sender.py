@@ -31,9 +31,9 @@ def enviar_ride_por_email(
         logger.warning("No se proporcionó email del destinatario")
         return {"enviado": False, "razon": "Sin email de destinatario"}
 
-    if AMBIENTE == "certificacion":
-        logger.info(f"Ambiente certificación: email simulado a {email_destinatario}")
-        return {"enviado": True, "simulado": True, "destinatario": email_destinatario}
+    # if AMBIENTE == "certificacion":
+    #     logger.info(f"Ambiente certificación: email simulado a {email_destinatario}")
+    #     return {"enviado": True, "simulado": True, "destinatario": email_destinatario}
 
     try:
         clave_acceso  = datos_factura.get("clave_acceso", "")
