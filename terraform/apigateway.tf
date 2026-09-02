@@ -637,3 +637,92 @@ resource "aws_api_gateway_integration_response" "options_ride" {
   }
   depends_on = [aws_api_gateway_integration.options_ride]
 }
+
+# =================================================
+# RECURSO: /Configuracion
+# =================================================
+# /configuracion
+resource "aws_api_gateway_resource" "configuracion" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  parent_id   = aws_api_gateway_rest_api.sri.root_resource_id
+  path_part   = "configuracion"
+}
+
+# GET /configuracion
+resource "aws_api_gateway_method" "get_configuracion" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.configuracion.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
+}
+
+resource "aws_api_gateway_integration" "get_configuracion" {
+  rest_api_id             = aws_api_gateway_rest_api.sri.id
+  resource_id             = aws_api_gateway_resource.configuracion.id
+  http_method             = aws_api_gateway_method.get_configuracion.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.api_proxy.invoke_arn
+}
+
+# PUT /configuracion
+resource "aws_api_gateway_method" "put_configuracion" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.configuracion.id
+  http_method   = "PUT"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
+}
+
+resource "aws_api_gateway_integration" "put_configuracion" {
+  rest_api_id             = aws_api_gateway_rest_api.sri.id
+  resource_id             = aws_api_gateway_resource.configuracion.id
+  http_method             = aws_api_gateway_method.put_configuracion.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.api_proxy.invoke_arn
+}
+
+# OPTIONS /configuracion — CORS
+resource "aws_api_gateway_method" "options_configuracion" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.configuracion.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "options_configuracion" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.configuracion.id
+  http_method = aws_api_gateway_method.options_configuracion.http_method
+  type        = "MOCK"
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "options_configuracion_200" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.configuracion.id
+  http_method = aws_api_gateway_method.options_configuracion.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_configuracion" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.configuracion.id
+  http_method = aws_api_gateway_method.options_configuracion.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+  depends_on = [aws_api_gateway_integration.options_configuracion]
+}

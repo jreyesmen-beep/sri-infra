@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { logout, getEmail } from '../services/auth'
 import NuevaFactura  from './NuevaFactura'
 import ListaFacturas from './ListaFacturas'
+import Configuracion from './Configuracion'
 
 const TABS = [
-  { id: 'nueva',  label: '+ Nueva Factura' },
-  { id: 'lista',  label: 'Comprobantes'    },
+  { id: 'nueva',         label: '+ Nueva Factura' },
+  { id: 'lista',         label: 'Comprobantes'    },
+  { id: 'configuracion', label: '⚙ Configuración'  },  // ← nuevo
 ]
 
 export default function Dashboard({ onLogout }) {
@@ -54,6 +56,8 @@ export default function Dashboard({ onLogout }) {
         <div className="fade-in" key={tab}>
           {tab === 'nueva' && <NuevaFactura />}
           {tab === 'lista' && <ListaFacturas />}
+          // En el render agregar:
+          {tab === 'configuracion' && <Configuracion />}          
         </div>
       </main>
 

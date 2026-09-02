@@ -95,22 +95,78 @@ async function descargarRIDE() {
     setDescargando(false)
   }
 }
+}
 
 const styles = {
-  titulo:      { fontSize: '1.75rem', marginBottom: '0.25rem' },
-  subtitulo:   { color: '#64748B', fontSize: '0.875rem', marginBottom: '2rem' },
-  card:        { background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' },
-  form:        { display: 'flex', gap: '0.75rem', marginBottom: '1rem' },
-  input:       { flex: 1, padding: '0.75rem 1rem', border: '1.5px solid #E2E8F0', borderRadius: '8px', fontSize: '0.875rem', fontFamily: "'DM Mono', monospace", outline: 'none', color: '#0F1923' },
-  btnConsultar:{ background: '#00875A', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.25rem', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' },
-  error:       { background: '#FFF5F5', color: '#E53E3E', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem', margin: '0' },
-  resultado:   { borderTop: '1px solid #E2E8F0', paddingTop: '1.25rem', marginTop: '0.5rem', borderRadius: '10px', padding: '1.25rem' },
-  badgeRow:    { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' },
-  estadoLabel: { fontWeight: 700, fontSize: '1rem' },
-  dato:        { display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: '0.75rem' },
-  datoLabel:   { fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 600, color: '#64748B' },
-  datoValor:   { fontFamily: "'DM Mono', monospace", fontSize: '0.8rem', color: '#0F1923', wordBreak: 'break-all' },
-  btnRIDE:     { background: '#00875A', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontWeight: 600, fontSize: '0.9rem', width: '100%', cursor: 'pointer' },
-  btnReintentar:{ background: 'transparent', border: '1.5px solid #E2E8F0', borderRadius: '6px', padding: '0.5rem 1rem', color: '#64748B', fontSize: '0.875rem', cursor: 'pointer', marginTop: '0.75rem' },
-  aviso:       { display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', marginTop: '0.75rem' },
+  contenedor: {
+    display:   'flex',
+    minHeight: '100vh',
+  },
+  sidebar: {
+    width:         '220px',
+    background:    '#0F1923',
+    display:       'flex',
+    flexDirection: 'column',
+    padding:       '1.5rem',
+    position:      'fixed',
+    top:           0,
+    left:          0,
+    bottom:        0,
+  },
+  logoSide: {
+    display:        'flex',
+    alignItems:     'center',
+    justifyContent: 'center',
+    marginBottom:   '2rem',
+    paddingBottom:  '1rem',
+    borderBottom:   '1px solid #1E2D3D',
+  },
+  nav: {
+    display:       'flex',
+    flexDirection: 'column',
+    gap:           '0.5rem',
+    flex:          1,
+  },
+  navItem: {
+    padding:      '0.75rem 1rem',
+    background:   'transparent',
+    color:        '#94A3B8',
+    border:       'none',
+    borderRadius: '8px',
+    textAlign:    'left',
+    fontSize:     '0.9rem',
+    cursor:       'pointer',
+    transition:   'all 0.2s',
+  },
+  navActivo: {
+    background: '#1E2D3D',
+    color:      '#3B82F6',
+    fontWeight: '600',
+  },
+  userInfo: {
+    borderTop:  '1px solid #1E2D3D',
+    paddingTop: '1rem',
+  },
+  userEmail: {
+    color:        '#64748B',
+    fontSize:     '0.75rem',
+    marginBottom: '0.5rem',
+    wordBreak:    'break-all',
+  },
+  btnLogout: {
+    background:   'transparent',
+    border:       '1px solid #2D3748',
+    color:        '#64748B',
+    borderRadius: '6px',
+    padding:      '0.4rem 0.75rem',
+    fontSize:     '0.8rem',
+    width:        '100%',
+    cursor:       'pointer',
+  },
+  main: {
+    marginLeft: '220px',
+    flex:       1,
+    padding:    '2rem',
+    maxWidth:   '960px',
+  }
 }

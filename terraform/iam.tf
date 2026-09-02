@@ -206,3 +206,4 @@ resource "aws_iam_role_policy_attachment" "sqs" {
 # Data source: obtener el Account ID automaticamente
 # -------------------------------------------------
 data "aws_caller_identity" "current" {}
+

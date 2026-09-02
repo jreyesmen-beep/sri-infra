@@ -1,10 +1,41 @@
-import { useState } from 'react'
-import { emitirFactura } from '../services/api'
+import { useState, useEffect } from 'react'
+import { emitirFactura, obtenerConfiguracion } from '../services/api'
 
 const ITEM_VACIO = {
   codigo: '', descripcion: '', cantidad: 1,
   precio_unitario: 0, descuento: 0
 }
+
+// ← Cargar configuración del emisor automáticamente
+  useEffect(() => {
+    async function cargar() {
+      try {
+        const config = await obtenerConfiguracion()
+        setForm(f => ({
+          ...f,
+          ruc:                 config.ruc                 || f.ruc,
+          razon_social:        config.razon_social        || f.razon_social,
+          nombre_comercial:    config.nombre_comercial    || f.nombre_comercial,
+          establecimiento:     config.establecimiento     || f.establecimiento,
+          punto_emision:       config.punto_emision       || f.punto_emision,
+          dir_matriz:          config.dir_matriz          || f.dir_matriz,
+          dir_establecimiento: config.dir_establecimiento || f.dir_establecimiento,
+          // Calcular siguiente secuencial
+          secuencial:          _siguiente_secuencial(config.secuencial_actual || '1'),
+        }))
+      } catch (err) {
+        console.warn('No hay configuración guardada aún')
+      } finally {
+        setCargandoConfig(false)
+      }
+    }
+    cargar()
+  }, [])
+
+ function _siguiente_secuencial(actual) {
+  const num = parseInt(actual || '1', 10)
+  return String(num).padStart(9, '0')
+} 
 
 export default function NuevaFactura() {
   const [form, setForm] = useState({
@@ -21,6 +52,9 @@ export default function NuevaFactura() {
     email_comprador:  '',
     dir_establecimiento: '',
   })
+
+  const [cargandoConfig, setCargandoConfig] = useState(true)
+
   const [items,   setItems]   = useState([{ ...ITEM_VACIO }])
   const [estado,  setEstado]  = useState('idle')  // idle | loading | ok | error
   const [resultado, setResultado] = useState(null)

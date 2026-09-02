@@ -15,6 +15,32 @@ EMAIL_EMISOR  = os.environ.get("EMAIL_EMISOR", "")
 NOMBRE_EMISOR = os.environ.get("NOMBRE_EMISOR", "Facturación Electrónica")
 AMBIENTE      = os.environ.get("AMBIENTE", "certificacion")
 
+# Agregar función para verificar emails en sandbox
+def verificar_email_si_sandbox(email: str) -> bool:
+    """
+    Verifica el email en SES si estamos en sandbox.
+    Retorna True si el email ya está verificado.
+    """
+    try:
+        response = ses.get_identity_verification_attributes(
+            Identities=[email]
+        )
+        atributos = response.get("VerificationAttributes", {})
+        estado    = atributos.get(email, {}).get("VerificationStatus", "")
+
+        if estado == "Success":
+            logger.info(f"Email {email} ya verificado en SES")
+            return True
+
+        # Enviar verificación si no está verificado
+        ses.verify_email_identity(EmailAddress=email)
+        logger.info(f"Email de verificación enviado a {email}")
+        return False
+
+    except Exception as e:
+        logger.error(f"Error verificando email: {str(e)}")
+        return False
+
 
 def enviar_ride_por_email(
     email_destinatario: str,
@@ -36,84 +62,109 @@ def enviar_ride_por_email(
     #     return {"enviado": True, "simulado": True, "destinatario": email_destinatario}
 
     try:
-        clave_acceso  = datos_factura.get("clave_acceso", "")
-        secuencial    = datos_factura.get("secuencial", "").zfill(9)
-        establecimiento = datos_factura.get("establecimiento", "001")
-        punto_emision   = datos_factura.get("punto_emision", "001")
-        num_factura   = f"{establecimiento}-{punto_emision}-{secuencial}"
-        total         = datos_factura.get("importe_total", 0)
-        fecha_emision = datos_factura.get("fecha_emision", "")
-        razon_social  = datos_factura.get("razon_social", "")
+        # Verificar si estamos en sandbox
+        account = ses.get_account_sending_enabled()
 
-        # Construir el email
-        msg = MIMEMultipart("mixed")
-        msg["Subject"] = f"Factura Electrónica {num_factura} — {razon_social}"
-        msg["From"]    = f"{NOMBRE_EMISOR} <{EMAIL_EMISOR}>"
-        msg["To"]      = f"{nombre_destinatario} <{email_destinatario}>"
+        # Intentar enviar — si falla por sandbox, verificar y notificar
+        try:
+            return _enviar_email(
+                email_destinatario,
+                nombre_destinatario,
+                datos_factura,
+                pdf_bytes,
+                numero_autorizacion,
+                fecha_autorizacion
+            )
 
-        # Cuerpo HTML
-        html_body = _construir_html(
-            nombre_destinatario = nombre_destinatario,
-            num_factura         = num_factura,
-            fecha_emision       = fecha_emision,
-            total               = total,
-            numero_autorizacion = numero_autorizacion,
-            fecha_autorizacion  = fecha_autorizacion,
-            razon_social        = razon_social,
-            clave_acceso        = clave_acceso,
-        )
+        except ses.exceptions.MessageRejected as e:
+            if "Email address is not verified" in str(e):
+                logger.warning(f"Email no verificado en sandbox: {email_destinatario}")
 
-        # Cuerpo texto plano (fallback)
-        texto_plano = _construir_texto_plano(
-            nombre_destinatario = nombre_destinatario,
-            num_factura         = num_factura,
-            fecha_emision       = fecha_emision,
-            total               = total,
-            numero_autorizacion = numero_autorizacion,
-        )
+                # Enviar verificación automáticamente
+                verificar_email_si_sandbox(email_destinatario)
 
-        # Parte alternativa HTML/texto
-        parte_alternativa = MIMEMultipart("alternative")
-        parte_alternativa.attach(MIMEText(texto_plano, "plain", "utf-8"))
-        parte_alternativa.attach(MIMEText(html_body,   "html",  "utf-8"))
-        msg.attach(parte_alternativa)
-
-        # Adjuntar PDF
-        adjunto = MIMEApplication(pdf_bytes, _subtype="pdf")
-        adjunto.add_header(
-            "Content-Disposition",
-            "attachment",
-            filename = f"Factura-{num_factura}.pdf"
-        )
-        msg.attach(adjunto)
-
-        # Enviar
-        response = ses.send_raw_email(
-            Source       = f"{NOMBRE_EMISOR} <{EMAIL_EMISOR}>",
-            Destinations = [email_destinatario],
-            RawMessage   = {"Data": msg.as_string()}
-        )
-
-        message_id = response["MessageId"]
-        logger.info(f"Email enviado a {email_destinatario} — MessageId: {message_id}")
-
-        return {
-            "enviado":       True,
-            "message_id":    message_id,
-            "destinatario":  email_destinatario,
-        }
-
-    except ses.exceptions.MessageRejected as e:
-        logger.error(f"SES rechazó el email: {str(e)}")
-        return {"enviado": False, "razon": f"SES rechazó: {str(e)}"}
-
-    except ses.exceptions.MailFromDomainNotVerifiedException as e:
-        logger.error(f"Dominio no verificado en SES: {str(e)}")
-        return {"enviado": False, "razon": "Dominio no verificado en SES"}
+                return {
+                    "enviado": False,
+                    "razon":   "sandbox",
+                    "mensaje": f"Se envió un email de verificación a {email_destinatario}. "
+                               f"El cliente debe verificar su email para recibir facturas."
+                }
+            raise
 
     except Exception as e:
         logger.error(f"Error enviando email: {str(e)}")
-        return {"enviado": False, "razon": str(e)}
+        return {"enviado": False, "razon": str(e)}        
+
+def _enviar_email(
+    email_destinatario,
+    nombre_destinatario,
+    datos_factura,
+    pdf_bytes,
+    numero_autorizacion,
+    fecha_autorizacion
+) -> dict:
+    """Lógica real de envío — separada para reutilizar."""
+    from email.mime.multipart  import MIMEMultipart
+    from email.mime.text       import MIMEText
+    from email.mime.application import MIMEApplication
+
+    clave_acceso    = datos_factura.get("clave_acceso", "")
+    secuencial      = datos_factura.get("secuencial", "").zfill(9)
+    establecimiento = datos_factura.get("establecimiento", "001")
+    punto_emision   = datos_factura.get("punto_emision", "001")
+    num_factura     = f"{establecimiento}-{punto_emision}-{secuencial}"
+    total           = datos_factura.get("importe_total", 0)
+    fecha_emision   = datos_factura.get("fecha_emision", "")
+    razon_social    = datos_factura.get("razon_social", "")
+
+    msg            = MIMEMultipart("mixed")
+    msg["Subject"] = f"Factura Electrónica {num_factura} — {razon_social}"
+    msg["From"]    = f"{NOMBRE_EMISOR} <{EMAIL_EMISOR}>"
+    msg["To"]      = f"{nombre_destinatario} <{email_destinatario}>"
+
+    html_body   = _construir_html(
+        nombre_destinatario = nombre_destinatario,
+        num_factura         = num_factura,
+        fecha_emision       = fecha_emision,
+        total               = total,
+        numero_autorizacion = numero_autorizacion,
+        fecha_autorizacion  = fecha_autorizacion,
+        razon_social        = razon_social,
+        clave_acceso        = clave_acceso,
+    )
+    texto_plano = _construir_texto_plano(
+        nombre_destinatario = nombre_destinatario,
+        num_factura         = num_factura,
+        fecha_emision       = fecha_emision,
+        total               = total,
+        numero_autorizacion = numero_autorizacion,
+    )
+
+    parte = MIMEMultipart("alternative")
+    parte.attach(MIMEText(texto_plano, "plain", "utf-8"))
+    parte.attach(MIMEText(html_body,   "html",  "utf-8"))
+    msg.attach(parte)
+
+    adjunto = MIMEApplication(pdf_bytes, _subtype="pdf")
+    adjunto.add_header(
+        "Content-Disposition", "attachment",
+        filename=f"Factura-{num_factura}.pdf"
+    )
+    msg.attach(adjunto)
+
+    response   = ses.send_raw_email(
+        Source       = f"{NOMBRE_EMISOR} <{EMAIL_EMISOR}>",
+        Destinations = [email_destinatario],
+        RawMessage   = {"Data": msg.as_string()}
+    )
+    message_id = response["MessageId"]
+    logger.info(f"✅ Email enviado — MessageId: {message_id}")
+
+    return {
+        "enviado":      True,
+        "message_id":   message_id,
+        "destinatario": email_destinatario,
+    }    
 
 
 def _construir_html(

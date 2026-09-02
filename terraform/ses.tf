@@ -62,7 +62,18 @@ resource "aws_iam_policy" "lambda_ses" {
             "ses:FromAddress" = var.email_emisor
           }
         }
-      }
+      },
+      {
+        # ← Agregar permisos para sandbox
+        Sid    = "VerificarEmailsSandbox"
+        Effect = "Allow"
+        Action = [
+          "ses:VerifyEmailIdentity",
+          "ses:GetIdentityVerificationAttributes",
+          "ses:GetAccountSendingEnabled"
+        ]
+        Resource = "*"
+      }      
     ]
   })
 

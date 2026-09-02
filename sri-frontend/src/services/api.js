@@ -26,3 +26,7 @@ export const emitirFactura = (datos)        => request('POST', '/facturas', dato
 
 // Consultar estado de un comprobante
 export const consultarFactura = (claveAcceso) => request('GET', `/facturas/${claveAcceso}`)
+
+// Opcion de Configuracion de RUC
+export const obtenerConfiguracion = ()      => request('GET', '/configuracion')
+export const guardarConfiguracion = (datos) => request('PUT', '/configuracion', datos)

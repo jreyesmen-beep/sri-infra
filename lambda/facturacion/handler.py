@@ -34,6 +34,11 @@ def manejar_api_gateway(event, context):
     Punto de entrada para requests de API Gateway.
     SIEMPRE debe retornar el formato completo con statusCode, headers y body.
     """    
+
+    http_method = event.get("httpMethod", "")
+    path        = event.get("path", "")
+    params      = event.get("pathParameters") or {}
+
     CORS = {
         "Access-Control-Allow-Origin":  "*",
         "Access-Control-Allow-Headers": "Content-Type,Authorization",
@@ -41,69 +46,34 @@ def manejar_api_gateway(event, context):
         "Content-Type":                 "application/json"
     }
 
-    try:
-        http_method = event.get("httpMethod", "GET")
-        path        = event.get("path", "")
-        params      = event.get("pathParameters") or {}
+    if http_method == "OPTIONS":
+        return {"statusCode": 200, "headers": CORS, "body": ""}
 
-        logger.info(f"API Gateway request: {http_method} {path}")
-        logger.info(f"Path parameters: {params}")
+    # GET /configuracion — leer datos del emisor
+    if http_method == "GET" and path.endswith("/configuracion"):
+        return obtener_configuracion(CORS)
 
-        # OPTIONS - preflight CORS
-        if http_method == "OPTIONS":
-            return {
-                "statusCode": 200,
-                "headers":    CORS,
-                "body":       ""
-            }
+    # PUT /configuracion — guardar datos del emisor
+    if http_method == "PUT" and path.endswith("/configuracion"):
+        return guardar_configuracion(event, CORS)
 
-        # GET /facturas/{claveAcceso}/ride
-        if http_method == "GET" and path.endswith("/ride"):
-            clave_acceso = params.get("claveAcceso", "")
-            if not clave_acceso:
-                return {
-                    "statusCode": 400,
-                    "headers":    CORS,
-                    "body":       json.dumps({"mensaje": "Clave de acceso requerida"})
-                }
-            return descargar_ride(clave_acceso, CORS)
+    # GET /facturas/{claveAcceso}/ride
+    if http_method == "GET" and path.endswith("/ride"):
+        clave_acceso = params.get("claveAcceso", "")
+        return descargar_ride(clave_acceso, CORS)
 
-        # GET /facturas/{claveAcceso}
-        if http_method == "GET" and "claveAcceso" in params:
-            clave_acceso = params.get("claveAcceso", "")
-            if not clave_acceso:
-                return {
-                    "statusCode": 400,
-                    "headers":    CORS,
-                    "body":       json.dumps({"mensaje": "Clave de acceso requerida"})
-                }
+    # GET /facturas/{claveAcceso}
+    if http_method == "GET" and "claveAcceso" in params:
+        clave_acceso = params.get("claveAcceso", "")
+        resultado    = consultar_estado_s3(clave_acceso)
+        return {"statusCode": 200, "headers": CORS,
+                "body": json.dumps(resultado, ensure_ascii=False)}
 
-            logger.info(f"Consultando estado: {clave_acceso}")
-            resultado = consultar_estado_s3(clave_acceso)
-
-            return {
-                "statusCode": 200,
-                "headers":    CORS,
-                "body":       json.dumps(resultado, ensure_ascii=False)
-            }
-
-        # Ruta no encontrada
-        return {
-            "statusCode": 404,
-            "headers":    CORS,
-            "body":       json.dumps({"mensaje": f"Ruta no encontrada: {http_method} {path}"})
-        }
-
-    except Exception as e:
-        logger.error(f"Error en API Gateway handler: {str(e)}", exc_info=True)
-        return {
-            "statusCode": 500,
-            "headers":    CORS,
-            "body":       json.dumps({
-                "mensaje": "Error interno del servidor",
-                "detalle": str(e)
-            })
-        }
+    return {
+        "statusCode": 404,
+        "headers":    CORS,
+        "body":       json.dumps({"mensaje": "Ruta no encontrada"})
+    }    
 
 def descargar_ride(clave_acceso: str, cors: dict) -> dict:
     """Genera y devuelve el RIDE en PDF."""
@@ -521,3 +491,79 @@ def _guardar_estado_error(datos: dict, tipo_error: str, mensaje: str):
         )
     except Exception as e:
         logger.error(f"No se pudo guardar estado de error: {str(e)}")
+
+
+def obtener_configuracion(cors: dict) -> dict:
+    """Lee los datos del emisor desde S3."""
+    key = f"{AMBIENTE}/configuracion/emisor.json"
+    try:
+        response = s3.get_object(Bucket=BUCKET, Key=key)
+        datos    = json.loads(response["Body"].read().decode("utf-8"))
+        return {
+            "statusCode": 200,
+            "headers":    cors,
+            "body":       json.dumps(datos, ensure_ascii=False)
+        }
+
+    except s3.exceptions.NoSuchKey:
+        return {
+            "statusCode": 404,
+            "headers":    cors,
+            "body":       json.dumps({"mensaje": "Configuración no encontrada"})
+        }
+    except Exception as e:
+        logger.error(f"Error leyendo configuración: {str(e)}")
+        return {
+            "statusCode": 500,
+            "headers":    cors,
+            "body":       json.dumps({"mensaje": str(e)})
+        }
+
+def guardar_configuracion(event, cors: dict) -> dict:
+    """Guarda los datos del emisor en S3."""
+    key = f"{AMBIENTE}/configuracion/emisor.json"
+    try:
+        body = event.get("body", "{}")
+        if isinstance(body, str):
+            datos = json.loads(body)
+        else:
+            datos = body
+
+        # Validar campos obligatorios
+        campos_requeridos = ["ruc", "razon_social", "dir_matriz",
+                             "establecimiento", "punto_emision"]
+        faltantes = [c for c in campos_requeridos if not datos.get(c)]
+        if faltantes:
+            return {
+                "statusCode": 400,
+                "headers":    cors,
+                "body": json.dumps({
+                    "mensaje": f"Campos requeridos: {', '.join(faltantes)}"
+                })
+            }
+
+        # Guardar en S3
+        s3.put_object(
+            Bucket      = BUCKET,
+            Key         = key,
+            Body        = json.dumps(datos, ensure_ascii=False),
+            ContentType = "application/json"
+        )
+        logger.info(f"Configuración guardada: RUC {datos.get('ruc')}")
+
+        return {
+            "statusCode": 200,
+            "headers":    cors,
+            "body": json.dumps({
+                "mensaje": "Configuración guardada correctamente",
+                "ruc":     datos.get("ruc")
+            })
+        }
+
+    except Exception as e:
+        logger.error(f"Error guardando configuración: {str(e)}")
+        return {
+            "statusCode": 500,
+            "headers":    cors,
+            "body": json.dumps({"mensaje": str(e)})
+        }            
