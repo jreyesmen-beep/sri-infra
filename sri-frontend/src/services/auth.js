@@ -58,6 +58,26 @@ export function logout() {
   localStorage.removeItem('sri_email')
 }
 
+export function verificarSesion() {
+  const token = getToken()
+  if (!token) return false
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const ahora   = Math.floor(Date.now() / 1000)
+
+    if (payload.exp && payload.exp < ahora) {
+      // Token expirado
+      logout()
+      return false
+    }
+    return true
+  } catch {
+    logout()
+    return false
+  }
+}
+
 export function getToken()         { return localStorage.getItem('sri_token') }
 export function getEmail()         { return localStorage.getItem('sri_email') }
 export function isAuthenticated()  { return !!getToken() }

@@ -34,18 +34,30 @@ def lambda_handler(event, context):
     if http_method == "POST" and path.endswith("/facturas"):
         return encolar_comprobante(event)
 
-    # GET /facturas/{claveAcceso} — consultar estado
-    if http_method == "GET" and not path.endswith("/ride"):
+    # GET /configuracion — leer datos del emisor
+    if http_method == "GET" and path.endswith("/configuracion"):
+        return invocar_lambda_fact(event, context)
+
+    # PUT /configuracion — guardar datos del emisor
+    if http_method == "PUT" and path.endswith("/configuracion"):
         return invocar_lambda_fact(event, context)
 
     # GET /facturas/{claveAcceso}/ride — descargar PDF
     if http_method == "GET" and path.endswith("/ride"):
         return invocar_lambda_fact(event, context)
 
+    # GET /facturas/{claveAcceso} — consultar estado
+    if http_method == "GET" and "/facturas/" in path:
+        return invocar_lambda_fact(event, context)
+
+    # # GET /facturas/{claveAcceso} — consultar estado
+    # if http_method == "GET" and not path.endswith("/ride"):
+    #     return invocar_lambda_fact(event, context)
+    logger.warning(f"Ruta no encontrada: {http_method} {path}")
     return {
         "statusCode": 404,
         "headers":    CORS_HEADERS,
-        "body":       json.dumps({"mensaje": "Ruta no encontrada"})
+        "body":       json.dumps({"mensaje": f"Ruta no encontrada: {http_method} {path}"})
     }
 
 

@@ -31,16 +31,12 @@ export default function Configuracion() {
     setEstado('loading')
     try {
       const datos = await obtenerConfiguracion()
-      setForm(datos)
+      if (datos) setForm(datos)   // ← solo actualizar si hay datos
       setEstado('idle')
     } catch (err) {
-      // Si no existe configuración aún, es normal
-      if (err.message?.includes('404') || err.message?.includes('no encontrada')) {
-        setEstado('idle')
-      } else {
-        setEstado('error')
-        setMensaje('Error al cargar la configuración')
-      }
+    // 404 es normal en el primer uso — no mostrar error
+    setEstado('idle')
+    // No hacer nada más, el formulario quedará vacío para llenar
     }
   }
 

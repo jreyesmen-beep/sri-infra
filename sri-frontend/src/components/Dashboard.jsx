@@ -56,7 +56,6 @@ export default function Dashboard({ onLogout }) {
         <div className="fade-in" key={tab}>
           {tab === 'nueva' && <NuevaFactura />}
           {tab === 'lista' && <ListaFacturas />}
-          // En el render agregar:
           {tab === 'configuracion' && <Configuracion />}          
         </div>
       </main>
