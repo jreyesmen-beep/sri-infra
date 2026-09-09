@@ -357,7 +357,9 @@ function generarClaveAcceso(form, fecha) {
   const dd   = String(fecha.getDate()).padStart(2, '0')
   const mm   = String(fecha.getMonth() + 1).padStart(2, '0')
   const yyyy = fecha.getFullYear()
-  const clave = `${dd}${mm}${yyyy}01${form.ruc}1${form.establecimiento}${form.punto_emision}${form.secuencial.padStart(9,'0')}1`
+  const codigoBase = '12345678'
+  const clave = `${dd}${mm}${yyyy}01${form.ruc}1${form.establecimiento}${form.punto_emision}${form.secuencial.padStart(9,'0')}${codigoBase}1`
+
   const factores = [2, 3, 4, 5, 6, 7]
   let total = 0
   for (let i = 0; i < clave.length; i++) {
