@@ -82,6 +82,50 @@ export default function ListaFacturas() {
     }
   }
 
+  async function imprimirRIDE() {
+    setDescargando(true)
+    setErrorDescarga('')
+    try {
+      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
+        headers: { "Authorization": `Bearer ${getToken()}` }
+      })
+
+      const texto = await res.text()
+
+      if (!res.ok) {
+        const data = JSON.parse(texto)
+        throw new Error(data.mensaje || `Error ${res.status}`)
+      }
+
+      const data      = JSON.parse(texto)
+      const pdfBase64 = data.pdf_base64
+      if (!pdfBase64) throw new Error("No se recibió el PDF")
+
+      // Convertir base64 a blob
+      const bytes = atob(pdfBase64)
+      const arr   = new Uint8Array(bytes.length)
+      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+      const blob = new Blob([arr], { type: "application/pdf" })
+      const url  = URL.createObjectURL(blob)
+
+      // ✅ Abrir en ventana nueva e imprimir automáticamente
+      const ventana = window.open(url)
+      ventana.onload = () => {
+        ventana.focus()
+        ventana.print()
+        // Limpiar el blob después de imprimir
+        ventana.onafterprint = () => {
+          URL.revokeObjectURL(url)
+        }
+      }
+
+    } catch (err) {
+      setErrorDescarga('Error al imprimir: ' + err.message)
+    } finally {
+      setDescargando(false)
+    }
+  }
+
   const info = factura ? (ESTADOS[factura.estado] || ESTADOS.ERROR_INTERNO) : null
 
   return (
@@ -170,7 +214,9 @@ export default function ListaFacturas() {
 
             {/* Botón RIDE — solo si está autorizado */}
             {factura.estado === 'AUTORIZADO' && (
-              <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+
+              {/* Botón descargar */}
                 <button
                   onClick  = {descargarRIDE}
                   disabled = {descargando}
@@ -181,10 +227,21 @@ export default function ListaFacturas() {
                 >
                   {descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
                 </button>
+
+                {/* Botón imprimir */}
+                <button
+                  onClick  = {imprimirRIDE}
+                  disabled = {descargando}
+                  style    = {{
+                    ...styles.btnImprimir,
+                    opacity: descargando ? 0.7 : 1
+                  }}
+                >
+                  🖨 Imprimir RIDE
+                </button>
+
                 {errorDescarga && (
-                  <div style={{ ...styles.errorBox, marginTop: '0.5rem' }}>
-                    {errorDescarga}
-                  </div>
+                  <div style={styles.errorBox}>{errorDescarga}</div>
                 )}
               </div>
             )}
@@ -227,4 +284,26 @@ const styles = {
   btnRIDE:     { background: '#00875A', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontWeight: 600, fontSize: '0.9rem', width: '100%', cursor: 'pointer' },
   btnReintentar:{ background: 'transparent', border: '1.5px solid #E2E8F0', borderRadius: '6px', padding: '0.5rem 1rem', color: '#64748B', fontSize: '0.875rem', cursor: 'pointer', marginTop: '0.75rem' },
   aviso:       { display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', marginTop: '0.75rem' },
+  btnRIDE: {
+    background:   '#00875A',
+    color:        '#fff',
+    border:       'none',
+    borderRadius: '8px',
+    padding:      '0.75rem 1.5rem',
+    fontWeight:   600,
+    fontSize:     '0.9rem',
+    width:        '100%',
+    cursor:       'pointer'
+  },
+  btnImprimir: {
+    background:   '#fff',
+    color:        '#00875A',
+    border:       '1.5px solid #00875A',
+    borderRadius: '8px',
+    padding:      '0.75rem 1.5rem',
+    fontWeight:   600,
+    fontSize:     '0.9rem',
+    width:        '100%',
+    cursor:       'pointer'
+  },  
 }

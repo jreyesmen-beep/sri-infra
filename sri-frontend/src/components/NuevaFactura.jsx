@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import { emitirFactura, obtenerConfiguracion } from '../services/api'
+import { getToken }                            from '../services/auth'  // ← debe estar
+
+const API_URL = import.meta.env.VITE_API_URL
 
 const ITEM_VACIO = {
   codigo: '', descripcion: '', cantidad: 1,
@@ -27,12 +30,21 @@ export default function NuevaFactura() {
   const [resultado,      setResultado]      = useState(null)
   const [error,          setError]          = useState('')
   const [cargandoConfig, setCargandoConfig] = useState(true)
+  const [descargando,    setDescargando]    = useState(false)
+  const [errorPDF,       setErrorPDF]       = useState('')
+  const [errorDescarga,  setErrorDescarga] = useState('')
 
   // ✅ Cargar configuración del emisor
   useEffect(() => {
     function cargar() {
       obtenerConfiguracion()
         .then(config => {
+          if (!config) return
+
+          // Calcular el siguiente secuencial desde el último guardado
+          const ultimoSecuencial = config.secuencial_actual || '0'
+          const siguiente        = _siguiente_secuencial(ultimoSecuencial)
+
           setForm(f => ({
             ...f,
             ruc:                 config.ruc                 || f.ruc,
@@ -42,9 +54,7 @@ export default function NuevaFactura() {
             punto_emision:       config.punto_emision       || f.punto_emision,
             dir_matriz:          config.dir_matriz          || f.dir_matriz,
             dir_establecimiento: config.dir_establecimiento || f.dir_establecimiento,
-            secuencial:          _siguiente_secuencial(
-                                   config.secuencial_actual || '1'
-                                 ),
+            secuencial:          siguiente,   // ← siguiente al último autorizado
           }))
         })
         .catch(err => {
@@ -56,6 +66,91 @@ export default function NuevaFactura() {
     }
     cargar()
   }, [])
+
+  async function descargarRIDE() {
+    setDescargando(true)
+    setErrorDescarga('')
+    try {
+      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
+        headers: { "Authorization": `Bearer ${getToken()}` }
+      })
+
+      const texto = await res.text()
+
+      if (!res.ok) {
+        const data = JSON.parse(texto)
+        throw new Error(data.mensaje || `Error ${res.status}`)
+      }
+
+      const data      = JSON.parse(texto)
+      const pdfBase64 = data.pdf_base64
+
+      if (!pdfBase64) throw new Error("No se recibió el PDF")
+
+      const bytes = atob(pdfBase64)
+      const arr   = new Uint8Array(bytes.length)
+      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+
+      const blob = new Blob([arr], { type: "application/pdf" })
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement("a")
+      a.href     = url
+      a.download = `factura-${clave}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+    } catch (err) {
+      setErrorDescarga('Error al descargar: ' + err.message)
+    } finally {
+      setDescargando(false)
+    }
+  }
+
+  async function imprimirRIDE() {
+    setDescargando(true)
+    setErrorDescarga('')
+    try {
+      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
+        headers: { "Authorization": `Bearer ${getToken()}` }
+      })
+
+      const texto = await res.text()
+
+      if (!res.ok) {
+        const data = JSON.parse(texto)
+        throw new Error(data.mensaje || `Error ${res.status}`)
+      }
+
+      const data      = JSON.parse(texto)
+      const pdfBase64 = data.pdf_base64
+      if (!pdfBase64) throw new Error("No se recibió el PDF")
+
+      // Convertir base64 a blob
+      const bytes = atob(pdfBase64)
+      const arr   = new Uint8Array(bytes.length)
+      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+      const blob = new Blob([arr], { type: "application/pdf" })
+      const url  = URL.createObjectURL(blob)
+
+      // ✅ Abrir en ventana nueva e imprimir automáticamente
+      const ventana = window.open(url)
+      ventana.onload = () => {
+        ventana.focus()
+        ventana.print()
+        // Limpiar el blob después de imprimir
+        ventana.onafterprint = () => {
+          URL.revokeObjectURL(url)
+        }
+      }
+
+    } catch (err) {
+      setErrorDescarga('Error al imprimir: ' + err.message)
+    } finally {
+      setDescargando(false)
+    }
+  }
 
   // Calcular totales
   const subtotal = items.reduce(
@@ -119,11 +214,14 @@ export default function NuevaFactura() {
   if (estado === 'ok') {
     return (
       <div style={styles.exito} className="fade-in">
+        {/* Ícono de éxito */}
         <div style={styles.exitoIcono}>✓</div>
         <h2 style={styles.exitoTitulo}>Comprobante en proceso</h2>
         <p  style={styles.exitoSub}>
           El comprobante fue enviado a la cola de procesamiento
         </p>
+
+        {/* Datos del comprobante */}
         <div style={styles.claveBox}>
           <span style={styles.claveLabel}>Estado</span>
           <span style={styles.clave}>{resultado?.estado}</span>
@@ -136,17 +234,60 @@ export default function NuevaFactura() {
             </>
           )}
         </div>
+
+{/* Botones de acción */}
+      <div style={styles.botonesExito}>
+
+        {/* Descargar RIDE */}
+        <button
+          onClick  = {() => descargarRIDE(resultado?.clave_acceso)}
+          disabled = {descargando}
+          style    = {{
+            ...styles.btnRIDE,
+            opacity: descargando ? 0.7 : 1
+          }}
+        >
+          {descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
+        </button>
+
+        {/* Imprimir RIDE */}
+        <button
+          onClick  = {() => imprimirRIDE(resultado?.clave_acceso)}
+          disabled = {descargando}
+          style    = {{
+            ...styles.btnImprimir,
+            opacity: descargando ? 0.7 : 1
+          }}
+        >
+          🖨 Imprimir RIDE
+        </button>
+
+        {/* Nueva factura */}
         <button
           style   = {styles.btnNueva}
           onClick = {() => {
             setEstado('idle')
             setResultado(null)
+            setError('')
+            setDescargando(false)
+            setErrorPDF('')            
             setItems([{ ...ITEM_VACIO }])
           }}
         >
-          Emitir otro comprobante
+          + Emitir otro comprobante
         </button>
       </div>
+      
+      {errorPDF && (
+        <div style={styles.errorPDF}>{errorPDF}</div>
+      )}      
+
+      {/* Aviso si el comprobante aún no está autorizado */}
+      <p style={styles.avisoEspera}>
+        💡 Si el PDF no está disponible aún, espera unos segundos
+        y vuelve a intentarlo. El SRI puede tardar en autorizar.
+      </p>
+     </div>
     )
   }
 
@@ -348,9 +489,11 @@ export default function NuevaFactura() {
   )
 }
 
-function _siguiente_secuencial(actual) {
-  const num = parseInt(actual || '1', 10)
-  return String(num).padStart(9, '0')
+
+// ✅ Función corregida: incrementa desde el último guardado
+function _siguiente_secuencial(ultimoGuardado) {
+  const num = parseInt(ultimoGuardado || '0', 10)
+  return String(num + 1).padStart(9, '0')
 }
 
 function generarClaveAcceso(form, fecha) {

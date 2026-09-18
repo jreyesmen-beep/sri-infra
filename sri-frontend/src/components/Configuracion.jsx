@@ -96,23 +96,31 @@ export default function Configuracion() {
         <section style={styles.seccion}>
           <h3 style={styles.seccionTitulo}>Secuencial</h3>
           <p style={styles.infoTexto}>
-            El secuencial se incrementa automáticamente con cada factura emitida.
+    El secuencial se actualiza automáticamente después de cada
+    factura autorizada por el SRI.
           </p>
           <div style={styles.grilla}>
-            <div style={styles.campo}>
+          <div style={styles.campo}>
               <label style={styles.label}>
-                Secuencial actual
+                Último secuencial autorizado
               </label>
               <input
                 type        = "number"
-                value       = {form.secuencial_actual || '1'}
+                value       = {form.secuencial_actual || '0'}
                 onChange    = {e => setForm(f => ({
-                  ...f, secuencial_actual: e.target.value
+                  ...f,
+                  secuencial_actual: e.target.value
                 }))}
-                min         = "1"
+                min         = "0"
                 style       = {styles.input}
               />
-            </div>
+              <span style={styles.labelOpcional}>
+                La próxima factura usará el número{' '}
+                <strong>
+                  {String(parseInt(form.secuencial_actual || '0') + 1).padStart(9, '0')}
+                </strong>
+              </span>
+          </div>
           </div>
         </section>
 

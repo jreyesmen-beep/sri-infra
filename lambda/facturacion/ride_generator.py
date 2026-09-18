@@ -46,13 +46,21 @@ class CodigoBarras(Flowable):
         self.height       = alto
 
     def draw(self):
+        # ✅ Calcular barWidth para que el código quepa exactamente en el ancho
+        # Code128 genera aproximadamente 11 barras por caracter
+        num_chars  = len(self.valor)
+        bar_width  = max(0.3, (self.ancho * 0.72) / (num_chars * 11))
+
         barcode = code128.Code128(
             self.valor,
-            barWidth      = self.ancho / len(self.valor) / 2,
+            barWidth      = bar_width,
             barHeight     = self.alto,
             humanReadable = self.mostrar_texto
         )
-        barcode.drawOn(self.canv, 0, 0)
+        # Centrar el código dentro del espacio disponible
+        barcode_width = barcode.width
+        offset_x      = max(0, (self.ancho - barcode_width) / 2)
+        barcode.drawOn(self.canv, offset_x, 0)
 
 
 def generar_ride(datos: dict, numero_autorizacion: str, fecha_autorizacion: str) -> bytes:
@@ -317,8 +325,8 @@ def _generar_barras_cabecera(numero_autorizacion: str) -> CodigoBarras:
     """
     return CodigoBarras(
         valor         = numero_autorizacion,
-        ancho         = 6 * cm,
-        alto          = 1.0 * cm,
+        ancho         = 5 * cm,    # ← reducido de 6 a 5
+        alto          = 0.8 * cm,  # ← reducido de 1.0 a 0.8
         mostrar_texto = False
     )
 
@@ -351,10 +359,24 @@ def _seccion_clave_acceso(clave_acceso: str, estilo_label, estilo_mono):
     # Código de barras completo centrado
     barras = CodigoBarras(
         valor         = clave_acceso,
-        ancho         = 15 * cm,
+        ancho         = 13 * cm,   # ← reducido de 15 a 13 para dejar margen
         alto          = 1.5 * cm,
         mostrar_texto = False
     )
+
+# Envolver en tabla para centrar y agregar padding
+    barras_tabla = Table(
+        [[barras]],
+        colWidths = [17 * cm]   # ancho total disponible
+    )
+    barras_tabla.setStyle(TableStyle([
+        ("ALIGN",         (0, 0), (-1, -1), "CENTER"),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 10),   # ← margen izquierdo
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 10),   # ← margen derecho
+        ("TOPPADDING",    (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("BOX",           (0, 0), (-1, -1), 0.25, colors.grey),
+    ]))
 
     return KeepTogether([clave_tabla, Spacer(1, 0.2*cm), barras])
 

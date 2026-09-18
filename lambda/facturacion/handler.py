@@ -567,3 +567,92 @@ def guardar_configuracion(event, cors: dict) -> dict:
             "headers":    cors,
             "body": json.dumps({"mensaje": str(e)})
         }            
+
+def _incrementar_secuencial():
+    """
+    Incrementa el secuencial en la configuración guardada en S3.
+    """
+    key = f"{AMBIENTE}/configuracion/emisor.json"
+    try:
+        # Leer configuración actual
+        response = s3.get_object(Bucket=BUCKET, Key=key)
+        config   = json.loads(response["Body"].read().decode("utf-8"))
+
+        # Incrementar secuencial
+        actual   = int(config.get("secuencial_actual", "1"))
+        nuevo    = actual + 1
+        config["secuencial_actual"] = str(nuevo)
+
+        # Guardar de vuelta
+        s3.put_object(
+            Bucket      = BUCKET,
+            Key         = key,
+            Body        = json.dumps(config, ensure_ascii=False),
+            ContentType = "application/json"
+        )
+        logger.info(f"Secuencial actualizado: {actual} → {nuevo}")
+        return nuevo
+
+    except s3.exceptions.NoSuchKey:
+        logger.warning("No hay configuración guardada, no se actualiza secuencial")
+        return None
+    except Exception as e:
+        logger.error(f"Error actualizando secuencial: {str(e)}")
+        return None
+
+def procesar_comprobante(datos: dict):
+    clave_acceso = datos["clave_acceso"]
+    sri = SRIClient()
+
+    logger.info("Construyendo XML...")
+    xml         = construir_factura(datos)
+    logger.info("Firmando XML...")
+    xml_firmado = firmar_xml(xml)
+    guardar_en_s3(clave_acceso, xml_firmado, "xml-firmado")
+
+    logger.info("Enviando al SRI...")
+    sri.enviar_comprobante(xml_firmado)
+
+    logger.info("Consultando autorización...")
+    respuesta = sri.autorizar_comprobante(clave_acceso)
+
+    if respuesta["estado"] != "AUTORIZADO":
+        raise SRIRechazo(f"No autorizado: {respuesta.get('errores')}")
+
+    guardar_en_s3(clave_acceso, respuesta["xml_autorizado"], "xml-autorizado")
+    _guardar_estado_ok(datos, respuesta)
+
+    # ✅ Incrementar secuencial después de autorización exitosa
+    nuevo_secuencial = _incrementar_secuencial()
+    if nuevo_secuencial:
+        logger.info(f"Próximo secuencial: {nuevo_secuencial}")
+
+    # Generar y enviar RIDE
+    logger.info("Generando RIDE...")
+    pdf_bytes = generar_ride(
+        datos               = datos,
+        numero_autorizacion = respuesta["numero_autorizacion"],
+        fecha_autorizacion  = respuesta["fecha_autorizacion"]
+    )
+
+    key_pdf = f"{AMBIENTE}/rides/{clave_acceso}.pdf"
+    s3.put_object(
+        Bucket      = BUCKET,
+        Key         = key_pdf,
+        Body        = pdf_bytes,
+        ContentType = "application/pdf"
+    )
+
+    email_cliente = datos.get("email_comprador", "")
+    if email_cliente:
+        resultado_email = enviar_ride_por_email(
+            email_destinatario  = email_cliente,
+            nombre_destinatario = datos.get("razon_comprador", "Cliente"),
+            datos_factura       = datos,
+            pdf_bytes           = pdf_bytes,
+            numero_autorizacion = respuesta["numero_autorizacion"],
+            fecha_autorizacion  = respuesta["fecha_autorizacion"]
+        )
+        logger.info(f"Resultado email: {resultado_email}")
+
+    logger.info(f"✅ Factura autorizada: {respuesta['numero_autorizacion']}")

@@ -7,6 +7,8 @@ from email.mime.text       import MIMEText
 from email.mime.base       import MIMEBase
 from email.mime.application import MIMEApplication
 from email                 import encoders
+from email.header import Header
+from email.utils  import formataddr
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +65,7 @@ def enviar_ride_por_email(
 
     try:
         # Verificar si estamos en sandbox
-        account = ses.get_account_sending_enabled()
+        # account = ses.get_account_sending_enabled()
 
         # Intentar enviar — si falla por sandbox, verificar y notificar
         try:
@@ -76,24 +78,26 @@ def enviar_ride_por_email(
                 fecha_autorizacion
             )
 
-        except ses.exceptions.MessageRejected as e:
-            if "Email address is not verified" in str(e):
-                logger.warning(f"Email no verificado en sandbox: {email_destinatario}")
+        except Exception as e:
+            logger.error(f"Error enviando email: {str(e)}")
+            return {"enviado": False, "razon": str(e)}        
 
-                # Enviar verificación automáticamente
-                verificar_email_si_sandbox(email_destinatario)
 
-                return {
-                    "enviado": False,
-                    "razon":   "sandbox",
-                    "mensaje": f"Se envió un email de verificación a {email_destinatario}. "
-                               f"El cliente debe verificar su email para recibir facturas."
-                }
-            raise
+    except ses.exceptions.MessageRejected as e:
+        if "Email address is not verified" in str(e):
+            logger.warning(f"Email no verificado en sandbox: {email_destinatario}")
 
-    except Exception as e:
-        logger.error(f"Error enviando email: {str(e)}")
-        return {"enviado": False, "razon": str(e)}        
+            # Enviar verificación automáticamente
+            verificar_email_si_sandbox(email_destinatario)
+
+            return {
+                "enviado": False,
+                "razon":   "sandbox",
+                "mensaje": f"Se envió un email de verificación a {email_destinatario}. "
+                            f"El cliente debe verificar su email para recibir facturas."
+            }
+        raise
+
 
 def _enviar_email(
     email_destinatario,
@@ -107,6 +111,8 @@ def _enviar_email(
     from email.mime.multipart  import MIMEMultipart
     from email.mime.text       import MIMEText
     from email.mime.application import MIMEApplication
+    from email.header           import Header
+    from email.utils            import formataddr    
 
     clave_acceso    = datos_factura.get("clave_acceso", "")
     secuencial      = datos_factura.get("secuencial", "").zfill(9)
@@ -117,10 +123,22 @@ def _enviar_email(
     fecha_emision   = datos_factura.get("fecha_emision", "")
     razon_social    = datos_factura.get("razon_social", "")
 
+    # ✅ Codificar nombre emisor correctamente para soportar tildes y ñ
+    nombre_emisor_encoded = Header(NOMBRE_EMISOR, 'utf-8').encode()
+    from_address          = f"{nombre_emisor_encoded} <{EMAIL_EMISOR}>"
+
+    # ✅ Codificar nombre destinatario también
+    nombre_dest_encoded   = Header(nombre_destinatario, 'utf-8').encode()
+    to_address            = f"{nombre_dest_encoded} <{email_destinatario}>"
+
+    # ✅ Asunto con tildes también codificado
+    asunto_texto = f"Factura Electronica {num_factura} - {razon_social}"
+    asunto_encoded = Header(asunto_texto, 'utf-8').encode()
+
     msg            = MIMEMultipart("mixed")
-    msg["Subject"] = f"Factura Electrónica {num_factura} — {razon_social}"
-    msg["From"]    = f"{NOMBRE_EMISOR} <{EMAIL_EMISOR}>"
-    msg["To"]      = f"{nombre_destinatario} <{email_destinatario}>"
+    msg["Subject"] = asunto_encoded
+    msg["From"]    = from_address
+    msg["To"]      = to_address
 
     html_body   = _construir_html(
         nombre_destinatario = nombre_destinatario,
@@ -153,7 +171,7 @@ def _enviar_email(
     msg.attach(adjunto)
 
     response   = ses.send_raw_email(
-        Source       = f"{NOMBRE_EMISOR} <{EMAIL_EMISOR}>",
+        Source       = EMAIL_EMISOR,   # ← solo el email sin nombre para Source
         Destinations = [email_destinatario],
         RawMessage   = {"Data": msg.as_string()}
     )
