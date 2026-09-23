@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getToken } from '../services/auth'
+import { useRIDE }  from '../hooks/useRIDE'   // ← nuevo
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -17,16 +18,20 @@ export default function ListaFacturas() {
   const [clave,         setClave]         = useState('')
   const [factura,       setFactura]       = useState(null)
   const [cargando,      setCargando]      = useState(false)
-  const [descargando,   setDescargando]   = useState(false)
+  //const [descargando,   setDescargando]   = useState(false)
   const [error,         setError]         = useState('')
   const [errorDescarga, setErrorDescarga] = useState('')
 
+  // ✅ Hook centralizado — reemplaza todas las funciones de PDF
+  const ride = useRIDE()
+  
   async function handleConsultar(e) {
     e.preventDefault()
     setCargando(true)
     setError('')
     setFactura(null)
     setErrorDescarga('')
+    ride.limpiarError()
 
     try {
       const res = await fetch(`${API_URL}/facturas/${clave}`, {
@@ -38,91 +43,6 @@ export default function ListaFacturas() {
       setError('Error al consultar el comprobante: ' + err.message)
     } finally {
       setCargando(false)
-    }
-  }
-
-  async function descargarRIDE() {
-    setDescargando(true)
-    setErrorDescarga('')
-    try {
-      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
-        headers: { "Authorization": `Bearer ${getToken()}` }
-      })
-
-      const texto = await res.text()
-
-      if (!res.ok) {
-        const data = JSON.parse(texto)
-        throw new Error(data.mensaje || `Error ${res.status}`)
-      }
-
-      const data      = JSON.parse(texto)
-      const pdfBase64 = data.pdf_base64
-
-      if (!pdfBase64) throw new Error("No se recibió el PDF")
-
-      const bytes = atob(pdfBase64)
-      const arr   = new Uint8Array(bytes.length)
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-
-      const blob = new Blob([arr], { type: "application/pdf" })
-      const url  = URL.createObjectURL(blob)
-      const a    = document.createElement("a")
-      a.href     = url
-      a.download = `factura-${clave}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-
-    } catch (err) {
-      setErrorDescarga('Error al descargar: ' + err.message)
-    } finally {
-      setDescargando(false)
-    }
-  }
-
-  async function imprimirRIDE() {
-    setDescargando(true)
-    setErrorDescarga('')
-    try {
-      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
-        headers: { "Authorization": `Bearer ${getToken()}` }
-      })
-
-      const texto = await res.text()
-
-      if (!res.ok) {
-        const data = JSON.parse(texto)
-        throw new Error(data.mensaje || `Error ${res.status}`)
-      }
-
-      const data      = JSON.parse(texto)
-      const pdfBase64 = data.pdf_base64
-      if (!pdfBase64) throw new Error("No se recibió el PDF")
-
-      // Convertir base64 a blob
-      const bytes = atob(pdfBase64)
-      const arr   = new Uint8Array(bytes.length)
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-      const blob = new Blob([arr], { type: "application/pdf" })
-      const url  = URL.createObjectURL(blob)
-
-      // ✅ Abrir en ventana nueva e imprimir automáticamente
-      const ventana = window.open(url)
-      ventana.onload = () => {
-        ventana.focus()
-        ventana.print()
-        // Limpiar el blob después de imprimir
-        ventana.onafterprint = () => {
-          URL.revokeObjectURL(url)
-        }
-      }
-
-    } catch (err) {
-      setErrorDescarga('Error al imprimir: ' + err.message)
-    } finally {
-      setDescargando(false)
     }
   }
 
@@ -214,34 +134,34 @@ export default function ListaFacturas() {
 
             {/* Botón RIDE — solo si está autorizado */}
             {factura.estado === 'AUTORIZADO' && (
-              <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={styles.botonesRIDE}>
 
               {/* Botón descargar */}
                 <button
-                  onClick  = {descargarRIDE}
-                  disabled = {descargando}
+                  onClick  = {() => ride.descargar(clave)}
+                  disabled = {ride.descargando}
                   style    = {{
                     ...styles.btnRIDE,
-                    opacity: descargando ? 0.7 : 1
+                    opacity: ride.descargando ? 0.7 : 1
                   }}
                 >
-                  {descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
+                  {ride.descargando ? '⏳ Procesando...' : '⬇ Descargar RIDE (PDF)'}
                 </button>
 
                 {/* Botón imprimir */}
                 <button
-                  onClick  = {imprimirRIDE}
-                  disabled = {descargando}
+                  onClick  = {() => ride.imprimir(clave)}
+                  disabled = {ride.descargando}
                   style    = {{
                     ...styles.btnImprimir,
-                    opacity: descargando ? 0.7 : 1
+                    opacity: ride.descargando ? 0.7 : 1
                   }}
                 >
                   🖨 Imprimir RIDE
                 </button>
 
-                {errorDescarga && (
-                  <div style={styles.errorBox}>{errorDescarga}</div>
+                {ride.error && (
+                  <div style={styles.errorBox}>{ride.error}</div>
                 )}
               </div>
             )}

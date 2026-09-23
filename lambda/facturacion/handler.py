@@ -618,7 +618,8 @@ def procesar_comprobante(datos: dict):
 
     if respuesta["estado"] != "AUTORIZADO":
         raise SRIRechazo(f"No autorizado: {respuesta.get('errores')}")
-
+    
+    xml_autorizado = respuesta["xml_autorizado"]
     guardar_en_s3(clave_acceso, respuesta["xml_autorizado"], "xml-autorizado")
     _guardar_estado_ok(datos, respuesta)
 
@@ -650,6 +651,7 @@ def procesar_comprobante(datos: dict):
             nombre_destinatario = datos.get("razon_comprador", "Cliente"),
             datos_factura       = datos,
             pdf_bytes           = pdf_bytes,
+            xml_autorizado      = xml_autorizado,   # ← nuevo
             numero_autorizacion = respuesta["numero_autorizacion"],
             fecha_autorizacion  = respuesta["fecha_autorizacion"]
         )

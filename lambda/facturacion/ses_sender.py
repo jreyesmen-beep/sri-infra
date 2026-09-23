@@ -49,6 +49,7 @@ def enviar_ride_por_email(
     nombre_destinatario: str,
     datos_factura: dict,
     pdf_bytes: bytes,
+    xml_autorizado: str,        # ← nuevo parámetro
     numero_autorizacion: str,
     fecha_autorizacion: str
 ) -> dict:
@@ -74,6 +75,7 @@ def enviar_ride_por_email(
                 nombre_destinatario,
                 datos_factura,
                 pdf_bytes,
+                xml_autorizado,     # ← nuevo                
                 numero_autorizacion,
                 fecha_autorizacion
             )
@@ -104,6 +106,7 @@ def _enviar_email(
     nombre_destinatario,
     datos_factura,
     pdf_bytes,
+    xml_autorizado,             # ← nuevo    
     numero_autorizacion,
     fecha_autorizacion
 ) -> dict:
@@ -169,6 +172,18 @@ def _enviar_email(
         filename=f"Factura-{num_factura}.pdf"
     )
     msg.attach(adjunto)
+
+    # ✅ Adjunto 2: XML autorizado
+    xml_bytes   = xml_autorizado.encode("utf-8") \
+                  if isinstance(xml_autorizado, str) \
+                  else xml_autorizado
+
+    adjunto_xml = MIMEApplication(xml_bytes, _subtype="xml")
+    adjunto_xml.add_header(
+        "Content-Disposition", "attachment",
+        filename = f"Factura-{num_factura}.xml"
+    )
+    msg.attach(adjunto_xml)
 
     response   = ses.send_raw_email(
         Source       = EMAIL_EMISOR,   # ← solo el email sin nombre para Source
@@ -277,24 +292,31 @@ def _construir_html(
                 </td>
               </tr>
 
-              <!-- Adjunto -->
+              <!-- Adjuntos -->
               <tr>
                 <td style="padding:0 40px 24px;">
-                  <div style="background:#EFF6FF;border-radius:8px;padding:16px;
-                    display:flex;align-items:center;">
-                    <span style="font-size:24px;margin-right:12px;">📎</span>
-                    <div>
-                      <p style="margin:0;font-weight:600;color:#1D4ED8;font-size:14px;">
-                        RIDE adjunto en PDF
-                      </p>
-                      <p style="margin:4px 0 0;color:#64748B;font-size:12px;">
-                        Factura-{num_factura}.pdf
-                      </p>
-                    </div>
+                  <div style="background:#EFF6FF;border-radius:8px;padding:16px;">
+                    <p style="margin:0 0 12px;font-weight:600;color:#1D4ED8;font-size:14px;">
+                      📎 Archivos adjuntos
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#374151;">
+                          📄 <strong>Factura-{num_factura}.pdf</strong>
+                          <span style="color:#6B7280;font-size:12px;"> — RIDE (Representación Impresa)</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#374151;">
+                          📋 <strong>Factura-{num_factura}.xml</strong>
+                          <span style="color:#6B7280;font-size:12px;"> — Comprobante electrónico autorizado</span>
+                        </td>
+                      </tr>
+                    </table>
                   </div>
                 </td>
               </tr>
-
+              
               <!-- Footer -->
               <tr>
                 <td style="background:#F7F9FC;padding:20px 40px;

@@ -12,6 +12,15 @@ const TABS = [
 
 export default function Dashboard({ onLogout }) {
   const [tab, setTab] = useState('nueva')
+  const [keyNueva,     setKeyNueva]     = useState(0)  // ← nuevo
+
+  function handleTabChange(nuevoTab) {
+    // Si vuelve a Nueva Factura, incrementar la key para forzar remount
+    if (nuevoTab === 'nueva') {
+      setKeyNueva(k => k + 1)
+    }
+    setTab(nuevoTab)
+  }  
 
   function handleLogout() {
     logout()
@@ -32,7 +41,7 @@ export default function Dashboard({ onLogout }) {
           {TABS.map(t => (
             <button
               key     = {t.id}
-              onClick = {() => setTab(t.id)}
+              onClick = {() => handleTabChange(t.id)}  // ← usar handleTabChange
               style   = {{
                 ...styles.navItem,
                 ...(tab === t.id ? styles.navActivo : {})
@@ -54,7 +63,9 @@ export default function Dashboard({ onLogout }) {
       {/* Contenido principal */}
       <main style={styles.main}>
         <div className="fade-in" key={tab}>
-          {tab === 'nueva' && <NuevaFactura />}
+          {tab === 'nueva' && (
+            <NuevaFactura key={keyNueva} />  // ← key fuerza remount
+          )}
           {tab === 'lista' && <ListaFacturas />}
           {tab === 'configuracion' && <Configuracion />}          
         </div>

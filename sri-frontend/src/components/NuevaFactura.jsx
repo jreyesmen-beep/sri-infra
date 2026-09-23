@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { emitirFactura, obtenerConfiguracion } from '../services/api'
 import { getToken }                            from '../services/auth'  // ← debe estar
+import { useRIDE }                             from '../hooks/useRIDE'  // ← nuevo
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -30,9 +31,12 @@ export default function NuevaFactura() {
   const [resultado,      setResultado]      = useState(null)
   const [error,          setError]          = useState('')
   const [cargandoConfig, setCargandoConfig] = useState(true)
-  const [descargando,    setDescargando]    = useState(false)
-  const [errorPDF,       setErrorPDF]       = useState('')
-  const [errorDescarga,  setErrorDescarga] = useState('')
+  //const [descargando,    setDescargando]    = useState(false)
+  //const [errorPDF,       setErrorPDF]       = useState('')
+  //const [errorDescarga,  setErrorDescarga] = useState('')
+
+  // ✅ Reemplaza descargandoPDF, errorPDF, descargarRIDE, imprimirRIDE
+  const ride = useRIDE()
 
   // ✅ Cargar configuración del emisor
   useEffect(() => {
@@ -67,7 +71,7 @@ export default function NuevaFactura() {
     cargar()
   }, [])
 
-  async function descargarRIDE() {
+/*   async function descargarRIDE() {
     setDescargando(true)
     setErrorDescarga('')
     try {
@@ -106,9 +110,9 @@ export default function NuevaFactura() {
     } finally {
       setDescargando(false)
     }
-  }
+  } */
 
-  async function imprimirRIDE() {
+/*   async function imprimirRIDE() {
     setDescargando(true)
     setErrorDescarga('')
     try {
@@ -151,6 +155,7 @@ export default function NuevaFactura() {
       setDescargando(false)
     }
   }
+ */
 
   // Calcular totales
   const subtotal = items.reduce(
@@ -240,23 +245,23 @@ export default function NuevaFactura() {
 
         {/* Descargar RIDE */}
         <button
-          onClick  = {() => descargarRIDE(resultado?.clave_acceso)}
-          disabled = {descargando}
+          onClick  = {() => ride.descargar(resultado?.clave_acceso)}
+          disabled = {ride.descargando}
           style    = {{
             ...styles.btnRIDE,
-            opacity: descargando ? 0.7 : 1
+            opacity: ride.descargando ? 0.7 : 1
           }}
         >
-          {descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
+          {ride.descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
         </button>
 
         {/* Imprimir RIDE */}
         <button
-          onClick  = {() => imprimirRIDE(resultado?.clave_acceso)}
-          disabled = {descargando}
+          onClick  = {() => ride.imprimir(resultado?.clave_acceso)}
+          disabled = {ride.descargando}
           style    = {{
             ...styles.btnImprimir,
-            opacity: descargando ? 0.7 : 1
+            opacity: ride.descargando ? 0.7 : 1
           }}
         >
           🖨 Imprimir RIDE
@@ -269,8 +274,9 @@ export default function NuevaFactura() {
             setEstado('idle')
             setResultado(null)
             setError('')
-            setDescargando(false)
-            setErrorPDF('')            
+            //setDescargando(false)
+            //setErrorPDF('')        
+            ride.limpiarError()    
             setItems([{ ...ITEM_VACIO }])
           }}
         >
@@ -278,9 +284,9 @@ export default function NuevaFactura() {
         </button>
       </div>
       
-      {errorPDF && (
-        <div style={styles.errorPDF}>{errorPDF}</div>
-      )}      
+      {ride.error && (
+        <div style={styles.errorPDF}>{ride.error}</div>
+      )}
 
       {/* Aviso si el comprobante aún no está autorizado */}
       <p style={styles.avisoEspera}>
