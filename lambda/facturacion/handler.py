@@ -348,6 +348,41 @@ def manejar_sqs(event, context):
 def procesar_comprobante(datos: dict):
     # logger.info(f"PAYLOAD RECIBIDO: {json.dumps(datos, ensure_ascii=False)}")
     clave_acceso = datos["clave_acceso"]
+
+    # ✅ Leer configuración de IVA
+    config_iva = _obtener_config_iva()
+    logger.info(f"IVA configurado: {config_iva['porcentaje']}% "
+                f"(codigo={config_iva['codigo']}, "
+                f"codigoPorcentaje={config_iva['codigo_porcentaje']})")
+
+    # Sobrescribir los impuestos del payload con la config actual
+    # Por si el frontend envía valores desactualizados
+    tarifa      = config_iva["tarifa"]
+    subtotal    = datos.get("total_sin_impuestos", 0)
+    iva_valor   = round(subtotal * tarifa, 2)
+    total       = round(subtotal + iva_valor, 2)
+
+    datos["impuestos"] = [{
+        "codigo":  config_iva["codigo"],
+        "tarifa":  config_iva["codigo_porcentaje"],
+        "base":    subtotal,
+        "valor":   iva_valor,
+    }]
+    datos["importe_total"] = total
+
+    # Actualizar impuestos de cada item
+    for item in datos.get("items", []):
+        base_item = round(
+            item["cantidad"] * item["precio_unitario"] - item.get("descuento", 0), 2
+        )
+        item["impuestos"] = [{
+            "codigo":      config_iva["codigo"],
+            "tarifa":      config_iva["codigo_porcentaje"],
+            "porcentaje":  config_iva["porcentaje"],
+            "base":        base_item,
+            "valor":       round(base_item * tarifa, 2),
+        }]
+
     sri = SRIClient()
 
     # 1. Construir XML
@@ -623,6 +658,7 @@ def procesar_comprobante(datos: dict):
     guardar_en_s3(clave_acceso, respuesta["xml_autorizado"], "xml-autorizado")
     _guardar_estado_ok(datos, respuesta)
 
+
     # ✅ Incrementar secuencial después de autorización exitosa
     nuevo_secuencial = _incrementar_secuencial()
     if nuevo_secuencial:
@@ -658,3 +694,27 @@ def procesar_comprobante(datos: dict):
         logger.info(f"Resultado email: {resultado_email}")
 
     logger.info(f"✅ Factura autorizada: {respuesta['numero_autorizacion']}")
+
+def _obtener_config_iva() -> dict:
+    """
+    Lee la configuración de IVA desde S3.
+    Si no existe, retorna los valores por defecto (IVA 15%).
+    """
+    key = f"{AMBIENTE}/configuracion/emisor.json"
+    try:
+        response = s3.get_object(Bucket=BUCKET, Key=key)
+        config   = json.loads(response["Body"].read().decode("utf-8"))
+        return {
+            "codigo":            config.get("iva_codigo",            "2"),
+            "codigo_porcentaje": config.get("iva_codigo_porcentaje", "4"),
+            "porcentaje":        config.get("iva_porcentaje",        "15"),
+            "tarifa":            float(config.get("iva_tarifa",      "0.15")),
+        }
+    except Exception:
+        # Valores por defecto si no hay configuración
+        return {
+            "codigo":            "2",
+            "codigo_porcentaje": "4",
+            "porcentaje":        "15",
+            "tarifa":            0.15,
+        }

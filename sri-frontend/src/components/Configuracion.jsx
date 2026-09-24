@@ -92,7 +92,7 @@ export default function Configuracion() {
           </div>
         </section>
 
-        {/* Secuencial -->
+        {/* Secuencial */}
         <section style={styles.seccion}>
           <h3 style={styles.seccionTitulo}>Secuencial</h3>
           <p style={styles.infoTexto}>
@@ -121,6 +121,111 @@ export default function Configuracion() {
                 </strong>
               </span>
           </div>
+          </div>
+        </section>
+
+        {/* Sección IVA */}
+        <section style={styles.seccion}>
+          <h3 style={styles.seccionTitulo}>Configuración de IVA</h3>
+          <p style={styles.infoTexto}>
+            Actualiza estos valores si el gobierno cambia el porcentaje de IVA.
+            Se aplicarán automáticamente en todas las nuevas facturas.
+          </p>
+
+          <div style={styles.grilla}>
+
+            <div style={styles.campo}>
+              <label style={styles.label}>
+                Porcentaje IVA (%)
+                <span style={styles.requerido}> *</span>
+              </label>
+              <input
+                type        = "number"
+                value       = {form.iva_porcentaje || '15'}
+                onChange    = {e => {
+                  const pct   = e.target.value
+                  const tarifa = (parseFloat(pct) / 100).toFixed(4)
+                  setForm(f => ({
+                    ...f,
+                    iva_porcentaje: pct,
+                    iva_tarifa:     tarifa,
+                  }))
+                }}
+                min         = "0"
+                max         = "100"
+                step        = "1"
+                required
+                style       = {styles.input}
+              />
+            </div>
+
+            <div style={styles.campo}>
+              <label style={styles.label}>
+                Código SRI (codigo)
+                <span style={styles.requerido}> *</span>
+              </label>
+              <select
+                value    = {form.iva_codigo || '2'}
+                onChange = {e => setForm(f => ({ ...f, iva_codigo: e.target.value }))}
+                style    = {styles.input}
+              >
+                <option value="2">2 — IVA</option>
+                <option value="3">3 — ICE</option>
+                <option value="5">5 — IRBPNR</option>
+                <option value="6">6 — No objeto de IVA</option>
+                <option value="7">7 — Exento de IVA</option>
+              </select>
+            </div>
+
+            <div style={styles.campo}>
+              <label style={styles.label}>
+                Código Porcentaje SRI
+                <span style={styles.requerido}> *</span>
+              </label>
+              <select
+                value    = {form.iva_codigo_porcentaje || '4'}
+                onChange = {e => setForm(f => ({
+                  ...f, iva_codigo_porcentaje: e.target.value
+                }))}
+                style    = {styles.input}
+              >
+                <option value="0">0 — 0%</option>
+                <option value="2">2 — 12% (histórico)</option>
+                <option value="3">3 — 14% (histórico)</option>
+                <option value="4">4 — 15% (vigente)</option>
+                <option value="5">5 — 5%</option>
+                <option value="6">6 — No objeto</option>
+                <option value="7">7 — Exento</option>
+                <option value="8">8 — 8%</option>
+                <option value="10">10 — 13%</option>
+              </select>
+            </div>
+
+            <div style={styles.campo}>
+              <label style={styles.label}>Tarifa decimal (calculada)</label>
+              <input
+                type      = "text"
+                value     = {form.iva_tarifa || '0.15'}
+                readOnly
+                style     = {{ ...styles.input, background: '#F7F9FC', color: '#64748B' }}
+              />
+            </div>
+
+          </div>
+
+          {/* Vista previa */}
+          <div style={styles.previvaIVA}>
+            <span style={styles.previaLabel}>Vista previa:</span>
+            <span>
+              Sobre $100.00 de subtotal →{' '}
+              <strong>
+                IVA ${(100 * parseFloat(form.iva_tarifa || '0.15')).toFixed(2)}
+              </strong>
+              {' '}= Total{' '}
+              <strong>
+                ${(100 + 100 * parseFloat(form.iva_tarifa || '0.15')).toFixed(2)}
+              </strong>
+            </span>
           </div>
         </section>
 
@@ -164,4 +269,21 @@ const styles = {
   infoTexto:    { color: '#64748B', fontSize: '0.875rem', marginBottom: '1rem' },
   mensaje:      { padding: '0.875rem 1rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem', fontWeight: 500 },
   btnGuardar:   { background: '#00875A', color: '#fff', border: 'none', borderRadius: '10px', padding: '1rem 2rem', fontSize: '1rem', fontWeight: 600, width: '100%', cursor: 'pointer' },
+
+  previvaIVA: {
+    background:   '#E3F5EE',
+    borderRadius: '8px',
+    padding:      '0.875rem 1rem',
+    marginTop:    '1rem',
+    fontSize:     '0.875rem',
+    color:        '#005C3D',
+    display:      'flex',
+    gap:          '0.5rem',
+    alignItems:   'center',
+  },
+  previaLabel: {
+    fontWeight: 600,
+    flexShrink: 0,
+  },
+
 }

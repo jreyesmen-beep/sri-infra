@@ -1,9 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'  // ← agregar useRef
 import { emitirFactura, obtenerConfiguracion } from '../services/api'
 import { getToken }                            from '../services/auth'  // ← debe estar
 import { useRIDE }                             from '../hooks/useRIDE'  // ← nuevo
 
 const API_URL = import.meta.env.VITE_API_URL
+
+// Estados posibles del SRI
+const ESTADOS_SRI = {
+  EN_PROCESO:        { color: '#EFF6FF', texto: '#1D4ED8', icono: '⏳', label: 'Procesando...'          },
+  AUTORIZADO:        { color: '#E3F5EE', texto: '#005C3D', icono: '✓',  label: 'Autorizado por el SRI'  },
+  SRI_NO_DISPONIBLE: { color: '#FFF7ED', texto: '#C2410C', icono: '⚠️', label: 'SRI no disponible'      },
+  SRI_RECHAZO:       { color: '#FFF5F5', texto: '#E53E3E', icono: '✕',  label: 'Rechazado por el SRI'   },
+  NO_AUTORIZADO:     { color: '#FFF5F5', texto: '#E53E3E', icono: '✕',  label: 'No autorizado'           },
+  ERROR_INTERNO:     { color: '#FFF5F5', texto: '#E53E3E', icono: '✕',  label: 'Error interno'           },
+  NO_ENCONTRADO:     { color: '#F8FAFC', texto: '#64748B', icono: '○',  label: 'Buscando...'             },
+}
 
 const ITEM_VACIO = {
   codigo: '', descripcion: '', cantidad: 1,
@@ -11,6 +22,25 @@ const ITEM_VACIO = {
 }
 
 export default function NuevaFactura() {
+
+  const [items,          setItems]          = useState([{ ...ITEM_VACIO }])
+  const [estado,         setEstado]         = useState('idle')
+  const [resultado,      setResultado]      = useState(null)
+  const [error,          setError]          = useState([])  // ← array en lugar de string
+  const [cargandoConfig, setCargandoConfig] = useState(true)
+  // ✅ Reemplaza descargandoPDF, errorPDF, descargarRIDE, imprimirRIDE
+  const ride = useRIDE()
+  //Estados para control de Autorizacion
+  const [estadoSRI,    setEstadoSRI]    = useState(null)
+  const [pollingActivo, setPollingActivo] = useState(false)
+  const [intentos,     setIntentos]     = useState(0)
+  const intervaloRef = useRef(null)
+
+  const [ivaTarifa,    setIvaTarifa]    = useState(0.15)
+  const [ivaCodigo,    setIvaCodigo]    = useState('2')
+  const [ivaCodigoPct, setIvaCodigoPct] = useState('4')
+  const [ivaPorcentaje,setIvaPorcentaje]= useState('15')
+
   const [form, setForm] = useState({
     ruc:                 '',
     razon_social:        '',
@@ -26,24 +56,19 @@ export default function NuevaFactura() {
     email_comprador:     '',
   })
 
-  const [items,          setItems]          = useState([{ ...ITEM_VACIO }])
-  const [estado,         setEstado]         = useState('idle')
-  const [resultado,      setResultado]      = useState(null)
-  const [error,          setError]          = useState('')
-  const [cargandoConfig, setCargandoConfig] = useState(true)
-  //const [descargando,    setDescargando]    = useState(false)
-  //const [errorPDF,       setErrorPDF]       = useState('')
-  //const [errorDescarga,  setErrorDescarga] = useState('')
-
-  // ✅ Reemplaza descargandoPDF, errorPDF, descargarRIDE, imprimirRIDE
-  const ride = useRIDE()
-
   // ✅ Cargar configuración del emisor
   useEffect(() => {
     function cargar() {
       obtenerConfiguracion()
         .then(config => {
           if (!config) return
+
+          // ✅ Guardar config de IVA en estado
+          const ivaTarifa = parseFloat(config.iva_tarifa || '0.15')
+          setIvaTarifa(ivaTarifa)
+          setIvaCodigo(config.iva_codigo             || '2')
+          setIvaCodigoPct(config.iva_codigo_porcentaje || '4')
+          setIvaPorcentaje(config.iva_porcentaje       || '15')
 
           // Calcular el siguiente secuencial desde el último guardado
           const ultimoSecuencial = config.secuencial_actual || '0'
@@ -71,91 +96,65 @@ export default function NuevaFactura() {
     cargar()
   }, [])
 
-/*   async function descargarRIDE() {
-    setDescargando(true)
-    setErrorDescarga('')
-    try {
-      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
-        headers: { "Authorization": `Bearer ${getToken()}` }
-      })
+// -----------------------------------------------
+  // Polling: consultar estado cada 3 segundos
+  // -----------------------------------------------
+  useEffect(() => {
+    if (!pollingActivo || !resultado?.clave_acceso) return
 
-      const texto = await res.text()
+    const MAX_INTENTOS = 20   // 20 × 3s = 60 segundos máximo
 
-      if (!res.ok) {
-        const data = JSON.parse(texto)
-        throw new Error(data.mensaje || `Error ${res.status}`)
-      }
+    async function consultarEstado() {
+      try {
+        const res  = await fetch(
+          `${API_URL}/facturas/${resultado.clave_acceso}`,
+          { headers: { "Authorization": `Bearer ${getToken()}` } }
+        )
+        const data = await res.json()
 
-      const data      = JSON.parse(texto)
-      const pdfBase64 = data.pdf_base64
+        setEstadoSRI(data)
+        setIntentos(i => i + 1)
 
-      if (!pdfBase64) throw new Error("No se recibió el PDF")
-
-      const bytes = atob(pdfBase64)
-      const arr   = new Uint8Array(bytes.length)
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-
-      const blob = new Blob([arr], { type: "application/pdf" })
-      const url  = URL.createObjectURL(blob)
-      const a    = document.createElement("a")
-      a.href     = url
-      a.download = `factura-${clave}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-
-    } catch (err) {
-      setErrorDescarga('Error al descargar: ' + err.message)
-    } finally {
-      setDescargando(false)
-    }
-  } */
-
-/*   async function imprimirRIDE() {
-    setDescargando(true)
-    setErrorDescarga('')
-    try {
-      const res = await fetch(`${API_URL}/facturas/${clave}/ride`, {
-        headers: { "Authorization": `Bearer ${getToken()}` }
-      })
-
-      const texto = await res.text()
-
-      if (!res.ok) {
-        const data = JSON.parse(texto)
-        throw new Error(data.mensaje || `Error ${res.status}`)
-      }
-
-      const data      = JSON.parse(texto)
-      const pdfBase64 = data.pdf_base64
-      if (!pdfBase64) throw new Error("No se recibió el PDF")
-
-      // Convertir base64 a blob
-      const bytes = atob(pdfBase64)
-      const arr   = new Uint8Array(bytes.length)
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-      const blob = new Blob([arr], { type: "application/pdf" })
-      const url  = URL.createObjectURL(blob)
-
-      // ✅ Abrir en ventana nueva e imprimir automáticamente
-      const ventana = window.open(url)
-      ventana.onload = () => {
-        ventana.focus()
-        ventana.print()
-        // Limpiar el blob después de imprimir
-        ventana.onafterprint = () => {
-          URL.revokeObjectURL(url)
+        // Detener polling si ya hay respuesta definitiva
+        const estadosFinales = [
+          'AUTORIZADO', 'SRI_RECHAZO',
+          'NO_AUTORIZADO', 'SRI_NO_DISPONIBLE', 'ERROR_INTERNO'
+        ]
+        if (estadosFinales.includes(data.estado)) {
+          detenerPolling()
         }
-      }
 
-    } catch (err) {
-      setErrorDescarga('Error al imprimir: ' + err.message)
-    } finally {
-      setDescargando(false)
+      } catch (err) {
+        console.warn('Error consultando estado:', err.message)
+      }
+    }
+
+    // Primera consulta inmediata tras 3 segundos
+    const timeout = setTimeout(() => {
+      consultarEstado()
+      // Luego cada 3 segundos
+      intervaloRef.current = setInterval(consultarEstado, 3000)
+    }, 3000)
+
+    // Detener después de MAX_INTENTOS
+    const timeoutMax = setTimeout(() => {
+      detenerPolling()
+    }, MAX_INTENTOS * 3000)
+
+    return () => {
+      clearTimeout(timeout)
+      clearTimeout(timeoutMax)
+      if (intervaloRef.current) clearInterval(intervaloRef.current)
+    }
+  }, [pollingActivo, resultado?.clave_acceso])
+
+  function detenerPolling() {
+    setPollingActivo(false)
+    if (intervaloRef.current) {
+      clearInterval(intervaloRef.current)
+      intervaloRef.current = null
     }
   }
- */
 
   // Calcular totales
   const subtotal = items.reduce(
@@ -170,16 +169,112 @@ export default function NuevaFactura() {
     ))
   }
 
+  function inputItemStyle(valor, tipo = 'text') {
+    const vacio = tipo === 'number'
+      ? (!valor && valor !== 0) || valor === ''
+      : !String(valor || '').trim()
+
+    return {
+      ...styles.inputTabla,
+      borderColor: vacio ? '#E53E3E' : '#E2E8F0',
+      background:  vacio ? '#FFF5F5' : '#fff',
+    }
+  }
+
   function agregarItem()    { setItems(prev => [...prev, { ...ITEM_VACIO }]) }
   function eliminarItem(idx){ setItems(prev => prev.filter((_, i) => i !== idx)) }
 
+  function validarFormulario() {
+    const errores = []
+
+    // Datos del emisor
+    if (!form.ruc || form.ruc.length !== 13) {
+      errores.push('El RUC debe tener 13 dígitos')
+    }
+    if (!form.razon_social?.trim()) {
+      errores.push('La razón social es requerida')
+    }
+    if (!form.establecimiento || form.establecimiento.length !== 3) {
+      errores.push('El establecimiento debe tener 3 dígitos')
+    }
+    if (!form.punto_emision || form.punto_emision.length !== 3) {
+      errores.push('El punto de emisión debe tener 3 dígitos')
+    }
+    if (!form.secuencial || form.secuencial.length !== 9) {
+      errores.push('El secuencial debe tener 9 dígitos')
+    }
+    if (!form.dir_matriz?.trim()) {
+      errores.push('La dirección matriz es requerida')
+    }
+
+    // Datos del comprador
+    if (!form.id_comprador?.trim()) {
+      errores.push('La identificación del comprador es requerida')
+    }
+    if (!form.razon_comprador?.trim()) {
+      errores.push('La razón social del comprador es requerida')
+    }
+
+    // Items
+    if (items.length === 0) {
+      errores.push('Debe agregar al menos un producto o servicio')
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      const num  = i + 1
+
+      if (!item.codigo?.trim()) {
+        errores.push(`Ítem ${num}: el código es requerido`)
+      }
+      if (!item.descripcion?.trim()) {
+        errores.push(`Ítem ${num}: la descripción es requerida`)
+      }
+      if (!item.cantidad || item.cantidad <= 0) {
+        errores.push(`Ítem ${num}: la cantidad debe ser mayor a 0`)
+      }
+      if (item.precio_unitario === undefined ||
+          item.precio_unitario === null ||
+          item.precio_unitario < 0) {
+        errores.push(`Ítem ${num}: el precio unitario no puede ser negativo`)
+      }
+      if (item.precio_unitario === 0) {
+        errores.push(`Ítem ${num}: el precio unitario debe ser mayor a 0`)
+      }
+    }
+
+    // Total
+    if (subtotal <= 0) {
+      errores.push('El total de la factura debe ser mayor a $0.00')
+    }
+
+    return errores
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
+
+    // ✅ Validar antes de enviar
+    const erroresValidacion = validarFormulario()
+    if (erroresValidacion.length > 0) {
+      setError(erroresValidacion)  // ← array de errores
+      return
+    }
+
     setEstado('loading')
     setError('')
+    setEstadoSRI(null)
+    setIntentos(0)
 
     const fecha    = new Date()
     const fechaStr = `${String(fecha.getDate()).padStart(2,'0')}/${String(fecha.getMonth()+1).padStart(2,'0')}/${fecha.getFullYear()}`
+
+    // Cálculo dinámico con IVA de la configuración
+    const subtotal = items.reduce(
+      (acc, i) => acc + (i.cantidad * i.precio_unitario - i.descuento), 0
+    )
+    const iva   = subtotal * ivaTarifa   // ← dinámico
+    const total = subtotal + iva
 
     const payload = {
       ...form,
@@ -190,17 +285,24 @@ export default function NuevaFactura() {
       total_sin_impuestos:  subtotal,
       total_descuento:      items.reduce((a, i) => a + Number(i.descuento), 0),
       importe_total:        total,
+
+      // En el payload usar los valores de la configuración
       impuestos: [{
-        codigo: '2', tarifa: '4',
-        base: subtotal, valor: iva
-      }],
+        codigo:  ivaCodigo,       // ← dinámico
+        tarifa:  ivaCodigoPct,    // ← dinámico
+        base:    subtotal,
+        valor:   iva
+      }],      
+
       items: items.map(it => ({
         ...it,
         precio_total: it.cantidad * it.precio_unitario - it.descuento,
         impuestos: [{
-          codigo: '2', tarifa: '4', porcentaje: '15',
+          codigo:      ivaCodigo,       // ← dinámico
+          tarifa:      ivaCodigoPct,    // ← dinámico
+          porcentaje:  ivaPorcentaje,   // ← dinámico
           base:  it.cantidad * it.precio_unitario - it.descuento,
-          valor: (it.cantidad * it.precio_unitario - it.descuento) * 0.15
+          valor: (it.cantidad * it.precio_unitario - it.descuento) * ivaTarifa
         }]
       }))
     }
@@ -209,64 +311,171 @@ export default function NuevaFactura() {
       const res = await emitirFactura(payload)
       setResultado(res)
       setEstado('ok')
-    } catch (err) {
+      // ✅ Iniciar polling para consultar autorización
+      setPollingActivo(true)      
+    } 
+    catch (err) {
       setError(err.message)
       setEstado('error')
     }
   }
 
-  // Pantalla de éxito
+  // -----------------------------------------------
+  // Pantalla de éxito con estado en tiempo real
+  // -----------------------------------------------
   if (estado === 'ok') {
+
+    const infoEstado = estadoSRI
+      ? (ESTADOS_SRI[estadoSRI.estado] || ESTADOS_SRI.ERROR_INTERNO)
+      : ESTADOS_SRI.EN_PROCESO
+
+    const autorizado = estadoSRI?.estado === 'AUTORIZADO'
+    const rechazado  = ['SRI_RECHAZO', 'NO_AUTORIZADO',
+                        'SRI_NO_DISPONIBLE', 'ERROR_INTERNO']
+                       .includes(estadoSRI?.estado)
+
     return (
       <div style={styles.exito} className="fade-in">
-        {/* Ícono de éxito */}
-        <div style={styles.exitoIcono}>✓</div>
-        <h2 style={styles.exitoTitulo}>Comprobante en proceso</h2>
-        <p  style={styles.exitoSub}>
-          El comprobante fue enviado a la cola de procesamiento
-        </p>
+
+        {/* Errores de validación */}
+        {Array.isArray(error) && error.length > 0 && (
+          <div style={styles.erroresBox} className="fade-in">
+            <p style={styles.erroresTitulo}>
+              ⚠️ Por favor corrige los siguientes errores:
+            </p>
+            <ul style={styles.erroresList}>
+              {error.map((err, i) => (
+                <li key={i} style={styles.errorItem}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {typeof error === 'string' && error && (
+          <div style={styles.erroresBox}>
+            <p style={styles.erroresTitulo}>⚠️ {error}</p>
+          </div>
+        )}
+
+        {/* Estado del SRI en tiempo real */}
+        <div style={{
+          ...styles.estadoBadge,
+          background: infoEstado.color,
+          color:      infoEstado.texto,
+        }}>
+          <span style={styles.estadoIcono}>{infoEstado.icono}</span>
+          <div>
+            <p style={styles.estadoLabel}>{infoEstado.label}</p>
+            {pollingActivo && (
+              <p style={styles.estadoSub}>
+                Consultando al SRI... ({intentos} verificación{intentos !== 1 ? 'es' : ''})
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* Datos del comprobante */}
         <div style={styles.claveBox}>
-          <span style={styles.claveLabel}>Estado</span>
-          <span style={styles.clave}>{resultado?.estado}</span>
-          {resultado?.clave_acceso && (
+          <span style={styles.claveLabel}>Clave de acceso</span>
+          <span style={styles.claveValor}>{resultado?.clave_acceso}</span>
+
+          {/* Número de autorización — solo si está autorizado */}
+          {autorizado && estadoSRI?.numero_autorizacion && (
             <>
-              <span style={{ ...styles.claveLabel, marginTop: '0.5rem' }}>
-                Clave de acceso
+              <span style={{ ...styles.claveLabel, marginTop: '0.75rem' }}>
+                Número de autorización
               </span>
-              <span style={styles.clave}>{resultado.clave_acceso}</span>
+              <span style={{ ...styles.claveValor, color: '#005C3D' }}>
+                {estadoSRI.numero_autorizacion}
+              </span>
+              <span style={{ ...styles.claveLabel, marginTop: '0.5rem' }}>
+                Fecha de autorización
+              </span>
+              <span style={styles.claveValor}>
+                {estadoSRI.fecha_autorizacion}
+              </span>
+            </>
+          )}
+
+          {/* Detalle del error si fue rechazado */}
+          {rechazado && estadoSRI?.mensaje_error && (
+            <>
+              <span style={{ ...styles.claveLabel, marginTop: '0.75rem', color: '#E53E3E' }}>
+                Motivo
+              </span>
+              <span style={{ ...styles.claveValor, color: '#E53E3E', fontSize: '0.75rem' }}>
+                {estadoSRI.mensaje_error}
+              </span>
             </>
           )}
         </div>
 
-{/* Botones de acción */}
+        {/* Botones — solo si está autorizado */}
+        <div style={styles.botonesExito}>
+          {autorizado && (
+            <>
+              <button
+                onClick  = {() => ride.descargar(resultado?.clave_acceso)}
+                disabled = {ride.descargando}
+                style    = {{
+                  ...styles.btnRIDE,
+                  opacity: ride.descargando ? 0.7 : 1
+                }}
+              >
+                {ride.descargando ? '⏳ Procesando...' : '⬇ Descargar RIDE (PDF)'}
+              </button>
+
+              <button
+                onClick  = {() => ride.imprimir(resultado?.clave_acceso)}
+                disabled = {ride.descargando}
+                style    = {{
+                  ...styles.btnImprimir,
+                  opacity: ride.descargando ? 0.7 : 1
+                }}
+              >
+                🖨 Imprimir RIDE
+              </button>
+            </>
+          )}
+
+{/*           <button
+            style   = {styles.btnNueva}
+            onClick = {() => {
+              detenerPolling()
+              setEstado('idle')
+              setResultado(null)
+              setEstadoSRI(null)
+              setError('')
+              ride.limpiarError()
+              setItems([{ ...ITEM_VACIO }])
+            }}
+          >
+            + Emitir otro comprobante
+          </button> */}
+        </div>
+
+        {ride.error && (
+          <div style={styles.errorPDF}>{ride.error}</div>
+        )}
+
+        {/* Aviso si aún está procesando */}
+        {pollingActivo && (
+          <p style={styles.avisoEspera}>
+            ⏳ Esperando respuesta del SRI Ecuador...
+            El proceso puede tardar hasta 60 segundos.
+          </p>
+        )}
+
+        {/* Aviso timeout */}
+        {!pollingActivo && !autorizado && !rechazado && intentos > 0 && (
+          <p style={styles.avisoEspera}>
+            El SRI tardó más de lo esperado. Ve a{' '}
+            <strong>Comprobantes</strong> y consulta con la clave de acceso.
+          </p>
+        )}
+
+      {/* Botones de acción */}
       <div style={styles.botonesExito}>
-
-        {/* Descargar RIDE */}
-        <button
-          onClick  = {() => ride.descargar(resultado?.clave_acceso)}
-          disabled = {ride.descargando}
-          style    = {{
-            ...styles.btnRIDE,
-            opacity: ride.descargando ? 0.7 : 1
-          }}
-        >
-          {ride.descargando ? '⏳ Generando PDF...' : '⬇ Descargar RIDE (PDF)'}
-        </button>
-
-        {/* Imprimir RIDE */}
-        <button
-          onClick  = {() => ride.imprimir(resultado?.clave_acceso)}
-          disabled = {ride.descargando}
-          style    = {{
-            ...styles.btnImprimir,
-            opacity: ride.descargando ? 0.7 : 1
-          }}
-        >
-          🖨 Imprimir RIDE
-        </button>
-
         {/* Nueva factura */}
         <button
           style   = {styles.btnNueva}
@@ -432,7 +641,7 @@ export default function NuevaFactura() {
                             placeholder = {ph}
                             min       = {type === 'number' ? 0 : undefined}
                             step      = {type === 'number' ? '0.01' : undefined}
-                            style     = {styles.inputTabla}
+                            style       = {inputItemStyle(item[campo], type)}  // ← nuevo
                           />
                         </td>
                       ))}
@@ -469,10 +678,14 @@ export default function NuevaFactura() {
               <span>Subtotal (sin IVA)</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
+
+            {/* En el label de IVA del formulario mostrar el porcentaje real */}
             <div style={styles.totalFila}>
-              <span>IVA 15%</span>
+              <span>IVA {ivaPorcentaje}%</span>   {/* ← dinámico */}
               <span>${iva.toFixed(2)}</span>
             </div>
+
+
             <div style={{ ...styles.totalFila, ...styles.totalFinal }}>
               <span>TOTAL</span>
               <span>${total.toFixed(2)}</span>
@@ -550,4 +763,52 @@ const styles = {
   claveLabel:   { fontSize: '0.75rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 600 },
   clave:        { fontFamily: "'DM Mono', monospace", fontSize: '0.85rem', color: '#00875A', wordBreak: 'break-all' },
   btnNueva:     { background: '#00875A', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer' },
+//Estados para validacion de Autorizacion
+  estadoBadge: {
+    display:      'flex',
+    alignItems:   'center',
+    gap:          '1rem',
+    borderRadius: '12px',
+    padding:      '1.25rem 1.5rem',
+    marginBottom: '1.25rem',
+    transition:   'all 0.3s',
+  },
+  estadoIcono: {
+    fontSize:   '2rem',
+    flexShrink: 0,
+  },
+  estadoLabel: {
+    margin:     0,
+    fontWeight: 700,
+    fontSize:   '1rem',
+  },
+  estadoSub: {
+    margin:    '0.25rem 0 0',
+    fontSize:  '0.75rem',
+    opacity:   0.8,
+  },
+  erroresBox: {
+    background:   '#FFF5F5',
+    border:       '1.5px solid #FED7D7',
+    borderRadius: '10px',
+    padding:      '1rem 1.25rem',
+    marginBottom: '1rem',
+  },
+  erroresTitulo: {
+    color:        '#C53030',
+    fontWeight:   700,
+    fontSize:     '0.9rem',
+    marginBottom: '0.5rem',
+  },
+  erroresList: {
+    margin:     0,
+    paddingLeft:'1.25rem',
+    display:    'flex',
+    flexDirection: 'column',
+    gap:        '0.3rem',
+  },
+  errorItem: {
+    color:    '#C53030',
+    fontSize: '0.85rem',
+  },
 }
