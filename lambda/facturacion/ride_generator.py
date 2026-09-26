@@ -63,7 +63,12 @@ class CodigoBarras(Flowable):
         barcode.drawOn(self.canv, offset_x, 0)
 
 
-def generar_ride(datos: dict, numero_autorizacion: str, fecha_autorizacion: str) -> bytes:
+def generar_ride(
+    datos: dict, 
+    numero_autorizacion: str, 
+    fecha_autorizacion: str,
+    logo_base64: str = None    # ← nuevo parámetro
+    ) -> bytes:
     """
     Genera el RIDE (PDF) de la factura electrónica
     según el formato requerido por el SRI Ecuador.
@@ -112,14 +117,53 @@ def generar_ride(datos: dict, numero_autorizacion: str, fecha_autorizacion: str)
     )
 
     # -----------------------------------------------
-    # 1. CABECERA
+    # 1. CABECERA con logo
     # -----------------------------------------------
     # Generar código (barras o QR según configuración)
     # En generar_ride — sección 1. CABECERA
     codigo = _generar_codigo(numero_autorizacion)
 
-    # Columna derecha con el código
-    col_derecha_data = [
+    # Columna izquierda: logo + datos del emisor
+    col_izq_items = []
+
+    # ✅ Logo si existe
+    if logo_base64:
+        try:
+            # Decodificar base64 (puede venir con prefijo data:image/png;base64,)
+            if ',' in logo_base64:
+                logo_data = base64.b64decode(logo_base64.split(',')[1])
+            else:
+                logo_data = base64.b64decode(logo_base64)
+
+            logo_buffer = io.BytesIO(logo_data)
+            logo_img    = Image(
+                logo_buffer,
+                width  = 4 * cm,
+                height = 2 * cm
+            )
+            logo_img.hAlign = 'LEFT'
+            col_izq_items.append([logo_img])
+        except Exception as e:
+            logger.warning(f"No se pudo cargar el logo: {str(e)}")
+
+    # Datos del emisor
+    col_izq_items.extend([
+        [Paragraph(datos.get("razon_social", ""),          estilo_titulo)],
+        [Paragraph(f'RUC: {datos.get("ruc", "")}',         estilo_subtitulo)],
+        [Paragraph(datos.get("dir_matriz", ""),             estilo_normal)],
+        [Paragraph(f'Teléf: {datos.get("telefono", "-")}', estilo_normal)],
+        [Paragraph(datos.get("email", ""),                  estilo_normal)],
+    ])
+
+    col_izquierda = Table(col_izq_items, colWidths=[10 * cm])
+    col_izquierda.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("TOPPADDING",    (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+
+    # Columna derecha: tipo documento + código
+    col_derecha_items = [
         [Paragraph("FACTURA", estilo_titulo)],
         [Paragraph(
             f'No. {datos.get("establecimiento","001")}-'
@@ -128,29 +172,22 @@ def generar_ride(datos: dict, numero_autorizacion: str, fecha_autorizacion: str)
             estilo_subtitulo
         )],
         [Paragraph("NÚMERO DE AUTORIZACIÓN", estilo_label)],
-        [Paragraph(numero_autorizacion, estilo_mono)],
-        [Paragraph(f'FECHA AUTORIZACIÓN: {fecha_autorizacion}', estilo_label)],
+        [Paragraph(numero_autorizacion,        estilo_mono)],
+        [Paragraph(
+            f'FECHA AUTORIZACIÓN: {fecha_autorizacion}',
+            estilo_label
+        )],
         [Paragraph(
             f'AMBIENTE: {"CERTIFICACIÓN" if datos.get("ambiente") == "1" else "PRODUCCIÓN"}',
             estilo_label
         )],
         [Paragraph('EMISIÓN: NORMAL', estilo_label)],
-        [codigo],   # ← CodigoBarras o Image según TIPO_CODIGO
+        [codigo],
     ]
 
-    col_derecha = Table(col_derecha_data, colWidths=[7*cm])
+    col_derecha = Table(col_derecha_items, colWidths=[7*cm])
 
-    cabecera_data = [[
-        Table([
-            [Paragraph(datos.get("razon_social", ""),         estilo_titulo)],
-            [Paragraph(f'RUC: {datos.get("ruc", "")}',        estilo_subtitulo)],
-            [Paragraph(datos.get("dir_matriz", ""),            estilo_normal)],
-            [Paragraph(f'Teléf: {datos.get("telefono","-")}', estilo_normal)],
-            [Paragraph(datos.get("email", ""),                 estilo_normal)],
-        ], colWidths=[10*cm]),
-        col_derecha
-    ]]
-
+    cabecera_data  = [[col_izquierda, col_derecha]]
     cabecera_tabla = Table(cabecera_data, colWidths=[10*cm, 7*cm])
     cabecera_tabla.setStyle(TableStyle([
         ("VALIGN",      (0, 0), (-1, -1), "TOP"),

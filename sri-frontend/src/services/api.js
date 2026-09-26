@@ -35,3 +35,6 @@ export const consultarFactura = (claveAcceso) => request('GET', `/facturas/${cla
 // Opcion de Configuracion de RUC
 export const obtenerConfiguracion = ()      => request('GET', '/configuracion')
 export const guardarConfiguracion = (datos) => request('PUT', '/configuracion', datos)
+
+// Verificar si una clave de acceso ya existe
+export const verificarDuplicado = (claveAcceso) => request('GET', `/facturas/${claveAcceso}`)

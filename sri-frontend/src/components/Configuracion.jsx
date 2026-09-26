@@ -17,10 +17,16 @@ const CAMPOS = [
 
 const FORM_VACIO = CAMPOS.reduce((acc, c) => ({ ...acc, [c.key]: '' }), {})
 
+
 export default function Configuracion() {
   const [form,    setForm]    = useState(FORM_VACIO)
   const [estado,  setEstado]  = useState('idle')   // idle | loading | guardando | ok | error
   const [mensaje, setMensaje] = useState('')
+
+  // Agregar estados en Configuracion.jsx
+  const [logoPreview,   setLogoPreview]   = useState(null)
+  const [subiendoLogo,  setSubiendoLogo]  = useState(false)
+  const [mensajeLogo,   setMensajeLogo]   = useState('')
 
   // Cargar configuración al montar
   useEffect(() => {
@@ -54,6 +60,71 @@ export default function Configuracion() {
       setMensaje(err.message)
     }
   }
+
+  // Función para subir el logo
+  async function handleLogoChange(e) {
+    const archivo = e.target.files[0]
+    if (!archivo) return
+
+    // Validar tipo y tamaño
+    if (!archivo.type.startsWith('image/')) {
+      setMensajeLogo('Solo se permiten imágenes (PNG, JPG)')
+      return
+    }
+    if (archivo.size > 500 * 1024) {
+      setMensajeLogo('El logo no debe superar 500KB')
+      return
+    }
+
+    setSubiendoLogo(true)
+    setMensajeLogo('')
+
+    try {
+      // Convertir a base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload  = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(archivo)
+      })
+
+      // Mostrar preview
+      setLogoPreview(base64)
+
+      // Guardar en la configuración
+      const configActual = await obtenerConfiguracion() || {}
+      await guardarConfiguracion({
+        ...configActual,
+        ...form,
+        logo_base64: base64,
+        logo_nombre: archivo.name,
+      })
+
+      setMensajeLogo('✅ Logo guardado correctamente')
+    } catch (err) {
+      setMensajeLogo('Error al subir el logo: ' + err.message)
+    } finally {
+      setSubiendoLogo(false)
+    }
+  }
+
+// Cargar logo al montar — actualiza cargarConfiguracion
+async function cargarConfiguracion() {
+  setEstado('loading')
+  try {
+    const datos = await obtenerConfiguracion()
+    if (datos) {
+      setForm(datos)
+      if (datos.logo_base64) {
+        setLogoPreview(datos.logo_base64)
+      }
+    }
+    setEstado('idle')
+  } catch {
+    setEstado('idle')
+  }
+}
+
 
   return (
     <div className="fade-in">
@@ -123,6 +194,82 @@ export default function Configuracion() {
           </div>
           </div>
         </section>
+
+        {/* Sección Logo */}
+        <section style={styles.seccion}>
+          <h3 style={styles.seccionTitulo}>Logo de la Empresa</h3>
+          <p style={styles.infoTexto}>
+            Se mostrará en el encabezado del RIDE (PDF de la factura).
+            Formato PNG o JPG, máximo 500KB. Recomendado: fondo blanco, 300×100px.
+          </p>
+
+          <div style={styles.logoUploadBox}>
+
+            {/* Preview del logo */}
+            <div style={styles.logoPreviewBox}>
+              {logoPreview ? (
+                <img
+                  src   = {logoPreview}
+                  alt   = "Logo empresa"
+                  style = {styles.logoPreviewImg}
+                />
+              ) : (
+                <div style={styles.logoPlaceholder}>
+                  <span style={{ fontSize: '2rem' }}>🏢</span>
+                  <p style={{ color: '#94A3B8', fontSize: '0.8rem', margin: '0.5rem 0 0' }}>
+                    Sin logo
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Botones */}
+            <div style={styles.logoAcciones}>
+              <label style={styles.btnSeleccionarLogo}>
+                {subiendoLogo ? '⏳ Subiendo...' : '📁 Seleccionar logo'}
+                <input
+                  type     = "file"
+                  accept   = "image/png,image/jpeg,image/jpg"
+                  onChange = {handleLogoChange}
+                  disabled = {subiendoLogo}
+                  style    = {{ display: 'none' }}
+                />
+              </label>
+
+              {logoPreview && (
+                <button
+                  type    = "button"
+                  onClick = {async () => {
+                    const configActual = await obtenerConfiguracion() || {}
+                    await guardarConfiguracion({
+                      ...configActual,
+                      ...form,
+                      logo_base64: null,
+                      logo_nombre: null,
+                    })
+                    setLogoPreview(null)
+                    setMensajeLogo('Logo eliminado')
+                  }}
+                  style = {styles.btnEliminarLogo}
+                >
+                  🗑 Eliminar logo
+                </button>
+              )}
+            </div>
+
+          </div>
+
+          {mensajeLogo && (
+            <p style={{
+              marginTop: '0.75rem',
+              fontSize:  '0.85rem',
+              color:     mensajeLogo.startsWith('✅') ? '#005C3D' : '#E53E3E',
+            }}>
+              {mensajeLogo}
+            </p>
+          )}
+        </section>
+
 
         {/* Sección IVA */}
         <section style={styles.seccion}>
@@ -285,5 +432,57 @@ const styles = {
     fontWeight: 600,
     flexShrink: 0,
   },
-
+  logoUploadBox: {
+    display:   'flex',
+    gap:       '1.5rem',
+    alignItems:'flex-start',
+    flexWrap:  'wrap',
+  },
+  logoPreviewBox: {
+    width:        '200px',
+    height:       '100px',
+    border:       '2px dashed #E2E8F0',
+    borderRadius: '8px',
+    display:      'flex',
+    alignItems:   'center',
+    justifyContent:'center',
+    background:   '#fff',
+    overflow:     'hidden',
+    flexShrink:   0,
+    },
+  logoPreviewImg: {
+    maxWidth:  '190px',
+    maxHeight: '90px',
+    objectFit: 'contain',
+  },
+  logoPlaceholder: {
+    textAlign: 'center',
+  },
+  logoAcciones: {
+    display:       'flex',
+    flexDirection: 'column',
+    gap:           '0.75rem',
+  },
+  btnSeleccionarLogo: {
+    display:      'inline-block',
+    background:   '#00875A',
+    color:        '#fff',
+    border:       'none',
+    borderRadius: '8px',
+    padding:      '0.75rem 1.25rem',
+    fontSize:     '0.9rem',
+    fontWeight:   600,
+    cursor:       'pointer',
+    textAlign:    'center',
+  },
+  btnEliminarLogo: {
+    background:   'transparent',
+    border:       '1.5px solid #FED7D7',
+    borderRadius: '8px',
+    color:        '#E53E3E',
+    padding:      '0.6rem 1rem',
+    fontSize:     '0.85rem',
+    cursor:       'pointer',
+    fontWeight:   500,
+  },
 }

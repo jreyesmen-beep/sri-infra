@@ -112,27 +112,32 @@ def descargar_ride(clave_acceso: str, cors: dict) -> dict:
         except Exception:
             # Generar si no existe
             logger.info("Generando RIDE...")
-            pdf_bytes = generar_ride(
-                datos               = datos,
-                numero_autorizacion = estado.get("numero_autorizacion", ""),
-                fecha_autorizacion  = estado.get("fecha_autorizacion", "")
-            )
-            # Guardar para próximas consultas
-            s3.put_object(
-                Bucket      = BUCKET,
-                Key         = key_pdf,
-                Body        = pdf_bytes,
-                ContentType = "application/pdf"
-            )
+            logo_base64 = None
+            try:
+                key      = f"{AMBIENTE}/configuracion/emisor.json"
+                response = s3.get_object(Bucket=BUCKET, Key=key)
+                config   = json.loads(response["Body"].read().decode("utf-8"))
+                logo_base64 = config.get("logo_base64")
+            except Exception:
+                logger.info("Generando RIDE...")
+                pdf_bytes = generar_ride(
+                    datos               = datos,
+                    numero_autorizacion = estado.get("numero_autorizacion", ""),
+                    fecha_autorizacion  = estado.get("fecha_autorizacion", ""),
+                    logo_base64         = logo_base64    # ← nuevo
+                )
+                s3.put_object(
+                    Bucket      = BUCKET,
+                    Key         = key_pdf,
+                    Body        = pdf_bytes,
+                    ContentType = "application/pdf"
+                )
 
         # ✅ Devolver JSON con el PDF en base64
         # Más confiable que depender de binary_media_types de API Gateway
         return {
             "statusCode": 200,
-            "headers": {
-                **cors,
-                "Content-Type": "application/json"
-            },
+            "headers": {**cors, "Content-Type": "application/json"},
             "body": json.dumps({
                 "pdf_base64": base64.b64encode(pdf_bytes).decode("utf-8"),
                 "filename":   f"factura-{clave_acceso}.pdf",
@@ -271,35 +276,6 @@ def consultar_estado_s3(clave_acceso: str) -> dict:
         "mensaje":      "No existe ningún comprobante con esta clave de acceso"
     }
 
-    # from datetime import datetime
-
-    # # Buscar en los últimos 7 días
-    # for dias_atras in range(7):
-    #     fecha = datetime.now()
-    #     from datetime import timedelta
-    #     fecha = fecha - timedelta(days=dias_atras)
-    #     fecha_str = fecha.strftime("%Y/%m/%d")
-
-    #     # Buscar estado autorizado
-    #     key_estado = f"{AMBIENTE}/estados/{fecha_str}/{clave_acceso}.json"
-    #     try:
-    #         response = s3.get_object(Bucket=BUCKET, Key=key_estado)
-    #         return json.loads(response["Body"].read().decode("utf-8"))
-    #     except s3.exceptions.NoSuchKey:
-    #         pass
-    #     except Exception:
-    #         pass
-
-    #     # Buscar estado de error
-    #     key_error = f"{AMBIENTE}/errores/{fecha_str}/{clave_acceso}.json"
-    #     try:
-    #         response = s3.get_object(Bucket=BUCKET, Key=key_error)
-    #         return json.loads(response["Body"].read().decode("utf-8"))
-    #     except s3.exceptions.NoSuchKey:
-    #         pass
-    #     except Exception:
-    #         pass
-
     # Si no encontró nada, puede estar en proceso
     return {
         "clave_acceso": clave_acceso,
@@ -319,7 +295,17 @@ def manejar_sqs(event, context):
         mensaje_id = record["messageId"]
         try:
             datos = json.loads(record["body"])
+            clave_acceso = datos.get("clave_acceso", "")
             logger.info(f"Procesando comprobante: {datos.get('clave_acceso', mensaje_id)}")
+
+            # ✅ Verificar duplicado antes de procesar
+            if _verificar_duplicado(clave_acceso):
+                logger.warning(
+                    f"Comprobante {clave_acceso} ya fue procesado. "
+                    f"Se descarta el mensaje duplicado."
+                )
+                # No agregar a errores — eliminar de la cola
+                continue
 
             procesar_comprobante(datos)
             # logger.info(f"Comprobante procesado: {resultado}")
@@ -348,6 +334,18 @@ def manejar_sqs(event, context):
 def procesar_comprobante(datos: dict):
     # logger.info(f"PAYLOAD RECIBIDO: {json.dumps(datos, ensure_ascii=False)}")
     clave_acceso = datos["clave_acceso"]
+
+    # ✅ Cargar logo de la configuración
+    logo_base64 = None
+    try:
+        key      = f"{AMBIENTE}/configuracion/emisor.json"
+        response = s3.get_object(Bucket=BUCKET, Key=key)
+        config   = json.loads(response["Body"].read().decode("utf-8"))
+        logo_base64 = config.get("logo_base64")
+        if logo_base64:
+            logger.info("Logo de empresa cargado para el RIDE")
+    except Exception as e:
+        logger.warning(f"No se pudo cargar el logo: {str(e)}")
 
     # ✅ Leer configuración de IVA
     config_iva = _obtener_config_iva()
@@ -424,7 +422,8 @@ def procesar_comprobante(datos: dict):
     pdf_bytes = generar_ride(
         datos               = datos,
         numero_autorizacion = respuesta_autorizacion["numero_autorizacion"],
-        fecha_autorizacion  = respuesta_autorizacion["fecha_autorizacion"]
+        fecha_autorizacion  = respuesta_autorizacion["fecha_autorizacion"],
+        logo_base64         = logo_base64    # ← nuevo
     )
 
     # Guardar PDF en S3
@@ -718,3 +717,30 @@ def _obtener_config_iva() -> dict:
             "porcentaje":        "15",
             "tarifa":            0.15,
         }
+
+def _verificar_duplicado(clave_acceso: str) -> bool:
+    """
+    Verifica si el comprobante ya fue procesado.
+    Retorna True si ya existe (es duplicado).
+    """
+    prefijos = [
+        f"{AMBIENTE}/estados/",
+        f"{AMBIENTE}/xml-autorizado/",
+        f"{AMBIENTE}/xml-firmado/",
+    ]
+    for prefijo in prefijos:
+        try:
+            response = s3.list_objects_v2(
+                Bucket = BUCKET,
+                Prefix = prefijo
+            )
+            for obj in response.get("Contents", []):
+                if clave_acceso in obj["Key"]:
+                    logger.warning(
+                        f"Comprobante duplicado detectado: "
+                        f"{clave_acceso} ya existe en {obj['Key']}"
+                    )
+                    return True
+        except Exception as e:
+            logger.error(f"Error verificando duplicado: {str(e)}")
+    return False

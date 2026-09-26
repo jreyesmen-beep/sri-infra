@@ -268,6 +268,7 @@ export default function NuevaFactura() {
 
     const fecha    = new Date()
     const fechaStr = `${String(fecha.getDate()).padStart(2,'0')}/${String(fecha.getMonth()+1).padStart(2,'0')}/${fecha.getFullYear()}`
+    const claveAcceso = generarClaveAcceso(form, fecha)
 
     // Cálculo dinámico con IVA de la configuración
     const subtotal = items.reduce(
@@ -275,6 +276,25 @@ export default function NuevaFactura() {
     )
     const iva   = subtotal * ivaTarifa   // ← dinámico
     const total = subtotal + iva
+
+    // ✅ Verificar duplicado antes de enviar
+    try {
+      const estadoExistente = await verificarDuplicado(claveAcceso)
+      if (estadoExistente &&
+          estadoExistente.estado !== 'NO_ENCONTRADO' &&
+          estadoExistente.estado !== 'EN_PROCESO') {
+        setError([
+          `El comprobante con secuencial ${form.secuencial} ya fue procesado.`,
+          `Estado: ${estadoExistente.estado}`,
+          'Por favor verifica el secuencial en la sección de Comprobantes.'
+        ])
+        setEstado('idle')
+        return
+      }
+    } catch {
+      // Si no se puede verificar, continuar con el envío
+      logger.warn?.('No se pudo verificar duplicado, continuando...')
+    }
 
     const payload = {
       ...form,
@@ -697,10 +717,17 @@ export default function NuevaFactura() {
 
         <button
           type     = "submit"
-          style    = {styles.btnEmitir}
+          style    = {{
+            ...styles.btnEmitir,
+            opacity: estado === 'loading' ? 0.7 : 1,
+            cursor:  estado === 'loading' ? 'not-allowed' : 'pointer',
+          }}
           disabled = {estado === 'loading'}
         >
-          {estado === 'loading' ? 'Procesando...' : 'Emitir Factura'}
+        {estado === 'loading'
+          ? '⏳ Enviando al SRI...'
+          : 'Emitir Factura'
+        }
         </button>
 
       </form>
