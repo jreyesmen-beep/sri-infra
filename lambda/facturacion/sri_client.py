@@ -137,20 +137,40 @@ class SRIClient:
                         "xml_autorizado":      autorizacion.comprobante,
                     }
 
-                if estado == "NO AUTORIZADO":
-                    mensajes = [
-                        f"{m.identificador}: {m.mensaje}"
-                        for m in autorizacion.mensajes.mensaje
-                    ]
-                    return {"estado": "NO_AUTORIZADO", "errores": mensajes}
+                # ✅ Manejar RECHAZADA y NO AUTORIZADO correctamente
+                if estado in ("NO AUTORIZADO", "RECHAZADA", "DEVUELTA"):
+                    mensajes = []
+                    try:
+                        mensajes = [
+                            f"{m.identificador}: {m.mensaje}"
+                            for m in autorizacion.mensajes.mensaje
+                        ]
+                    except Exception:
+                        mensajes = [f"Estado: {estado}"]
+
+                    logger.error(f"Comprobante rechazado: {mensajes}")
+
+                    # ← Lanzar SRIRechazo para que NO se reencole
+                    raise SRIRechazo(
+                        f"SRI rechazó el comprobante ({estado}): {mensajes}"
+                    )
+
+                # Estado desconocido — reintentar
+                logger.warning(f"Estado desconocido: {estado}, reintentando...")
+                time.sleep(3)
+
+            except SRIRechazo:
+                raise  # No reintentar
 
             except (ConnectionError, RemoteDisconnected, TransportError) as e:
                 logger.warning(f"SRI no disponible al autorizar (intento {intento}): {str(e)}")
-                time.sleep(3)
+                if intento < reintentos:
+                    time.sleep(3)
 
             except Exception as e:
                 logger.error(f"Error al autorizar (intento {intento}): {str(e)}")
-                time.sleep(3)
+                if intento < reintentos:
+                    time.sleep(3)
 
         raise SRINoDisponible(
             "El SRI no respondió la autorización en el tiempo esperado."

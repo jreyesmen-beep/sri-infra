@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'  // ← agregar useRef
 import { emitirFactura, obtenerConfiguracion } from '../services/api'
 import { getToken }                            from '../services/auth'  // ← debe estar
 import { useRIDE }                             from '../hooks/useRIDE'  // ← nuevo
+import { formatearFechaEcuador }               from '../utils/fecha'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -9,6 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL
 const ESTADOS_SRI = {
   EN_PROCESO:        { color: '#EFF6FF', texto: '#1D4ED8', icono: '⏳', label: 'Procesando...'          },
   AUTORIZADO:        { color: '#E3F5EE', texto: '#005C3D', icono: '✓',  label: 'Autorizado por el SRI'  },
+  YA_AUTORIZADO:     { color: '#F0FDF4', texto: '#166534', icono: '✓',  label: 'Comprobante ya autorizado'    }, // ← nuevo
   SRI_NO_DISPONIBLE: { color: '#FFF7ED', texto: '#C2410C', icono: '⚠️', label: 'SRI no disponible'      },
   SRI_RECHAZO:       { color: '#FFF5F5', texto: '#E53E3E', icono: '✕',  label: 'Rechazado por el SRI'   },
   NO_AUTORIZADO:     { color: '#FFF5F5', texto: '#E53E3E', icono: '✕',  label: 'No autorizado'           },
@@ -46,14 +48,16 @@ export default function NuevaFactura() {
     razon_social:        '',
     nombre_comercial:    '',
     establecimiento:     '001',
-    punto_emision:       '001',
+    punto_emision:       '002',
     secuencial:          '',
     dir_matriz:          '',
-    tipo_id_comprador:   '05',
+    tipo_id_comprador:   '07',
     razon_comprador:     'CONSUMIDOR FINAL',
     id_comprador:        '9999999999999',
     dir_establecimiento: '',
+    dir_comprador:       '',               // ← nuevo
     email_comprador:     '',
+    fecha_emision_input: _hoyInput(),      // ← nuevo: hoy por defecto
   })
 
   // ✅ Cargar configuración del emisor
@@ -117,7 +121,7 @@ export default function NuevaFactura() {
 
         // Detener polling si ya hay respuesta definitiva
         const estadosFinales = [
-          'AUTORIZADO', 'SRI_RECHAZO',
+          'AUTORIZADO', 'YA_AUTORIZADO', 'SRI_RECHAZO',
           'NO_AUTORIZADO', 'SRI_NO_DISPONIBLE', 'ERROR_INTERNO'
         ]
         if (estadosFinales.includes(data.estado)) {
@@ -136,9 +140,14 @@ export default function NuevaFactura() {
       intervaloRef.current = setInterval(consultarEstado, 3000)
     }, 3000)
 
-    // Detener después de MAX_INTENTOS
+    // ✅ Timeout máximo — mostrar mensaje si el SRI no responde
     const timeoutMax = setTimeout(() => {
       detenerPolling()
+      setEstadoSRI(prev => prev || {
+        clave_acceso: resultado.clave_acceso,
+        estado:       'SRI_NO_DISPONIBLE',
+        mensaje:      'El SRI tardó demasiado. Consulta el estado en "Comprobantes".'
+      })
     }, MAX_INTENTOS * 3000)
 
     return () => {
@@ -220,6 +229,29 @@ export default function NuevaFactura() {
       errores.push('Debe agregar al menos un producto o servicio')
     }
 
+    // ✅ Validar fecha
+    if (!form.fecha_emision_input) {
+      errores.push('La fecha de emisión es requerida')
+    } else {
+      const hoy        = new Date()
+      hoy.setHours(0, 0, 0, 0)
+      const fechaSelec = new Date(form.fecha_emision_input)
+      if (fechaSelec > hoy) {
+        errores.push('La fecha de emisión no puede ser futura')
+      }
+    }
+
+    // ✅ Validar dirección si no es consumidor final
+    if (form.tipo_id_comprador !== '07' &&
+        form.id_comprador !== '9999999999999') {
+      // Dirección opcional — no valida como requerida
+      // pero si se ingresa debe tener al menos 5 caracteres
+      if (form.dir_comprador &&
+          form.dir_comprador.trim().length < 5) {
+        errores.push('La dirección del comprador debe tener al menos 5 caracteres')
+      }
+    }
+
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
       const num  = i + 1
@@ -251,6 +283,18 @@ export default function NuevaFactura() {
     return errores
   }
 
+  function _hoyInput() {
+    const hoy = new Date()
+    return hoy.toISOString().split('T')[0]  // formato YYYY-MM-DD para input type=date
+  }
+
+  function _inputAFechaEcuador(fechaInput) {
+    // Convierte YYYY-MM-DD → DD/MM/YYYY (formato SRI)
+    if (!fechaInput) return ''
+    const [yyyy, mm, dd] = fechaInput.split('-')
+    return `${dd}/${mm}/${yyyy}`
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
 
@@ -266,9 +310,32 @@ export default function NuevaFactura() {
     setEstadoSRI(null)
     setIntentos(0)
 
-    const fecha    = new Date()
-    const fechaStr = `${String(fecha.getDate()).padStart(2,'0')}/${String(fecha.getMonth()+1).padStart(2,'0')}/${fecha.getFullYear()}`
-    const claveAcceso = generarClaveAcceso(form, fecha)
+    // ✅ Usar fecha del formulario en lugar de la fecha actual
+    const fechaInput = form.fecha_emision_input || _hoyInput()    
+    //const fecha    = new Date()
+    //const fechaStr = `${String(fecha.getDate()).padStart(2,'0')}/${String(fecha.getMonth()+1).padStart(2,'0')}/${fecha.getFullYear()}`
+    const fechaStr   = _inputAFechaEcuador(fechaInput)
+
+    // Para generar la clave de acceso usar la fecha seleccionada
+    const [yyyy, mm, dd] = fechaInput.split('-')
+    const fechaObj       = new Date(
+      parseInt(yyyy),
+      parseInt(mm) - 1,
+      parseInt(dd)
+    )
+    // ✅ Esto sí es correcto — usa hora local, no UTC
+
+    // Verificar que los valores son correctos
+    //logger.info?.(`Fecha para clave: ${dd}/${mm}/${yyyy}`)
+
+    //const claveAcceso = generarClaveAcceso(form, fecha)
+    const claveAcceso = generarClaveAcceso(form, fechaObj)
+
+    // Verificar en consola
+    console.log('Fecha input:',   fechaInput)
+    console.log('Fecha SRI:',     fechaStr)
+    console.log('Clave acceso:',  claveAcceso)
+    console.log('Longitud clave:', claveAcceso.length, '(debe ser 49)')
 
     // Cálculo dinámico con IVA de la configuración
     const subtotal = items.reduce(
@@ -293,14 +360,14 @@ export default function NuevaFactura() {
       }
     } catch {
       // Si no se puede verificar, continuar con el envío
-      logger.warn?.('No se pudo verificar duplicado, continuando...')
+      console.warn('No se pudo verificar duplicado, continuando...')
     }
 
     const payload = {
       ...form,
       ambiente:            '1',
       fecha_emision:        fechaStr,
-      clave_acceso:         generarClaveAcceso(form, fecha),
+      clave_acceso:         claveAcceso, //generarClaveAcceso(form, fecha),
       email_comprador:      form.email_comprador || '',
       total_sin_impuestos:  subtotal,
       total_descuento:      items.reduce((a, i) => a + Number(i.descuento), 0),
@@ -349,11 +416,15 @@ export default function NuevaFactura() {
       ? (ESTADOS_SRI[estadoSRI.estado] || ESTADOS_SRI.ERROR_INTERNO)
       : ESTADOS_SRI.EN_PROCESO
 
-    const autorizado = estadoSRI?.estado === 'AUTORIZADO'
+    const autorizado = ['AUTORIZADO', 'YA_AUTORIZADO']
+                        .includes(estadoSRI?.estado)
+
     const rechazado  = ['SRI_RECHAZO', 'NO_AUTORIZADO',
                         'SRI_NO_DISPONIBLE', 'ERROR_INTERNO']
                        .includes(estadoSRI?.estado)
 
+    const yaProcesado = estadoSRI?.estado === 'YA_AUTORIZADO'
+    
     return (
       <div style={styles.exito} className="fade-in">
 
@@ -394,7 +465,32 @@ export default function NuevaFactura() {
           </div>
         </div>
 
-        {/* Datos del comprobante */}
+        {/* ✅ Aviso especial para comprobante ya procesado */}
+        {yaProcesado && (
+          <div style={styles.avisoYaProcesado}>
+            <p style={styles.avisoYaTitulo}>
+              ℹ️ Este comprobante ya había sido enviado anteriormente
+            </p>
+            <p style={styles.avisoYaTexto}>
+              El sistema detectó que este número de factura ya fue
+              autorizado por el SRI en un envío previo. No se realizó
+              un nuevo envío para evitar duplicados. Los datos de
+              autorización corresponden al envío original.
+            </p>
+            {estadoSRI?.fecha_procesamiento && (
+              <p style={styles.avisoYaFecha}>
+                Fecha del envío original:{' '}
+                {new Date(estadoSRI.fecha_procesamiento)
+                  .toLocaleString('es-EC')}
+              </p>
+            )}
+          </div>
+        )}
+
+        
+        {/* Datos del comprobante 
+        // En la pantalla de éxito
+        */}
         <div style={styles.claveBox}>
           <span style={styles.claveLabel}>Clave de acceso</span>
           <span style={styles.claveValor}>{resultado?.clave_acceso}</span>
@@ -412,7 +508,7 @@ export default function NuevaFactura() {
                 Fecha de autorización
               </span>
               <span style={styles.claveValor}>
-                {estadoSRI.fecha_autorizacion}
+                {formatearFechaEcuador(estadoSRI.fecha_autorizacion)}
               </span>
             </>
           )}
@@ -577,11 +673,22 @@ export default function NuevaFactura() {
         <section style={styles.seccion}>
           <h3 style={styles.seccionTitulo}>Datos del Comprador</h3>
           <div style={styles.grilla}>
+
             <div style={styles.campo}>
               <label style={styles.label}>Tipo Identificación</label>
               <select
                 value    = {form.tipo_id_comprador}
-                onChange = {e => setForm(f => ({ ...f, tipo_id_comprador: e.target.value }))}
+                onChange = {e => setForm(f => ({
+                  ...f,
+                  tipo_id_comprador: e.target.value,
+                  // Limpiar datos si cambia a consumidor final
+                  razon_comprador: e.target.value === '07'
+                    ? 'CONSUMIDOR FINAL' : f.razon_comprador,
+                  id_comprador: e.target.value === '07'
+                    ? '9999999999999' : '',
+                  dir_comprador: e.target.value === '07'
+                    ? '' : f.dir_comprador,
+                }))}
                 style    = {styles.input}
               >
                 <option value="04">RUC</option>
@@ -590,26 +697,79 @@ export default function NuevaFactura() {
                 <option value="07">Consumidor Final</option>
               </select>
             </div>
+
             <div style={styles.campo}>
               <label style={styles.label}>Identificación</label>
               <input
+                type        = "text"
                 value       = {form.id_comprador}
                 onChange    = {e => setForm(f => ({ ...f, id_comprador: e.target.value }))}
-                placeholder = "9999999999999"
+                placeholder = {form.tipo_id_comprador === '07'
+                  ? '9999999999999' : 'Ingrese identificación'}
                 required
-                style       = {styles.input}
+                readOnly    = {form.tipo_id_comprador === '07'}
+                style       = {{
+                  ...styles.input,
+                  background: form.tipo_id_comprador === '07' ? '#F7F9FC' : '#fff',
+                  color:      form.tipo_id_comprador === '07' ? '#94A3B8' : '#0F1923',
+                }}
               />
             </div>
+
             <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-              <label style={styles.label}>Razón Social Comprador</label>
+              <label style={styles.label}>Razón Social / Nombres</label>
               <input
+                type        = "text"
                 value       = {form.razon_comprador}
                 onChange    = {e => setForm(f => ({ ...f, razon_comprador: e.target.value }))}
                 placeholder = "CONSUMIDOR FINAL"
                 required
-                style       = {styles.input}
+                readOnly    = {form.tipo_id_comprador === '07'}
+                style       = {{
+                  ...styles.input,
+                  background: form.tipo_id_comprador === '07' ? '#F7F9FC' : '#fff',
+                  color:      form.tipo_id_comprador === '07' ? '#94A3B8' : '#0F1923',
+                }}
               />
             </div>
+
+            {/* ✅ Dirección — solo si NO es consumidor final */}
+            {form.tipo_id_comprador !== '07' && (
+              <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+                <label style={styles.label}>
+                  Dirección del Comprador
+                  <span style={styles.labelOpcional}> (opcional)</span>
+                </label>
+                <input
+                  type        = "text"
+                  value       = {form.dir_comprador || ''}
+                  onChange    = {e => setForm(f => ({ ...f, dir_comprador: e.target.value }))}
+                  placeholder = "Av. Principal 123, Ciudad"
+                  style       = {styles.input}
+                />
+              </div>
+            )}
+
+            {/* ✅ Fecha de emisión editable */}
+            <div style={styles.campo}>
+              <label style={styles.label}>
+                Fecha de Emisión
+                <span style={styles.requerido}> *</span>
+              </label>
+              <input
+                type     = "date"
+                value    = {form.fecha_emision_input || _hoyInput()}
+                onChange = {e => setForm(f => ({
+                  ...f,
+                  fecha_emision_input: e.target.value
+                }))}
+                max      = {_hoyInput()}   // no permitir fechas futuras
+                required
+                style    = {styles.input}
+              />
+            </div>
+
+
             <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
               <label style={styles.label}>
                 Email del Comprador
@@ -838,4 +998,31 @@ const styles = {
     color:    '#C53030',
     fontSize: '0.85rem',
   },
+
+  avisoYaProcesado: {
+    background:   '#FFFBEB',
+    border:       '1.5px solid #FDE68A',
+    borderRadius: '10px',
+    padding:      '1rem 1.25rem',
+    marginBottom: '1rem',
+    textAlign:    'left',
+  },
+  avisoYaTitulo: {
+    color:        '#92400E',
+    fontWeight:   700,
+    fontSize:     '0.9rem',
+    margin:       '0 0 0.5rem',
+  },
+  avisoYaTexto: {
+    color:      '#78350F',
+    fontSize:   '0.825rem',
+    lineHeight: '1.6',
+    margin:     '0 0 0.5rem',
+  },
+  avisoYaFecha: {
+    color:      '#92400E',
+    fontSize:   '0.75rem',
+    margin:     0,
+    fontWeight: 600,
+  },  
 }

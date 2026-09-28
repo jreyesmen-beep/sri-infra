@@ -206,9 +206,11 @@ def consultar_estado_s3(clave_acceso: str) -> dict:
         )
         for obj in response.get("Contents", []):
             if clave_acceso in obj["Key"]:
-                logger.info(f"Estado encontrado: {obj['Key']}")
+                
                 data = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
-                return json.loads(data["Body"].read().decode("utf-8"))
+                estado = json.loads(data["Body"].read().decode("utf-8"))
+                logger.info(f"Estado encontrado: {estado.get('estado')}")
+                return estado
     except Exception as e:
         logger.error(f"Error buscando estado: {str(e)}")
 
@@ -293,10 +295,24 @@ def manejar_sqs(event, context):
 
     for record in event["Records"]:
         mensaje_id = record["messageId"]
+        datos      = {}
         try:
-            datos = json.loads(record["body"])
+            datos        = json.loads(record["body"])
             clave_acceso = datos.get("clave_acceso", "")
             logger.info(f"Procesando comprobante: {datos.get('clave_acceso', mensaje_id)}")
+
+            # Verificar duplicado
+            estado_existente = _obtener_estado_existente(clave_acceso)
+
+            if estado_existente:
+                logger.warning(
+                    f"Duplicado detectado: {clave_acceso} "
+                    f"ya fue {estado_existente.get('estado')}"
+                )
+                # ✅ Marcar como ya procesado para que el frontend lo sepa
+                if estado_existente.get("estado") == "AUTORIZADO":
+                    _guardar_estado_duplicado(datos, estado_existente)
+                continue
 
             # ✅ Verificar duplicado antes de procesar
             if _verificar_duplicado(clave_acceso):
@@ -720,6 +736,54 @@ def _obtener_config_iva() -> dict:
 
 def _verificar_duplicado(clave_acceso: str) -> bool:
     """
+    Verifica si el comprobante ya fue AUTORIZADO exitosamente.
+    No bloquea reintentos de comprobantes en proceso o con error.
+    """
+    # Solo verificar en estados autorizados
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/estados/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                # Leer el estado para confirmar que es AUTORIZADO
+                data   = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
+                estado = json.loads(data["Body"].read().decode("utf-8"))
+
+                if estado.get("estado") == "AUTORIZADO":
+                    logger.warning(
+                        f"Duplicado real: {clave_acceso} "
+                        f"ya fue autorizado el {estado.get('fecha_procesamiento')}"
+                    )
+                    return True
+                else:
+                    logger.info(
+                        f"Reintento legítimo: {clave_acceso} "
+                        f"estado anterior: {estado.get('estado')}"
+                    )
+                    return False
+    except Exception as e:
+        logger.error(f"Error verificando duplicado: {str(e)}")
+
+# También verificar xml-autorizado por si acaso
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/xml-autorizado/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                logger.warning(
+                    f"Duplicado por XML autorizado: {clave_acceso}"
+                )
+                return True
+    except Exception as e:
+        logger.error(f"Error verificando XML autorizado: {str(e)}")
+
+    return False
+
+    """
     Verifica si el comprobante ya fue procesado.
     Retorna True si ya existe (es duplicado).
     """
@@ -744,3 +808,67 @@ def _verificar_duplicado(clave_acceso: str) -> bool:
         except Exception as e:
             logger.error(f"Error verificando duplicado: {str(e)}")
     return False
+
+def _obtener_estado_existente(clave_acceso: str) -> dict:
+    """
+    Retorna el estado existente si el comprobante ya fue autorizado.
+    Retorna None si no existe o si puede reintentarse.
+    """
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/estados/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                data   = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
+                estado = json.loads(data["Body"].read().decode("utf-8"))
+                if estado.get("estado") == "AUTORIZADO":
+                    return estado
+    except Exception as e:
+        logger.error(f"Error verificando estado: {str(e)}")
+
+    try:
+        response = s3.list_objects_v2(
+            Bucket = BUCKET,
+            Prefix = f"{AMBIENTE}/xml-autorizado/"
+        )
+        for obj in response.get("Contents", []):
+            if clave_acceso in obj["Key"]:
+                return {"estado": "AUTORIZADO"}
+    except Exception as e:
+        logger.error(f"Error verificando XML autorizado: {str(e)}")
+
+    return None
+
+def _guardar_estado_duplicado(datos: dict, estado_original: dict):
+    """
+    Guarda un estado especial YA_AUTORIZADO para informar al frontend
+    que el comprobante ya existía y no se procesó de nuevo.
+    """
+    clave = datos.get("clave_acceso", "")
+    fecha = datetime.now().strftime("%Y/%m/%d")
+    key   = f"{AMBIENTE}/estados/{fecha}/{clave}.json"
+
+    estado = {
+        "clave_acceso":         clave,
+        "estado":               "YA_AUTORIZADO",
+        "numero_autorizacion":  estado_original.get("numero_autorizacion", ""),
+        "fecha_autorizacion":   estado_original.get("fecha_autorizacion", ""),
+        "fecha_procesamiento":  estado_original.get("fecha_procesamiento", ""),
+        "fecha_reintento":      datetime.now().isoformat(),
+        "mensaje":              "Este comprobante ya había sido autorizado anteriormente. "
+                                "No se realizó un nuevo envío al SRI.",
+        "datos_originales":     datos
+    }
+
+    try:
+        s3.put_object(
+            Bucket      = BUCKET,
+            Key         = key,
+            Body        = json.dumps(estado, ensure_ascii=False),
+            ContentType = "application/json"
+        )
+        logger.info(f"Estado YA_AUTORIZADO guardado: {key}")
+    except Exception as e:
+        logger.error(f"Error guardando estado duplicado: {str(e)}")

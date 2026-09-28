@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { getToken } from '../services/auth'
-import { useRIDE }  from '../hooks/useRIDE'   // ← nuevo
+import { useState }              from 'react'
+import { getToken }              from '../services/auth'
+import { useRIDE }               from '../hooks/useRIDE'   // ← nuevo
+import { formatearFechaEcuador } from '../utils/fecha'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -117,7 +118,7 @@ export default function ListaFacturas() {
               <div style={styles.dato}>
                 <span style={styles.datoLabel}>Fecha de autorización</span>
                 <span style={styles.datoValor}>
-                  {factura.fecha_autorizacion}
+                  {formatearFechaEcuador(factura.fecha_autorizacion)}
                 </span>
               </div>
             )}
