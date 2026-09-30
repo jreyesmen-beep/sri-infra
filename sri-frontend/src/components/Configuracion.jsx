@@ -28,6 +28,8 @@ export default function Configuracion() {
   const [subiendoLogo,  setSubiendoLogo]  = useState(false)
   const [mensajeLogo,   setMensajeLogo]   = useState('')
 
+  const [tieneLogoS3, setTieneLogoS3] = useState(false)
+
   // Cargar configuración al montar
   useEffect(() => {
     cargarConfiguracion()
@@ -91,13 +93,20 @@ export default function Configuracion() {
       // Mostrar preview
       setLogoPreview(base64)
 
-      // Guardar en la configuración
-      const configActual = await obtenerConfiguracion() || {}
+      // Obtener config actual
+      let configActual = {}
+      try {
+        configActual = await obtenerConfiguracion() || {}
+      } catch {
+        configActual = {}
+      }
+
+      // ✅ El backend separa el logo del JSON automáticamente
       await guardarConfiguracion({
         ...configActual,
         ...form,
-        logo_base64: base64,
-        logo_nombre: archivo.name,
+        logo_base64: base64,        // backend lo guarda en S3 por separado
+        logo_nombre: archivo.name,  // backend guarda solo el nombre en JSON
       })
 
       setMensajeLogo('✅ Logo guardado correctamente')
@@ -115,8 +124,10 @@ async function cargarConfiguracion() {
     const datos = await obtenerConfiguracion()
     if (datos) {
       setForm(datos)
-      if (datos.logo_base64) {
-        setLogoPreview(datos.logo_base64)
+      // ✅ Si hay referencia al logo, mostrarlo desde S3
+      if (datos.logo_key) {
+        setLogoPreview(`Logo: ${datos.logo_nombre || datos.logo_key}`)
+        setTieneLogoS3(true)   // ← nuevo estado
       }
     }
     setEstado('idle')
@@ -161,6 +172,22 @@ async function cargarConfiguracion() {
               </div>
             ))}
           </div>
+          {/* Campo especial para obligado contabilidad */}
+          <div style={styles.campo}>
+            <label style={styles.label}>
+              Obligado a Llevar Contabilidad
+            </label>
+            <select
+              value    = {form.obligado_contabilidad || 'NO'}
+              onChange = {e => setForm(f => ({
+                ...f, obligado_contabilidad: e.target.value
+              }))}
+              style    = {styles.input}
+            >
+              <option value="NO">NO</option>
+              <option value="SI">SI</option>
+            </select>
+          </div>          
         </section>
 
         {/* Secuencial */}
@@ -206,22 +233,35 @@ async function cargarConfiguracion() {
           <div style={styles.logoUploadBox}>
 
             {/* Preview del logo */}
-            <div style={styles.logoPreviewBox}>
-              {logoPreview ? (
-                <img
-                  src   = {logoPreview}
-                  alt   = "Logo empresa"
-                  style = {styles.logoPreviewImg}
-                />
-              ) : (
-                <div style={styles.logoPlaceholder}>
-                  <span style={{ fontSize: '2rem' }}>🏢</span>
-                  <p style={{ color: '#94A3B8', fontSize: '0.8rem', margin: '0.5rem 0 0' }}>
-                    Sin logo
-                  </p>
-                </div>
-              )}
-            </div>
+          <div style={styles.logoPreviewBox}>
+            {logoPreview && logoPreview.startsWith('data:') ? (
+              // Preview local (recién seleccionado)
+              <img
+                src   = {logoPreview}
+                alt   = "Logo empresa"
+                style = {styles.logoPreviewImg}
+              />
+            ) : tieneLogoS3 ? (
+              // Logo guardado en S3
+              <div style={styles.logoGuardado}>
+                <span style={{ fontSize: '1.5rem' }}>✅</span>
+                <p style={{ color: '#005C3D', fontSize: '0.8rem', margin: '0.25rem 0 0', fontWeight: 600 }}>
+                  Logo guardado
+                </p>
+                <p style={{ color: '#64748B', fontSize: '0.7rem', margin: '0.25rem 0 0' }}>
+                  {form.logo_nombre || 'logo_empresa'}
+                </p>
+              </div>
+            ) : (
+              // Sin logo
+              <div style={styles.logoPlaceholder}>
+                <span style={{ fontSize: '2rem' }}>🏢</span>
+                <p style={{ color: '#94A3B8', fontSize: '0.8rem', margin: '0.5rem 0 0' }}>
+                  Sin logo
+                </p>
+              </div>
+            )}
+          </div>
 
             {/* Botones */}
             <div style={styles.logoAcciones}>
@@ -485,4 +525,9 @@ const styles = {
     cursor:       'pointer',
     fontWeight:   500,
   },
+  logoGuardado: {
+    textAlign:  'center',
+    padding:    '0.5rem',
+  },
+
 }

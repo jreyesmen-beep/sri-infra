@@ -42,9 +42,14 @@ def manejar_api_gateway(event, context):
     CORS = {
         "Access-Control-Allow-Origin":  "*",
         "Access-Control-Allow-Headers": "Content-Type,Authorization",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,OPTIONS",
         "Content-Type":                 "application/json"
     }
+
+    http_method = event.get("httpMethod", "")
+    path        = event.get("path", "")
+
+    logger.info(f"API Gateway: {http_method} {path}")
 
     if http_method == "OPTIONS":
         return {"statusCode": 200, "headers": CORS, "body": ""}
@@ -59,7 +64,7 @@ def manejar_api_gateway(event, context):
 
     # GET /facturas/{claveAcceso}/ride
     if http_method == "GET" and path.endswith("/ride"):
-        clave_acceso = params.get("claveAcceso", "")
+        clave_acceso = (event.get("pathParameters") or {}).get("claveAcceso", "")
         return descargar_ride(clave_acceso, CORS)
 
     # GET /facturas/{claveAcceso}
@@ -68,7 +73,8 @@ def manejar_api_gateway(event, context):
         resultado    = consultar_estado_s3(clave_acceso)
         return {"statusCode": 200, "headers": CORS,
                 "body": json.dumps(resultado, ensure_ascii=False)}
-
+    
+    logger.warning(f"Ruta no encontrada: {http_method} {path}")
     return {
         "statusCode": 404,
         "headers":    CORS,
@@ -103,35 +109,28 @@ def descargar_ride(clave_acceso: str, cors: dict) -> dict:
                 "body": json.dumps({"mensaje": "No se encontraron datos del comprobante"})
             }
 
+        # Siempre regenerar el RIDE con el logo más reciente
+        logo_bytes = _cargar_logo()
+
+        # ✅ Siempre regenerar para incluir el logo más reciente
+        # No usar el PDF cacheado en S3
+        logger.info("Regenerando RIDE con logo actualizado...")
+        pdf_bytes = generar_ride(
+            datos               = datos,
+            numero_autorizacion = estado.get("numero_autorizacion", ""),
+            fecha_autorizacion  = estado.get("fecha_autorizacion", ""),
+            logo_bytes          = logo_bytes
+        )
+
         # Verificar si el PDF ya existe en S3
         key_pdf = f"{AMBIENTE}/rides/{clave_acceso}.pdf"
-        try:
-            response_s3 = s3.get_object(Bucket=BUCKET, Key=key_pdf)
-            pdf_bytes   = response_s3["Body"].read()
-            logger.info(f"RIDE recuperado desde S3: {key_pdf}")
-        except Exception:
-            # Generar si no existe
-            logger.info("Generando RIDE...")
-            logo_base64 = None
-            try:
-                key      = f"{AMBIENTE}/configuracion/emisor.json"
-                response = s3.get_object(Bucket=BUCKET, Key=key)
-                config   = json.loads(response["Body"].read().decode("utf-8"))
-                logo_base64 = config.get("logo_base64")
-            except Exception:
-                logger.info("Generando RIDE...")
-                pdf_bytes = generar_ride(
-                    datos               = datos,
-                    numero_autorizacion = estado.get("numero_autorizacion", ""),
-                    fecha_autorizacion  = estado.get("fecha_autorizacion", ""),
-                    logo_base64         = logo_base64    # ← nuevo
-                )
-                s3.put_object(
-                    Bucket      = BUCKET,
-                    Key         = key_pdf,
-                    Body        = pdf_bytes,
-                    ContentType = "application/pdf"
-                )
+        s3.put_object(
+            Bucket      = BUCKET,
+            Key         = key_pdf,
+            Body        = pdf_bytes,
+            ContentType = "application/pdf"
+        )
+        logger.info(f"RIDE actualizado en S3: {key_pdf}")
 
         # ✅ Devolver JSON con el PDF en base64
         # Más confiable que depender de binary_media_types de API Gateway
@@ -351,18 +350,6 @@ def procesar_comprobante(datos: dict):
     # logger.info(f"PAYLOAD RECIBIDO: {json.dumps(datos, ensure_ascii=False)}")
     clave_acceso = datos["clave_acceso"]
 
-    # ✅ Cargar logo de la configuración
-    logo_base64 = None
-    try:
-        key      = f"{AMBIENTE}/configuracion/emisor.json"
-        response = s3.get_object(Bucket=BUCKET, Key=key)
-        config   = json.loads(response["Body"].read().decode("utf-8"))
-        logo_base64 = config.get("logo_base64")
-        if logo_base64:
-            logger.info("Logo de empresa cargado para el RIDE")
-    except Exception as e:
-        logger.warning(f"No se pudo cargar el logo: {str(e)}")
-
     # ✅ Leer configuración de IVA
     config_iva = _obtener_config_iva()
     logger.info(f"IVA configurado: {config_iva['porcentaje']}% "
@@ -433,13 +420,16 @@ def procesar_comprobante(datos: dict):
     # Guardar estado final
     _guardar_estado_ok(datos, respuesta_autorizacion)
 
+    # Cargar logo
+    logo_bytes = _cargar_logo()
+
     # 4. Generar RIDE
     logger.info("Generando RIDE...")
     pdf_bytes = generar_ride(
         datos               = datos,
         numero_autorizacion = respuesta_autorizacion["numero_autorizacion"],
         fecha_autorizacion  = respuesta_autorizacion["fecha_autorizacion"],
-        logo_base64         = logo_base64    # ← nuevo
+        logo_bytes          = logo_bytes
     )
 
     # Guardar PDF en S3
@@ -574,12 +564,67 @@ def guardar_configuracion(event, cors: dict) -> dict:
     key = f"{AMBIENTE}/configuracion/emisor.json"
     try:
         body = event.get("body", "{}")
-        if isinstance(body, str):
-            datos = json.loads(body)
-        else:
-            datos = body
+        datos = json.loads(body) if isinstance(body, str) else body
 
-        # Validar campos obligatorios
+        # ✅ Extraer logo del payload — se guarda por separado
+        logo_base64 = datos.pop("logo_base64", None)
+        logo_nombre = datos.pop("logo_nombre", None)
+
+       # Si viene logo, guardarlo como archivo independiente en S3
+        if logo_base64:
+            try:
+                # Extraer extensión y bytes
+                if ',' in logo_base64:
+                    header, data_b64 = logo_base64.split(',', 1)
+                    extension        = 'png' if 'png' in header else 'jpg'
+                    content_type     = f"image/{extension}"
+                else:
+                    data_b64     = logo_base64
+                    extension    = 'png'
+                    content_type = 'image/png'
+
+                logo_bytes = base64.b64decode(data_b64)
+                key_logo   = f"{AMBIENTE}/configuracion/logo_empresa.{extension}"
+
+                s3.put_object(
+                    Bucket      = BUCKET,
+                    Key         = key_logo,
+                    Body        = logo_bytes,
+                    ContentType = content_type
+                )
+                logger.info(
+                    f"Logo guardado: s3://{BUCKET}/{key_logo} "
+                    f"({len(logo_bytes)} bytes)"
+                )
+
+                # ✅ Solo guardar referencia en el JSON
+                datos["logo_key"]       = key_logo
+                datos["logo_nombre"]    = logo_nombre or f"logo_empresa.{extension}"
+                datos["logo_extension"] = extension
+
+            except Exception as e:
+                logger.error(f"Error guardando logo: {str(e)}")
+                return {
+                    "statusCode": 500,
+                    "headers":    cors,
+                    "body": json.dumps({"mensaje": f"Error al guardar logo: {str(e)}"})
+                }
+
+        # Si viene indicación de eliminar logo
+        if datos.get("eliminar_logo"):
+            logo_key_actual = datos.pop("logo_key",       None)
+            datos.pop("logo_nombre",    None)
+            datos.pop("logo_extension", None)
+            datos.pop("eliminar_logo",  None)
+
+            if logo_key_actual:
+                try:
+                    s3.delete_object(Bucket=BUCKET, Key=logo_key_actual)
+                    logger.info(f"Logo eliminado: {logo_key_actual}")
+                except Exception as e:
+                    logger.warning(f"No se pudo eliminar logo: {str(e)}")
+
+        # Validar campos requeridos
         campos_requeridos = ["ruc", "razon_social", "dir_matriz",
                              "establecimiento", "punto_emision"]
         faltantes = [c for c in campos_requeridos if not datos.get(c)]
@@ -596,17 +641,21 @@ def guardar_configuracion(event, cors: dict) -> dict:
         s3.put_object(
             Bucket      = BUCKET,
             Key         = key,
-            Body        = json.dumps(datos, ensure_ascii=False),
+            Body        = json.dumps(datos, ensure_ascii=False, indent=2),
             ContentType = "application/json"
         )
-        logger.info(f"Configuración guardada: RUC {datos.get('ruc')}")
+        logger.info(
+            f"Configuración guardada: RUC={datos.get('ruc')} "
+            f"logo_key={datos.get('logo_key', 'sin logo')}"
+        )
 
         return {
             "statusCode": 200,
             "headers":    cors,
             "body": json.dumps({
                 "mensaje": "Configuración guardada correctamente",
-                "ruc":     datos.get("ruc")
+                "ruc":       datos.get("ruc"),
+                "logo_key":  datos.get("logo_key", ""),
             })
         }
 
@@ -679,12 +728,15 @@ def procesar_comprobante(datos: dict):
     if nuevo_secuencial:
         logger.info(f"Próximo secuencial: {nuevo_secuencial}")
 
+    logo_bytes = _cargar_logo()
+
     # Generar y enviar RIDE
     logger.info("Generando RIDE...")
     pdf_bytes = generar_ride(
         datos               = datos,
         numero_autorizacion = respuesta["numero_autorizacion"],
-        fecha_autorizacion  = respuesta["fecha_autorizacion"]
+        fecha_autorizacion  = respuesta["fecha_autorizacion"],
+        logo_bytes          = logo_bytes
     )
 
     key_pdf = f"{AMBIENTE}/rides/{clave_acceso}.pdf"
@@ -872,3 +924,41 @@ def _guardar_estado_duplicado(datos: dict, estado_original: dict):
         logger.info(f"Estado YA_AUTORIZADO guardado: {key}")
     except Exception as e:
         logger.error(f"Error guardando estado duplicado: {str(e)}")
+
+def _cargar_logo() -> bytes:
+    """
+    Carga el logo de la empresa desde S3.
+    Lee la ruta desde emisor.json y descarga el archivo de imagen.
+    Retorna bytes o None si no hay logo.
+    """
+    try:
+        # Leer referencia desde emisor.json
+        key_config = f"{AMBIENTE}/configuracion/emisor.json"
+        response   = s3.get_object(Bucket=BUCKET, Key=key_config)
+        config     = json.loads(response["Body"].read().decode("utf-8"))
+
+        logger.info(f"Config keys: {list(config.keys())}")
+
+        logo_key  = config.get("logo_key")
+        logger.info(f"logo_key en config: '{logo_key}'")
+
+        #logo_nombre = config.get("logo_nombre", "sin nombre")
+
+        if not logo_key:
+            logger.warning("logo_key no encontrado en emisor.json")
+            return None
+
+        # Descargar el archivo de imagen desde S3
+        # logger.info(f"Cargando logo: s3://{BUCKET}/{logo_key} ({logo_nombre})")
+        response_logo = s3.get_object(Bucket=BUCKET, Key=logo_key)
+        logo_bytes    = response_logo["Body"].read()
+
+        logger.info(f"Logo cargado: {len(logo_bytes)} bytes")
+        return logo_bytes
+
+    except s3.exceptions.NoSuchKey:
+        logger.warning("El archivo de logo no existe en S3")
+        return None
+    except Exception as e:
+        logger.warning(f"No se pudo cargar el logo: {str(e)}")
+        return None

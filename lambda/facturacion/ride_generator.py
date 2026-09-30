@@ -67,12 +67,20 @@ def generar_ride(
     datos: dict, 
     numero_autorizacion: str, 
     fecha_autorizacion: str,
-    logo_base64: str = None    # ← nuevo parámetro
+    logo_bytes: bytes = None
+    # logo_base64: str = None    # ← nuevo parámetro
     ) -> bytes:
     """
     Genera el RIDE (PDF) de la factura electrónica
     según el formato requerido por el SRI Ecuador.
     """
+
+    # ✅ Log al inicio
+    if logo_bytes:
+        logger.info(f"generar_ride: logo recibido {len(logo_bytes)} bytes")
+    else:
+        logger.warning("generar_ride: SIN logo")
+
     buffer = io.BytesIO()
 
     doc = SimpleDocTemplate(
@@ -127,33 +135,75 @@ def generar_ride(
     col_izq_items = []
 
     # ✅ Logo si existe
-    if logo_base64:
+    if logo_bytes:
         try:
-            # Decodificar base64 (puede venir con prefijo data:image/png;base64,)
-            if ',' in logo_base64:
-                logo_data = base64.b64decode(logo_base64.split(',')[1])
-            else:
-                logo_data = base64.b64decode(logo_base64)
-
-            logo_buffer = io.BytesIO(logo_data)
-            logo_img    = Image(
-                logo_buffer,
-                width  = 4 * cm,
-                height = 2 * cm
-            )
-            logo_img.hAlign = 'LEFT'
+            logo_buffer      = io.BytesIO(logo_bytes)
+            logo_img         = Image(logo_buffer, width=4*cm, height=2*cm)
+            logo_img.hAlign  = 'LEFT'
             col_izq_items.append([logo_img])
+            logger.info("✅ Logo incluido en cabecera del RIDE")
         except Exception as e:
-            logger.warning(f"No se pudo cargar el logo: {str(e)}")
+            logger.warning(f"No se pudo incluir logo en PDF: {str(e)}")
 
-    # Datos del emisor
-    col_izq_items.extend([
-        [Paragraph(datos.get("razon_social", ""),          estilo_titulo)],
-        [Paragraph(f'RUC: {datos.get("ruc", "")}',         estilo_subtitulo)],
-        [Paragraph(datos.get("dir_matriz", ""),             estilo_normal)],
-        [Paragraph(f'Teléf: {datos.get("telefono", "-")}', estilo_normal)],
-        [Paragraph(datos.get("email", ""),                  estilo_normal)],
-    ])
+    # ✅ Datos del emisor completos
+    razon_social    = datos.get("razon_social",        "")
+    nombre_comercial= datos.get("nombre_comercial",    "")
+    ruc             = datos.get("ruc",                 "")
+    dir_matriz      = datos.get("dir_matriz",          "")
+    dir_estab       = datos.get("dir_establecimiento", "")
+    telefono        = datos.get("telefono",            "")
+    email           = datos.get("email",               "")
+    obligado        = datos.get("obligado_contabilidad", "NO").upper()
+
+    # Razón social y nombre comercial
+    col_izq_items.append(
+        [Paragraph(razon_social, estilo_titulo)]
+    )
+
+    if nombre_comercial and nombre_comercial != razon_social:
+        col_izq_items.append(
+            [Paragraph(nombre_comercial, estilo_subtitulo)]
+        )
+
+    # RUC
+    col_izq_items.append(
+        [Paragraph(f'<b>RUC:</b> {ruc}', estilo_normal)]
+    )
+    # Dirección Matriz
+    if dir_matriz:
+        col_izq_items.append(
+            [Paragraph(
+                f'<b>Dir. Matriz:</b> {dir_matriz}',
+                estilo_normal
+            )]
+        )
+
+    # Dirección Sucursal/Establecimiento
+    if dir_estab and dir_estab != dir_matriz:
+        col_izq_items.append(
+            [Paragraph(
+                f'<b>Dir. Sucursal:</b> {dir_estab}',
+                estilo_normal
+            )]
+        )
+
+    # Teléfono y email
+    if telefono:
+        col_izq_items.append(
+            [Paragraph(f'<b>Teléf:</b> {telefono}', estilo_normal)]
+        )
+    if email:
+        col_izq_items.append(
+            [Paragraph(f'<b>Email:</b> {email}', estilo_normal)]
+        )
+
+    # Obligado a llevar contabilidad
+    col_izq_items.append(
+        [Paragraph(
+            f'<b>Obligado a llevar contabilidad:</b> {obligado}',
+            estilo_normal
+        )]
+    )
 
     col_izquierda = Table(col_izq_items, colWidths=[10 * cm])
     col_izquierda.setStyle(TableStyle([

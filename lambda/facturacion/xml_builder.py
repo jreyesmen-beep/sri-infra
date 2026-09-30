@@ -30,10 +30,22 @@ def construir_factura(datos: dict) -> str:
     # -- infoFactura --
     info_factura = etree.SubElement(root, "infoFactura")
     _texto(info_factura, "fechaEmision",          datos["fecha_emision"])   # dd/MM/yyyy
-    _texto(info_factura, "dirEstablecimiento",    datos["dir_establecimiento"])
+    _texto(info_factura, "dirEstablecimiento",    datos.get("dir_establecimiento", datos["dir_matriz"]))
+
+    # ✅ Obligado a llevar contabilidad
+    obligado = datos.get("obligado_contabilidad", "NO").upper()
+    _texto(info_factura, "obligadoContabilidad",  obligado)
+
+
     _texto(info_factura, "tipoIdentificacionComprador", datos["tipo_id_comprador"])
     _texto(info_factura, "razonSocialComprador",  datos["razon_comprador"])
     _texto(info_factura, "identificacionComprador", datos["id_comprador"])
+
+    # Dirección del comprador si existe
+    dir_comprador = datos.get("dir_comprador", "")
+    if dir_comprador:
+        _texto(info_factura, "direccionComprador", dir_comprador)
+
     _texto(info_factura, "totalSinImpuestos",     f'{datos["total_sin_impuestos"]:.2f}')
     _texto(info_factura, "totalDescuento",        f'{datos["total_descuento"]:.2f}')
 
