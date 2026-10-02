@@ -343,8 +343,8 @@ resource "aws_api_gateway_integration_response" "options_facturas" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
-    # "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    #"method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
   depends_on = [aws_api_gateway_integration.options_facturas]
@@ -397,6 +397,72 @@ resource "aws_api_gateway_integration_response" "options_factura_detalle" {
   depends_on = [aws_api_gateway_integration.options_factura_detalle]
 }
 
+# =================================================
+# RECURSO: /GET /facturas?numero=001-002-000000095
+# =================================================
+# /GET /facturas?numero=001-002-000000095
+
+# GET /facturas?numero=001-002-000000095
+/* resource "aws_api_gateway_method" "get_facturas" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.facturas.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
+
+  request_parameters = {
+    "method.request.querystring.numero" = false
+  }
+} */
+
+
+/* resource "aws_api_gateway_integration" "get_facturas" {
+  rest_api_id             = aws_api_gateway_rest_api.sri.id
+  resource_id             = aws_api_gateway_resource.facturas.id
+  http_method             = aws_api_gateway_method.get_facturas.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.api_proxy.invoke_arn
+} */
+
+# GET /facturas?numero=XXX — buscar por número
+resource "aws_api_gateway_method" "get_facturas_busqueda" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.facturas.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
+
+  request_parameters = {
+    "method.request.querystring.numero" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "get_facturas_busqueda" {
+  rest_api_id             = aws_api_gateway_rest_api.sri.id
+  resource_id             = aws_api_gateway_resource.facturas.id
+  http_method             = aws_api_gateway_method.get_facturas_busqueda.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.api_proxy.invoke_arn
+}
+
+
+resource "aws_lambda_permission" "apigateway_proxy_get_facturas_busqueda" {
+  statement_id  = "AllowAPIGatewayGetFacturas"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api_proxy.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.sri.execution_arn}/*/*"
+}
+
+# resource "aws_lambda_permission" "apigateway_proxy_get_facturas" {
+#   statement_id  = "AllowAPIGatewayGetFacturas"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.api_proxy.function_name
+#   principal     = "apigateway.amazonaws.com"
+#   source_arn    = "${aws_api_gateway_rest_api.sri.execution_arn}/*/*"
+# }
 
 # =================================================
 # Deployment y Stage
@@ -726,3 +792,4 @@ resource "aws_api_gateway_integration_response" "options_configuracion" {
   }
   depends_on = [aws_api_gateway_integration.options_configuracion]
 }
+

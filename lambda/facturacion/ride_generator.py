@@ -36,20 +36,21 @@ class CodigoBarras(Flowable):
     Flowable personalizado para código de barras Code128.
     Compatible con ReportLab sin necesidad de Drawing.
     """
-    def __init__(self, valor, ancho=15*cm, alto=1.5*cm, mostrar_texto=False):
+    def __init__(self, valor, ancho=8*cm, alto=1.5*cm, mostrar_texto=False):
         Flowable.__init__(self)
-        self.valor        = valor
-        self.ancho        = ancho
-        self.alto         = alto
+        self.valor         = valor
+        self.ancho         = ancho
+        self.alto          = alto
         self.mostrar_texto = mostrar_texto
-        self.width        = ancho
-        self.height       = alto
+        self.width         = ancho
+        self.height        = alto
 
     def draw(self):
-        # ✅ Calcular barWidth para que el código quepa exactamente en el ancho
-        # Code128 genera aproximadamente 11 barras por caracter
-        num_chars  = len(self.valor)
-        bar_width  = max(0.3, (self.ancho * 0.72) / (num_chars * 11))
+        # Calcular barWidth para llenar el ancho disponible
+        num_chars = len(self.valor)
+        # Code128: ~11.5 módulos por carácter + overhead fijo de ~20 módulos
+        total_modulos = (num_chars * 11.5) + 20
+        bar_width     = max(0.3, (self.ancho * 0.95) / total_modulos)
 
         barcode = code128.Code128(
             self.valor,
@@ -57,9 +58,8 @@ class CodigoBarras(Flowable):
             barHeight     = self.alto,
             humanReadable = self.mostrar_texto
         )
-        # Centrar el código dentro del espacio disponible
-        barcode_width = barcode.width
-        offset_x      = max(0, (self.ancho - barcode_width) / 2)
+        # Centrar horizontalmente
+        offset_x = max(0, (self.ancho - barcode.width) / 2)
         barcode.drawOn(self.canv, offset_x, 0)
 
 
@@ -108,7 +108,11 @@ def generar_ride(
     )
     estilo_normal = ParagraphStyle(
         "normal_sri", parent=styles["Normal"],
-        fontSize=8, textColor=NEGRO, fontName="Helvetica"
+        fontSize   = 8,
+        textColor  = NEGRO,
+        fontName   = "Helvetica",   # ← debe ser Helvetica para que <b> funcione
+        leading    = 11,            # ← espaciado entre líneas
+        spaceAfter = 1,
     )
     estilo_label = ParagraphStyle(
         "label", parent=styles["Normal"],
@@ -205,7 +209,7 @@ def generar_ride(
         )]
     )
 
-    col_izquierda = Table(col_izq_items, colWidths=[10 * cm])
+    col_izquierda = Table(col_izq_items, colWidths=[9 * cm])
     col_izquierda.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("TOPPADDING",    (0, 0), (-1, -1), 3),
@@ -232,13 +236,21 @@ def generar_ride(
             estilo_label
         )],
         [Paragraph('EMISIÓN: NORMAL', estilo_label)],
+        [Spacer(1, 0.2*cm)],                              # ← espacio antes
+
+        # ✅ Leyenda + clave de acceso + código de barras
+        [Paragraph("CLAVE DE ACCESO", estilo_label)],
+        [Spacer(1, 0.1*cm)],                              # ← espacio entre texto y barras
         [codigo],
+        [Paragraph(datos.get("clave_acceso", ""), estilo_mono)],
+        #[_generar_codigo(datos.get("clave_acceso", ""))],
+
     ]
 
-    col_derecha = Table(col_derecha_items, colWidths=[7*cm])
+    col_derecha = Table(col_derecha_items, colWidths=[8*cm])
 
     cabecera_data  = [[col_izquierda, col_derecha]]
-    cabecera_tabla = Table(cabecera_data, colWidths=[10*cm, 7*cm])
+    cabecera_tabla = Table(cabecera_data, colWidths=[9*cm, 8*cm])
     cabecera_tabla.setStyle(TableStyle([
         ("VALIGN",      (0, 0), (-1, -1), "TOP"),
         ("LINEAFTER",   (0, 0), (0, -1),  0.5, colors.grey),
@@ -253,10 +265,12 @@ def generar_ride(
     # -----------------------------------------------
     # 2. CLAVE DE ACCESO + CÓDIGO DE BARRAS COMPLETO
     # -----------------------------------------------
+    """     
     story.append(_seccion_clave_acceso(
         datos.get("clave_acceso", ""), estilo_label, estilo_mono
     ))
-    story.append(Spacer(1, 0.3 * cm))
+    story.append(Spacer(1, 0.3 * cm)) 
+    """
 
     # -----------------------------------------------
     # 3. DATOS DEL COMPRADOR
@@ -412,8 +426,8 @@ def _generar_barras_cabecera(numero_autorizacion: str) -> CodigoBarras:
     """
     return CodigoBarras(
         valor         = numero_autorizacion,
-        ancho         = 5 * cm,    # ← reducido de 6 a 5
-        alto          = 0.8 * cm,  # ← reducido de 1.0 a 0.8
+        ancho         = 7.2 * cm,    # ← reducido de 6 a 5
+        alto          = 1.2 * cm,  # ← reducido de 1.0 a 0.8
         mostrar_texto = False
     )
 

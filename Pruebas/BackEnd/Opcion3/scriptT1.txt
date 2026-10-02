@@ -1,3 +1,9 @@
 aws logs tail /aws/lambda/facturacion-sri-certificacion \
   --follow \
   --format short
+
+
+aws logs tail /aws/lambda/facturacion-sri-certificacion \
+  --follow \
+  --format short \
+  --since 30m | grep -iE "error|config|exception|traceback"

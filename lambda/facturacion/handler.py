@@ -35,10 +35,6 @@ def manejar_api_gateway(event, context):
     SIEMPRE debe retornar el formato completo con statusCode, headers y body.
     """    
 
-    http_method = event.get("httpMethod", "")
-    path        = event.get("path", "")
-    params      = event.get("pathParameters") or {}
-
     CORS = {
         "Access-Control-Allow-Origin":  "*",
         "Access-Control-Allow-Headers": "Content-Type,Authorization",
@@ -48,6 +44,8 @@ def manejar_api_gateway(event, context):
 
     http_method = event.get("httpMethod", "")
     path        = event.get("path", "")
+    params      = event.get("pathParameters") or {}
+    query       = event.get("queryStringParameters") or {}
 
     logger.info(f"API Gateway: {http_method} {path}")
 
@@ -66,6 +64,22 @@ def manejar_api_gateway(event, context):
     if http_method == "GET" and path.endswith("/ride"):
         clave_acceso = (event.get("pathParameters") or {}).get("claveAcceso", "")
         return descargar_ride(clave_acceso, CORS)
+
+    # ✅ GET /facturas?numero=001-002-000000095
+    if http_method == "GET" and path.endswith("/facturas"):
+        numero = query.get("numero", "")
+        if numero:
+            resultado = consultar_por_numero(numero)
+            return {
+                "statusCode": 200,
+                "headers":    CORS,
+                "body":       json.dumps(resultado, ensure_ascii=False)
+            }
+        return {
+            "statusCode": 400,
+            "headers":    CORS,
+            "body":       json.dumps({"mensaje": "Parámetro 'numero' requerido"})
+        }
 
     # GET /facturas/{claveAcceso}
     if http_method == "GET" and "claveAcceso" in params:
@@ -962,3 +976,57 @@ def _cargar_logo() -> bytes:
     except Exception as e:
         logger.warning(f"No se pudo cargar el logo: {str(e)}")
         return None
+
+def consultar_por_numero(numero_comprobante: str) -> dict:
+    """
+    Busca un comprobante por número (001-002-000000095).
+    Retorna el estado encontrado o NO_ENCONTRADO.
+    """
+    logger.info(f"Buscando por número: {numero_comprobante}")
+
+    # Normalizar el número de comprobante
+    # Acepta: 001-002-000000095 o 001002000000095
+    numero_limpio = numero_comprobante.replace("-", "").strip()
+
+    for prefijo in ["estados", "errores"]:
+        try:
+            response = s3.list_objects_v2(
+                Bucket = BUCKET,
+                Prefix = f"{AMBIENTE}/{prefijo}/"
+            )
+            for obj in response.get("Contents", []):
+                if not obj["Key"].endswith(".json"):
+                    continue
+                try:
+                    data   = s3.get_object(Bucket=BUCKET, Key=obj["Key"])
+                    estado = json.loads(data["Body"].read().decode("utf-8"))
+
+                    # Buscar en datos originales
+                    datos_orig  = estado.get("datos_originales", {})
+                    estab       = datos_orig.get("establecimiento", "")
+                    pto_emi     = datos_orig.get("punto_emision",   "")
+                    secuencial  = datos_orig.get("secuencial",      "").zfill(9)
+                    num_factura = f"{estab}{pto_emi}{secuencial}"
+
+                    if numero_limpio in num_factura or \
+                       numero_limpio == num_factura:
+                        logger.info(
+                            f"Comprobante encontrado: "
+                            f"{estab}-{pto_emi}-{secuencial}"
+                        )
+                        # Agregar número formateado a la respuesta
+                        estado["numero_comprobante"] = \
+                            f"{estab}-{pto_emi}-{secuencial}"
+                        return estado
+
+                except Exception as e:
+                    logger.warning(f"Error leyendo {obj['Key']}: {str(e)}")
+                    continue
+
+        except Exception as e:
+            logger.error(f"Error buscando en {prefijo}: {str(e)}")
+
+    return {
+        "estado":  "NO_ENCONTRADO",
+        "mensaje": f"No se encontró ningún comprobante con el número {numero_comprobante}"
+    }
