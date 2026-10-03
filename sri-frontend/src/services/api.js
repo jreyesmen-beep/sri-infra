@@ -39,6 +39,10 @@ export const guardarConfiguracion = (datos) => request('PUT', '/configuracion', 
 // Verificar si una clave de acceso ya existe
 export const verificarDuplicado = (claveAcceso) => request('GET', `/facturas/${claveAcceso}`)
 
-// ✅ Consultar por número de comprobante (nuevo)
+/* // ✅ Consultar por número de comprobante (nuevo)
 export const consultarPorNumero = (numero) =>
-  request('GET', `/facturas?numero=${encodeURIComponent(numero)}`)
+  request('GET', `/facturas?numero=${encodeURIComponent(numero)}`) */
+
+// Cambiar de GET a POST
+export const consultarPorNumero = (numero) =>
+  request('POST', '/facturas/busqueda', { numero })

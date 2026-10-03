@@ -26,6 +26,9 @@ def lambda_handler(event, context):
 
     logger.info(f"Request: {http_method} {path}")
 
+    ############################# 
+    # Configuracion
+    #############################
     # OPTIONS — preflight CORS
     if http_method == "OPTIONS":
         return {"statusCode": 200, "headers": CORS_HEADERS, "body": ""}
@@ -33,14 +36,6 @@ def lambda_handler(event, context):
     # POST /facturas — encolar comprobante
     if http_method == "POST" and path.endswith("/facturas"):
         return encolar_comprobante(event)
-
-    # GET /configuracion — leer datos del emisor
-    if http_method == "GET" and path.endswith("/configuracion"):
-        return invocar_lambda_fact(event, context)
-
-    # PUT /configuracion — guardar datos del emisor
-    if http_method == "PUT" and path.endswith("/configuracion"):
-        return invocar_lambda_fact(event, context)
 
     # GET /facturas/{claveAcceso}/ride — descargar PDF
     if http_method == "GET" and path.endswith("/ride"):
@@ -50,9 +45,25 @@ def lambda_handler(event, context):
     if http_method == "GET" and "/facturas/" in path:
         return invocar_lambda_fact(event, context)
 
-    # # GET /facturas/{claveAcceso} — consultar estado
-    # if http_method == "GET" and not path.endswith("/ride"):
-    #     return invocar_lambda_fact(event, context)
+    # ✅ GET /facturas?numero=001-002-000000095
+    if http_method == "GET" and path.endswith("/facturas"):
+        return invocar_lambda_fact(event, context)
+
+    # POST /facturas/busqueda
+    if http_method == "POST" and path.endswith("/busqueda"):
+        return invocar_lambda_fact(event, context)
+
+    ############################# 
+    # Configuracion
+    #############################
+    # GET /configuracion — leer datos del emisor
+    if http_method == "GET" and path.endswith("/configuracion"):
+        return invocar_lambda_fact(event, context)
+
+    # PUT /configuracion — guardar datos del emisor
+    if http_method == "PUT" and path.endswith("/configuracion"):
+        return invocar_lambda_fact(event, context)
+
     logger.warning(f"Ruta no encontrada: {http_method} {path}")
     return {
         "statusCode": 404,

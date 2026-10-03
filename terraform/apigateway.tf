@@ -343,8 +343,8 @@ resource "aws_api_gateway_integration_response" "options_facturas" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    #"method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
+    #"method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
   depends_on = [aws_api_gateway_integration.options_facturas]
@@ -391,7 +391,7 @@ resource "aws_api_gateway_integration_response" "options_factura_detalle" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
   }
 
   depends_on = [aws_api_gateway_integration.options_factura_detalle]
@@ -464,97 +464,6 @@ resource "aws_lambda_permission" "apigateway_proxy_get_facturas_busqueda" {
 #   source_arn    = "${aws_api_gateway_rest_api.sri.execution_arn}/*/*"
 # }
 
-# =================================================
-# Deployment y Stage
-# =================================================
-resource "aws_api_gateway_deployment" "sri" {
-  rest_api_id = aws_api_gateway_rest_api.sri.id
-
-  # Fuerza nuevo deployment si cambia cualquier recurso
-  triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.facturas,
-      aws_api_gateway_resource.factura_detalle,
-      aws_api_gateway_method.post_factura,
-      aws_api_gateway_method.get_factura,
-      aws_api_gateway_integration.post_factura_sqs,
-      aws_api_gateway_integration.get_factura_lambda,
-    ]))
-  }
-
-  depends_on = [
-    aws_api_gateway_integration.post_factura_sqs,
-    aws_api_gateway_integration.get_factura_lambda,
-    aws_api_gateway_integration_response.post_factura_200,
-    aws_api_gateway_integration_response.post_factura_400,
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_api_gateway_stage" "sri" {
-  rest_api_id   = aws_api_gateway_rest_api.sri.id
-  deployment_id = aws_api_gateway_deployment.sri.id
-  stage_name    = var.ambiente
-
-  # Logs en CloudWatch
-  # access_log_destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
-
-    format = jsonencode({
-      requestId               = "$context.requestId"
-      ip                      = "$context.identity.sourceIp"
-      caller                  = "$context.identity.caller"
-      user                    = "$context.identity.user"
-      requestTime             = "$context.requestTime"
-      httpMethod              = "$context.httpMethod"
-      resourcePath            = "$context.resourcePath"
-      status                  = "$context.status"
-      protocol                = "$context.protocol"
-      responseLength          = "$context.responseLength"
-      integrationErrorMessage = "$context.integrationErrorMessage"
-    })
-
-  }
-
-  xray_tracing_enabled = true
-
-  # Asegura que el rol de cuenta esté listo antes del stage
-  depends_on = [aws_api_gateway_account.sri]
-
-  tags = {
-    Proyecto = "facturacion-electronica"
-    Ambiente = var.ambiente
-  }
-}
-
-resource "aws_cloudwatch_log_group" "apigw_logs" {
-  name              = "/aws/apigateway/facturacion-sri-${var.ambiente}"
-  retention_in_days = 30
-  kms_key_id        = aws_kms_key.sri_secrets.arn
-
-  tags = {
-    Proyecto = "facturacion-electronica"
-    Ambiente = var.ambiente
-  }
-}
-
-# Throttling por stage
-resource "aws_api_gateway_method_settings" "sri" {
-  rest_api_id = aws_api_gateway_rest_api.sri.id
-  stage_name  = aws_api_gateway_stage.sri.stage_name
-  method_path = "*/*"
-
-  settings {
-    metrics_enabled        = true
-    logging_level          = "INFO"
-    throttling_burst_limit = 50   # máx requests simultáneos
-    throttling_rate_limit  = 100  # requests por segundo
-  }
-}
 
 # -------------------------------------------------
 # Rol IAM para que API Gateway escriba en CloudWatch
@@ -608,7 +517,7 @@ resource "aws_api_gateway_gateway_response" "cors_4xx" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
     "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,OPTIONS'"
   }
 }
 
@@ -620,7 +529,7 @@ resource "aws_api_gateway_gateway_response" "cors_5xx" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
     "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,OPTIONS'"
   }
 }
 
@@ -632,7 +541,7 @@ resource "aws_api_gateway_gateway_response" "cors_missing_auth" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
     "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,OPTIONS'"
   }
 }
 
@@ -699,9 +608,75 @@ resource "aws_api_gateway_integration_response" "options_ride" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
   }
   depends_on = [aws_api_gateway_integration.options_ride]
+}
+
+# /facturas/busqueda
+resource "aws_api_gateway_resource" "facturas_busqueda" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  parent_id   = aws_api_gateway_resource.facturas.id
+  path_part   = "busqueda"
+}
+
+resource "aws_api_gateway_method" "post_busqueda" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.facturas_busqueda.id
+  http_method   = "POST"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
+}
+
+resource "aws_api_gateway_integration" "post_busqueda" {
+  rest_api_id             = aws_api_gateway_rest_api.sri.id
+  resource_id             = aws_api_gateway_resource.facturas_busqueda.id
+  http_method             = aws_api_gateway_method.post_busqueda.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.api_proxy.invoke_arn
+}
+
+resource "aws_api_gateway_method" "options_busqueda" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  resource_id   = aws_api_gateway_resource.facturas_busqueda.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "options_busqueda" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.facturas_busqueda.id
+  http_method = aws_api_gateway_method.options_busqueda.http_method
+  type        = "MOCK"
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "options_busqueda_200" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.facturas_busqueda.id
+  http_method = aws_api_gateway_method.options_busqueda.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_busqueda" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  resource_id = aws_api_gateway_resource.facturas_busqueda.id
+  http_method = aws_api_gateway_method.options_busqueda.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
+  }
+  depends_on = [aws_api_gateway_integration.options_busqueda]
 }
 
 # =================================================
@@ -788,8 +763,116 @@ resource "aws_api_gateway_integration_response" "options_configuracion" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'https://d1ei3p7iqxo5z.cloudfront.net'"
+    #"method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
   depends_on = [aws_api_gateway_integration.options_configuracion]
 }
 
+# =================================================
+# Deployment y Stage
+# =================================================
+resource "aws_api_gateway_deployment" "sri" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+
+  # Fuerza nuevo deployment si cambia cualquier recurso
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.facturas,
+      aws_api_gateway_resource.factura_detalle,
+      aws_api_gateway_resource.factura_ride,
+      aws_api_gateway_resource.facturas_busqueda,
+      aws_api_gateway_resource.configuracion,
+      aws_api_gateway_method.post_factura,
+      aws_api_gateway_method.get_factura,
+      aws_api_gateway_method.get_ride,
+      aws_api_gateway_method.get_facturas_busqueda, #
+      aws_api_gateway_method.post_busqueda,
+      aws_api_gateway_method.get_configuracion,
+      aws_api_gateway_method.put_configuracion,
+      aws_api_gateway_integration.post_factura_sqs,
+      aws_api_gateway_integration.get_factura_lambda,
+      aws_api_gateway_integration.get_facturas_busqueda,
+      aws_api_gateway_integration.get_ride_lambda,
+      aws_api_gateway_integration.post_busqueda,
+      aws_api_gateway_integration.get_configuracion,      
+      aws_api_gateway_integration.put_configuracion,
+    ]))
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.post_factura_sqs,
+    aws_api_gateway_integration.get_factura_lambda,
+    aws_api_gateway_integration.get_facturas_busqueda,
+    aws_api_gateway_integration.get_ride_lambda,
+    aws_api_gateway_integration.post_busqueda,    
+    aws_api_gateway_integration_response.post_factura_200,
+    aws_api_gateway_integration_response.post_factura_400,
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "sri" {
+  rest_api_id   = aws_api_gateway_rest_api.sri.id
+  deployment_id = aws_api_gateway_deployment.sri.id
+  stage_name    = var.ambiente
+
+  # Logs en CloudWatch
+  # access_log_destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.apigw_logs.arn
+
+    format = jsonencode({
+      requestId               = "$context.requestId"
+      ip                      = "$context.identity.sourceIp"
+      caller                  = "$context.identity.caller"
+      user                    = "$context.identity.user"
+      requestTime             = "$context.requestTime"
+      httpMethod              = "$context.httpMethod"
+      resourcePath            = "$context.resourcePath"
+      status                  = "$context.status"
+      protocol                = "$context.protocol"
+      responseLength          = "$context.responseLength"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+    })
+
+  }
+
+  xray_tracing_enabled = true
+
+  # Asegura que el rol de cuenta esté listo antes del stage
+  depends_on = [aws_api_gateway_account.sri]
+
+  tags = {
+    Proyecto = "facturacion-electronica"
+    Ambiente = var.ambiente
+  }
+}
+
+resource "aws_cloudwatch_log_group" "apigw_logs" {
+  name              = "/aws/apigateway/facturacion-sri-${var.ambiente}"
+  retention_in_days = 30
+  kms_key_id        = aws_kms_key.sri_secrets.arn
+
+  tags = {
+    Proyecto = "facturacion-electronica"
+    Ambiente = var.ambiente
+  }
+}
+
+# Throttling por stage
+resource "aws_api_gateway_method_settings" "sri" {
+  rest_api_id = aws_api_gateway_rest_api.sri.id
+  stage_name  = aws_api_gateway_stage.sri.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled        = true
+    logging_level          = "INFO"
+    throttling_burst_limit = 50   # máx requests simultáneos
+    throttling_rate_limit  = 100  # requests por segundo
+  }
+}

@@ -87,7 +87,24 @@ def manejar_api_gateway(event, context):
         resultado    = consultar_estado_s3(clave_acceso)
         return {"statusCode": 200, "headers": CORS,
                 "body": json.dumps(resultado, ensure_ascii=False)}
-    
+
+    # POST /facturas/busqueda
+    if http_method == "POST" and path.endswith("/busqueda"):
+        body   = json.loads(event.get("body", "{}"))
+        numero = body.get("numero", "")
+        if not numero:
+            return {
+                "statusCode": 400,
+                "headers":    CORS,
+                "body":       json.dumps({"mensaje": "Campo 'numero' requerido"})
+            }
+        resultado = consultar_por_numero(numero)
+        return {
+            "statusCode": 200,
+            "headers":    CORS,
+            "body":       json.dumps(resultado, ensure_ascii=False)
+        }
+   
     logger.warning(f"Ruta no encontrada: {http_method} {path}")
     return {
         "statusCode": 404,
